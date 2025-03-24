@@ -4,19 +4,21 @@
  */
 package Controllers;
 
+import com.mycompany.proyectoprogramacionii.App;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+
 /**
  * FXML Controller class
  *
- * @author eduar
+ * @author Keylo
  */
 public class LoginWindowController implements Initializable {
 
@@ -29,9 +31,6 @@ public class LoginWindowController implements Initializable {
     private Button btnLogin;
     @FXML
     private Button btnCreateAccount;
-    /**
-     * Initializes the controller class.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
@@ -42,7 +41,8 @@ public class LoginWindowController implements Initializable {
     }
 
     @FXML
-    private void CreateAccount(ActionEvent event) {
+    private void CreateAccount(ActionEvent event) throws IOException {
+        App.setRoot("SignUpWindow");
     }
 
 }

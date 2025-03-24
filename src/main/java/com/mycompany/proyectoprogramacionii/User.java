@@ -4,22 +4,22 @@
  */
 package com.mycompany.proyectoprogramacionii;
 
-/**
- *
- * @author David
- */
-
-
-/**
-
-JavaFX App*/
-public abstract class User {
+public class User {
     protected String userName;
     protected String name;
     protected String lastName;
     protected String identification;
     protected String password;
     protected String userRol;
+
+    public User(String userName, String name, String lastName, String identification, String password, String userRol) {
+        this.userName = userName;
+        this.name = name;
+        this.lastName = lastName;
+        this.identification = identification;
+        this.password = password;
+        this.userRol = userRol;
+    }
 
     public String getUserName() {
         return userName;
