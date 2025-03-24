@@ -1,0 +1,56 @@
+.textFieldTitle{
+    -fx-background-color: transparent;   
+    -fx-border-color: transparent;    
+    -fx-font-family: "Gloucester MT Extra Condensed";
+    -fx-text-fill: White;
+    -fx-border-width: 0px;          
+    -fx-border-radius: 0px;         
+    -fx-font-size: 30px;              
+    -fx-padding: 0px;  
+}
+.textFieldGlobal {
+    -fx-background-color: transparent;   
+    -fx-border-color: transparent;    
+    -fx-font-family: "Gloucester MT Extra Condensed";
+    -fx-text-fill: White;
+    -fx-border-width: 0px;          
+    -fx-border-radius: 0px;         
+    -fx-font-size: 20px;             
+    -fx-padding: 0px;  
+}
+
+.buttonNormal {
+    -fx-background-color : white;
+    -fx-border-color : white; 
+    -fx-text-fill: black;
+    -fx-font-size: 15px;
+    -fx-font-family: "Gloucester MT Extra Condensed"; 
+}
+
+.buttonNormal:hover {
+    -fx-background-color: white; 
+    -fx-text-fill : blue;  
+}
+
+.buttonSignIn {
+    -fx-background-color : white;
+    -fx-border-color : white;
+    -fx-text-fill:  #83B4FF; 
+    -fx-font-size: 20px;
+    -fx-font-family: "Gloucester MT Extra Condensed";
+}
+.buttonSignIn:hover{
+    -fx-background-color: white;  
+    -fx-text-fill : greenyellow;   
+}
+.buttonSignUp {
+    -fx-background-color : transparent;
+    -fx-border-color : transparent;
+    -fx-text-fill: White;
+    -fx-font-size: 20px;
+    -fx-font-family: "Gloucester MT Extra Condensed";
+}
+.buttonSignUp:hover {
+    -fx-background-color: transparent;  
+    -fx-text-fill : red;  
+}
