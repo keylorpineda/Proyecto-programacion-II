@@ -4,7 +4,7 @@
  */
 package Controllers;
 
-import com.mycompany.proyectoprogramacionii.User;
+import Models.User;
 import com.mycompany.proyectoprogramacionii.Utilities;
 import java.net.URL;
 import java.util.ResourceBundle;
