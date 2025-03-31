@@ -13,11 +13,15 @@ import java.util.ResourceBundle;
 import com.mycompany.proyectoprogramacionii.Utilities;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.Parent;
+import javafx.stage.Stage;
 
 /**
  * FXML Controller class
@@ -46,11 +50,24 @@ public class LoginWindowController implements Initializable {
     private void LoginAccount(ActionEvent event) {
         String username = txtUserNameLogin.getText();
         String password = txtUserPassword.getText();
-        if (userManager.authenticateUser(username,password)) {
+        if (userManager.authenticateUser(username, password)) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/UserViewWindow.fxml"));
+                Parent root = loader.load();
+                UserViewWindowController controller = loader.getController();
+                controller.setUserName(username);
+                Stage stage = new Stage();
+                stage.setTitle("Panel de Usuario");
+                stage.setScene(new Scene(root));
+                stage.show();
 
-        }
-        else {
-            utilities.showAlert(Alert.AlertType.ERROR, "Error al iniciar sesion", "Datos de ingreso incorrectos");
+                ((Stage) btnLogin.getScene().getWindow()).close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                utilities.showAlert(Alert.AlertType.ERROR, "Error", "No se pudo cargar la vista de usuario.");
+            }
+        } else {
+            utilities.showAlert(Alert.AlertType.ERROR, "Error al iniciar sesión", "Datos de ingreso incorrectos");
         }
     }
 

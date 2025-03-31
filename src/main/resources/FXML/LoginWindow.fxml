@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="493.0" prefWidth="615.0" style="-fx-background-color: D4C9BE;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="493.0" prefWidth="615.0" style="-fx-background-color: D4C9BE;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.LoginWindowController">
    <children>
       <VBox alignment="TOP_CENTER" prefHeight="453.0" prefWidth="465.0" spacing="20.0" style="-fx-background-color: #123458;" VBox.vgrow="ALWAYS">
          <children>
@@ -19,7 +19,7 @@
                   <Image url="@../images/userImage.png" />
                </image>
             </ImageView>
-            <Label alignment="CENTER" prefHeight="38.0" prefWidth="206.0" styleClass="textFieldTitle" stylesheets="@../styles.css" text=" Iniciar sesion" textAlignment="CENTER" VBox.vgrow="ALWAYS">
+            <Label alignment="CENTER" prefHeight="38.0" prefWidth="206.0" styleClass="textFieldTitle" stylesheets="@../css/styles.css" text=" Iniciar sesion" textAlignment="CENTER" VBox.vgrow="ALWAYS">
                <VBox.margin>
                   <Insets top="-20.0" />
                </VBox.margin>
@@ -53,7 +53,7 @@
                         <Insets right="20.0" />
                      </HBox.margin>
                   </PasswordField>
-                  <Button fx:id="btnLogin" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#LoginAccount" prefHeight="42.0" prefWidth="91.0" styleClass="buttonSignIn" stylesheets="@../styles.css" text="Ingresar" HBox.hgrow="ALWAYS">
+                  <Button fx:id="btnLogin" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#LoginAccount" prefHeight="42.0" prefWidth="91.0" styleClass="buttonSignIn" stylesheets="@../css/styles.css" text="Ingresar" HBox.hgrow="ALWAYS">
                      <HBox.margin>
                         <Insets left="50.0" right="20.0" />
                      </HBox.margin>
@@ -65,7 +65,7 @@
                   <Insets left="25.0" right="25.0" />
                </VBox.margin>
             </HBox>
-            <Button fx:id="btnCreateAccount" mnemonicParsing="false" onAction="#CreateAccount" prefHeight="57.0" prefWidth="278.0" styleClass="buttonSignUp" stylesheets="@../styles.css" text="No tienes una cuenta? Cree una aqui" VBox.vgrow="ALWAYS">
+            <Button fx:id="btnCreateAccount" mnemonicParsing="false" onAction="#CreateAccount" prefHeight="57.0" prefWidth="278.0" styleClass="buttonSignUp" stylesheets="@../css/styles.css" text="No tienes una cuenta? Cree una aqui" VBox.vgrow="ALWAYS">
                <VBox.margin>
                   <Insets top="-20.0" />
                </VBox.margin>

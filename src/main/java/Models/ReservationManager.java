@@ -5,10 +5,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReservationManager {
-    private List<Reservation> reservations;
+    private static ReservationManager instance;
+    public List<Reservation> reservations;
 
-    public boolean createReservation(Reservation reservation){
-        if(isSpaceAvailable(String.valueOf(reservation.space.spaceId), reservation.startDate, reservation.endDate)){
+    public ReservationManager() {
+        reservations = new ArrayList<>();
+    }
+
+    public static ReservationManager getInstance() {
+        if (instance == null) {
+            instance = new ReservationManager();
+        }
+        return instance;
+    }
+
+    public boolean createReservation(Reservation reservation) {
+        if (isSpaceAvailable(String.valueOf(reservation.space.spaceId), reservation.startTime, reservation.endTime)) {
             reservations.add(reservation);
             reservation.space.reserve();
             return true;
@@ -16,9 +28,9 @@ public class ReservationManager {
         return false;
     }
 
-    public boolean cancelReservation(String reservationId){
-        for(Reservation reservation : reservations){
-            if(reservation.reservationId.equals(reservationId)){
+    public boolean cancelReservation(String reservationId) {
+        for (Reservation reservation : reservations) {
+            if (reservation.reservationId.equals(reservationId)) {
                 reservation.space.unReserve();
                 reservations.remove(reservation);
                 return true;
@@ -27,22 +39,20 @@ public class ReservationManager {
         return false;
     }
 
-    public List<Reservation> getReservationsByUser(String username){
+    public List<Reservation> getReservationsByUser(String username) {
         List<Reservation> userReservations = new ArrayList<>();
-
         for (Reservation reservation : reservations) {
             if (reservation.user.userName.equals(username)) {
                 userReservations.add(reservation);
             }
         }
-
         return userReservations;
     }
 
-    public boolean isSpaceAvailable(String spaceId, LocalDateTime start, LocalDateTime end){
-        for(Reservation reservation : reservations){
-            if(reservation.space.getSpaceId().equals(spaceId)){
-                if(!(reservation.endDate.isBefore(start) || reservation.startDate.isAfter(end))){
+    public boolean isSpaceAvailable(String spaceId, LocalDateTime start, LocalDateTime end) {
+        for (Reservation reservation : reservations) {
+            if (reservation.space.getSpaceId().equals(spaceId)) {
+                if (!(reservation.endTime.isBefore(start) || reservation.startTime.isAfter(end))) {
                     return false;
                 }
             }
@@ -50,3 +60,4 @@ public class ReservationManager {
         return true;
     }
 }
+

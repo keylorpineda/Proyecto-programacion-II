@@ -5,7 +5,11 @@
 package Controllers;
 
 import Models.User;
+import Models.UserManager;
+import com.mycompany.proyectoprogramacionii.App;
 import com.mycompany.proyectoprogramacionii.Utilities;
+
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -13,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -23,63 +28,53 @@ import javafx.scene.control.ToggleGroup;
  * @author Keylo
  */
 public class SignUpWindowController implements Initializable {
-    @FXML
+   @FXML
     private TextField txtName;
     @FXML
     private TextField txtLastName;
     @FXML
-    private TextField txtId;
+    private TextField txtUserId;
     @FXML
     private TextField txtUserName;
     @FXML
-    private TextField txtPassword;
+    private PasswordField txtUserPassword;
     @FXML
     private Button btnCreateAccount;
-    @FXML
-    private ToggleGroup roles;
 
     private Utilities utilities;
 
+    private UserManager userManager;
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         utilities = new Utilities();
-        roles = new ToggleGroup();
+        userManager=UserManager.getInstance();
     }
 
     @FXML
-    private void clickOnCreate(ActionEvent event) {
-        rdbCustomer.setToggleGroup(roles);
-        rdbAdministrator.setToggleGroup(roles);
+    private void clickOnCreate(ActionEvent event) throws IOException {
         String name = txtName.getText().trim(); 
         String lastName = txtLastName.getText().trim();
-        String id = txtId.getText().trim();
+        String id = txtUserId.getText().trim();
         String userName = txtUserName.getText().trim();
-        String password = txtPassword.getText().trim();
-        String role = "";
-
+        String password = txtUserPassword.getText().trim();
+        String role = "Usuario";
         if (name.isEmpty() || lastName.isEmpty() || id.isEmpty() || userName.isEmpty() || password.isEmpty()) {
             utilities.showAlert(AlertType.ERROR, "Campos incompletos", "Por favor, complete todos los campos.");
-         return;
-        }
-        if (rdbCustomer.isSelected()) {
-            role = "CUSTOMER";
-        } else if (rdbAdministrator.isSelected()) {
-            role = "ADMINISTRATOR";
-        } else {
-            utilities.showAlert(
-                    , "Rol no seleccionado", "Por favor, seleccione un rol.");
             return;
         }
+
 
         if (password.length() < 6) {
             utilities.showAlert(AlertType.ERROR, "Contraseña debil", "La contraseña debe tener al menos 6 caracteres.");
             return;
         }
-        User newUser = new User(name, lastName, id, userName, password, role);
+        User newUser = new User(name, lastName, id, userName, password,role);
+        userManager.addUser(newUser);
         utilities.showAlert(AlertType.INFORMATION, "Usuario creado", "Usuario creado exitosamente.");
+        App.setRoot("LoginWindow");
     }
 
 }

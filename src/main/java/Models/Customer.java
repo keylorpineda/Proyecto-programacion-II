@@ -12,7 +12,7 @@ public class Customer extends User {
     }
 
     public boolean makeReservation(String reservationId, Space space, LocalDateTime start, LocalDateTime end) {
-        if (reservationManager.isSpaceAvailable(space.spaceId, start, end)) {
+        if (reservationManager.isSpaceAvailable(String.valueOf(space.spaceId), start, end)) {
             Reservation reservation = new Reservation(this, reservationId, space, start, end);
             return reservationManager.createReservation(reservation);
         }

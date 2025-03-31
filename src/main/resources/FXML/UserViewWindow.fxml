@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="422.0" prefWidth="670.0" style="-fx-background-color: #007074;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.UserViewWindowController">
+   <children>
+      <HBox alignment="TOP_RIGHT" prefHeight="79.0" prefWidth="670.0" spacing="20.0" style="-fx-background-color: #034C53;">
+         <children>
+            <Label prefHeight="38.0" prefWidth="117.0" styleClass="textFieldTitle" stylesheets="@../css/stylesUserWindow.css" text="BIENVENIDO">
+               <HBox.margin>
+                  <Insets top="22.0" />
+               </HBox.margin>
+            </Label>
+            <Label fx:id="lblUserName" prefHeight="38.0" prefWidth="126.0" styleClass="textFieldUserName" stylesheets="@../css/stylesUserWindow.css">
+               <HBox.margin>
+                  <Insets right="20.0" top="20.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </HBox>
+      <Button mnemonicParsing="false" prefHeight="42.0" prefWidth="196.0" styleClass="makeReservationButton" stylesheets="@../css/stylesUserWindow.css" text="Hacer una reservacion" VBox.vgrow="ALWAYS">
+         <VBox.margin>
+            <Insets right="450.0" top="25.0" />
+         </VBox.margin>
+      </Button>
+      <ToggleButton fx:id="tgbShowReservation" mnemonicParsing="false" onAction="#showReservationTable" prefHeight="42.0" prefWidth="158.0" styleClass="toggleButton" stylesheets="@../css/stylesUserWindow.css" text="Mostrar Reservaciones" VBox.vgrow="ALWAYS">
+         <VBox.margin>
+            <Insets left="200.0" />
+         </VBox.margin>
+      </ToggleButton>
+      <TableView fx:id="tbvReservationTable" prefHeight="200.0" prefWidth="433.0" visible="false" VBox.vgrow="ALWAYS">
+        <columns>
+          <TableColumn fx:id="idColumn" prefWidth="75.0" text="ID" />
+          <TableColumn fx:id="placeColumn" prefWidth="75.0" text="Lugar" />
+            <TableColumn fx:id="spaceColumn" prefWidth="75.0" text="Espacio" />
+            <TableColumn fx:id="dateColumn" prefWidth="75.0" text="Fecha" />
+            <TableColumn fx:id="startColumn" prefWidth="75.0" text="Inicio" />
+            <TableColumn fx:id="endColumn" prefWidth="75.0" text="Final" />
+        </columns>
+         <VBox.margin>
+            <Insets bottom="15.0" left="200.0" right="15.0" top="25.0" />
+         </VBox.margin>
+      </TableView>
+   </children>
+</VBox>

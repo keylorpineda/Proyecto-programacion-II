@@ -10,8 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #D4C9BE;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #D4C9BE;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.SignUpWindowController">
    <children>
       <VBox alignment="TOP_CENTER" prefHeight="362.0" prefWidth="499.0" style="-fx-background-color: #123458;">
          <children>
@@ -23,7 +22,7 @@
                   <Insets right="415.0" top="10.0" />
                </VBox.margin>
             </ImageView>
-            <Label alignment="CENTER" prefHeight="20.0" prefWidth="121.0" styleClass="textFieldTitle" stylesheets="@../styles.css" text="Crear Cuenta" textAlignment="CENTER" VBox.vgrow="ALWAYS">
+            <Label alignment="CENTER" prefHeight="20.0" prefWidth="121.0" styleClass="textFieldTitle" stylesheets="@../css/styles.css" text="Crear Cuenta" textAlignment="CENTER" VBox.vgrow="ALWAYS">
                <VBox.margin>
                   <Insets top="-55.0" />
                </VBox.margin>
@@ -32,11 +31,11 @@
                <children>
                   <VBox prefHeight="170.0" prefWidth="70.0" spacing="10.0">
                      <children>
-                        <Label styleClass="textFieldGlobal" stylesheets="@../styles.css" text="Nombre" />
-                        <Label styleClass="textFieldGlobal" stylesheets="@../styles.css" text="Apellido" />
-                        <Label styleClass="textFieldGlobal" stylesheets="@../styles.css" text="Cedula" />
-                        <Label styleClass="textFieldGlobal" stylesheets="@../styles.css" text="Usuario" />
-                        <Label styleClass="textFieldGlobal" stylesheets="@../styles.css" text="Contraseña" />
+                        <Label styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Nombre" />
+                        <Label styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Apellido" />
+                        <Label styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Cedula" />
+                        <Label styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Usuario" />
+                        <Label styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Contraseña" />
                      </children>
                      <HBox.margin>
                         <Insets left="15.0" />
@@ -70,7 +69,7 @@
                   <Insets top="12.0" />
                </padding>
                <children>
-                  <Button fx:id="btnCreateAccount" mnemonicParsing="false" onAction="#clickOnCreate" prefHeight="42.0" prefWidth="102.0" styleClass="buttonSignIn" stylesheets="@../styles.css" text="Crear Cuenta">
+                  <Button fx:id="btnCreateAccount" mnemonicParsing="false" onAction="#clickOnCreate" prefHeight="42.0" prefWidth="123.0" styleClass="buttonSignIn" stylesheets="@../css/styles.css" text="Crear Cuenta">
                      <HBox.margin>
                         <Insets left="200.0" top="10.0" />
                      </HBox.margin>
