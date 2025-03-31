@@ -61,4 +61,9 @@ public class User {
         this.password = password;
     }
 
+    public void setUserRol(String userRol) {this.userRol = userRol;}
+
+    public void updatePassword(String newPassword){
+        password = newPassword;
+    }
 }

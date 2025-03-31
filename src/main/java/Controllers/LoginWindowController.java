@@ -4,13 +4,17 @@
  */
 package Controllers;
 
+import Models.UserManager;
 import com.mycompany.proyectoprogramacionii.App;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import com.mycompany.proyectoprogramacionii.Utilities;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -22,22 +26,32 @@ import javafx.scene.control.TextField;
  */
 public class LoginWindowController implements Initializable {
 
-
+    Utilities utilities;
+    private UserManager userManager;
     @FXML
-    private TextField txtuserNameLogin;
+    private TextField txtUserNameLogin;
     @FXML
-    private PasswordField txtuserPassword;
+    private PasswordField txtUserPassword;
     @FXML
     private Button btnLogin;
     @FXML
     private Button btnCreateAccount;
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        utilities = new Utilities();
+        userManager = UserManager.getInstance();
     }    
     
     @FXML
     private void LoginAccount(ActionEvent event) {
+        String username = txtUserNameLogin.getText();
+        String password = txtUserPassword.getText();
+        if (userManager.authenticateUser(username,password)) {
+
+        }
+        else {
+            utilities.showAlert(Alert.AlertType.ERROR, "Error al iniciar sesion", "Datos de ingreso incorrectos");
+        }
     }
 
     @FXML

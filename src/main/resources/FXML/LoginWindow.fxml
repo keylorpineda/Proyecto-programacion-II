@@ -7,13 +7,12 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #FDFFE2;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.LoginWindowController"> 
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="493.0" prefWidth="615.0" style="-fx-background-color: D4C9BE;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox alignment="TOP_CENTER" layoutX="131.0" layoutY="28.0" prefHeight="343.0" prefWidth="338.0" spacing="20.0" style="-fx-background-color: #83B4FF;" AnchorPane.bottomAnchor="29.0" AnchorPane.leftAnchor="131.0" AnchorPane.rightAnchor="131.0" AnchorPane.topAnchor="28.0">
+      <VBox alignment="TOP_CENTER" prefHeight="453.0" prefWidth="465.0" spacing="20.0" style="-fx-background-color: #123458;" VBox.vgrow="ALWAYS">
          <children>
             <ImageView fitHeight="109.0" fitWidth="109.0" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS">
                <image>
@@ -25,14 +24,14 @@
                   <Insets top="-20.0" />
                </VBox.margin>
             </Label>
-            <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+            <HBox prefHeight="69.0" prefWidth="465.0" VBox.vgrow="ALWAYS">
                <children>
                   <ImageView fitHeight="42.0" fitWidth="43.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
                      <image>
                         <Image url="@../images/idUserImage.png" />
                      </image>
                   </ImageView>
-                  <TextField fx:id="txtuserNameLogin" prefHeight="58.0" prefWidth="273.0" promptText="Usuario" HBox.hgrow="ALWAYS">
+                  <TextField fx:id="txtUserNameLogin" prefHeight="46.0" prefWidth="402.0" promptText="Usuario" HBox.hgrow="ALWAYS">
                      <opaqueInsets>
                         <Insets />
                      </opaqueInsets>
@@ -49,10 +48,11 @@
                         <Image url="@../images/passwordImage.png" />
                      </image>
                   </ImageView>
-                  <PasswordField fx:id="txtuserPassword" prefHeight="42.0" prefWidth="134.0" promptText="Contraseña" HBox.hgrow="ALWAYS">
+                  <PasswordField fx:id="txtUserPassword" prefHeight="42.0" prefWidth="134.0" promptText="Contraseña" HBox.hgrow="ALWAYS">
                      <HBox.margin>
                         <Insets right="20.0" />
-                     </HBox.margin></PasswordField>
+                     </HBox.margin>
+                  </PasswordField>
                   <Button fx:id="btnLogin" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#LoginAccount" prefHeight="42.0" prefWidth="91.0" styleClass="buttonSignIn" stylesheets="@../styles.css" text="Ingresar" HBox.hgrow="ALWAYS">
                      <HBox.margin>
                         <Insets left="50.0" right="20.0" />
@@ -71,6 +71,9 @@
                </VBox.margin>
             </Button>
          </children>
+         <VBox.margin>
+            <Insets bottom="50.0" left="75.0" right="75.0" top="25.0" />
+         </VBox.margin>
       </VBox>
    </children>
-</AnchorPane>
+</VBox>

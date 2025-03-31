@@ -35,13 +35,13 @@
 .buttonSignIn {
     -fx-background-color : white;
     -fx-border-color : white;
-    -fx-text-fill:  #83B4FF; 
+    -fx-text-fill:  #123458;
     -fx-font-size: 20px;
     -fx-font-family: "Gloucester MT Extra Condensed";
 }
 .buttonSignIn:hover{
     -fx-background-color: white;  
-    -fx-text-fill : greenyellow;   
+    -fx-text-fill : #83B4FF;
 }
 .buttonSignUp {
     -fx-background-color : transparent;

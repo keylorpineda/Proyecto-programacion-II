@@ -30,4 +30,7 @@ public class Room {
         return null;
     }
 
+    public List<Space> getAvailableSpaces(){
+        return spaceList;
+    }
 }

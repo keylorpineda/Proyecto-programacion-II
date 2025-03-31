@@ -34,10 +34,6 @@ public class SignUpWindowController implements Initializable {
     @FXML
     private TextField txtPassword;
     @FXML
-    private RadioButton rdbCustomer;
-    @FXML
-    private RadioButton rdbAdministrator;
-    @FXML
     private Button btnCreateAccount;
     @FXML
     private ToggleGroup roles;
@@ -73,7 +69,8 @@ public class SignUpWindowController implements Initializable {
         } else if (rdbAdministrator.isSelected()) {
             role = "ADMINISTRATOR";
         } else {
-            utilities.showAlert(AlertType.ERROR, "Rol no seleccionado", "Por favor, seleccione un rol.");
+            utilities.showAlert(
+                    , "Rol no seleccionado", "Por favor, seleccione un rol.");
             return;
         }
 
