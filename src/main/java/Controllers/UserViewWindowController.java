@@ -14,14 +14,14 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import Models.Reservation;
 import Models.ReservationManager;
+import com.mycompany.proyectoprogramacionii.App;
+import java.io.IOException;
 
 public class UserViewWindowController {
 
     @FXML
     private Label lblUserName;
 
-    @FXML
-    private Button makeReservationButton;
 
     @FXML
     private ToggleButton tgbShowReservation;
@@ -50,8 +50,9 @@ public class UserViewWindowController {
     private ReservationManager reservationManager;
 
     private ObservableList<Reservation> reservationList;
-
     @FXML
+    private Button btnMakeReservation;
+
     public void initialize() {
         reservationManager = ReservationManager.getInstance();
         idColumn.setCellValueFactory(new PropertyValueFactory<>("reservationId"));
@@ -81,9 +82,8 @@ public class UserViewWindowController {
         }
     }
 
-    @FXML
-    private void handleMakeReservation(ActionEvent event) {
-        //System.out.println("Hacer una reserva");
+    private void handleMakeReservation(ActionEvent event) throws IOException {
+        
     }
 
     private void loadUserReservations() {
@@ -92,5 +92,10 @@ public class UserViewWindowController {
         reservationList.clear();
         reservationList.addAll(reservationManager.getReservationsByUser(username));
         tbvReservationTable.refresh();
+    }
+
+    @FXML
+    private void changeMakeReservationWindow(ActionEvent event) throws IOException {
+        App.setRoot("MakeReservationWindow");
     }
 }

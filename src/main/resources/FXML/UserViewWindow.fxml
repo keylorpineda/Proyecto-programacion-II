@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="422.0" prefWidth="670.0" style="-fx-background-color: #007074;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.UserViewWindowController">
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #007074;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.UserViewWindowController">
    <children>
       <HBox alignment="TOP_RIGHT" prefHeight="79.0" prefWidth="670.0" spacing="20.0" style="-fx-background-color: #034C53;">
          <children>
@@ -20,7 +20,7 @@
             </Label>
             <Label fx:id="lblUserName" prefHeight="38.0" prefWidth="126.0" styleClass="textFieldUserName" stylesheets="@../css/stylesUserWindow.css">
                <HBox.margin>
-                  <Insets right="20.0" top="20.0" />
+                  <Insets right="30.0" top="20.0" />
                </HBox.margin>
             </Label>
          </children>
@@ -28,9 +28,9 @@
             <Insets />
          </VBox.margin>
       </HBox>
-      <Button mnemonicParsing="false" prefHeight="42.0" prefWidth="196.0" styleClass="makeReservationButton" stylesheets="@../css/stylesUserWindow.css" text="Hacer una reservacion" VBox.vgrow="ALWAYS">
+      <Button fx:id="btnMakeReservation" mnemonicParsing="false" onAction="#changeMakeReservationWindow" prefHeight="42.0" prefWidth="196.0" styleClass="makeReservationButton" stylesheets="@../css/stylesUserWindow.css" text="Hacer una reservacion" VBox.vgrow="ALWAYS">
          <VBox.margin>
-            <Insets right="450.0" top="25.0" />
+            <Insets right="600.0" top="25.0" />
          </VBox.margin>
       </Button>
       <ToggleButton fx:id="tgbShowReservation" mnemonicParsing="false" onAction="#showReservationTable" prefHeight="42.0" prefWidth="158.0" styleClass="toggleButton" stylesheets="@../css/stylesUserWindow.css" text="Mostrar Reservaciones" VBox.vgrow="ALWAYS">
@@ -40,12 +40,12 @@
       </ToggleButton>
       <TableView fx:id="tbvReservationTable" prefHeight="200.0" prefWidth="433.0" visible="false" VBox.vgrow="ALWAYS">
         <columns>
-          <TableColumn fx:id="idColumn" prefWidth="75.0" text="ID" />
-          <TableColumn fx:id="placeColumn" prefWidth="75.0" text="Lugar" />
-            <TableColumn fx:id="spaceColumn" prefWidth="75.0" text="Espacio" />
-            <TableColumn fx:id="dateColumn" prefWidth="75.0" text="Fecha" />
-            <TableColumn fx:id="startColumn" prefWidth="75.0" text="Inicio" />
-            <TableColumn fx:id="endColumn" prefWidth="75.0" text="Final" />
+          <TableColumn fx:id="idColumn" prefWidth="72.800048828125" text="ID" />
+          <TableColumn fx:id="placeColumn" prefWidth="122.39996337890625" text="Lugar" />
+            <TableColumn fx:id="spaceColumn" prefWidth="92.0" text="Espacio" />
+            <TableColumn fx:id="dateColumn" prefWidth="98.4000244140625" text="Fecha" />
+            <TableColumn fx:id="startColumn" prefWidth="88.0" text="Inicio" />
+            <TableColumn fx:id="endColumn" prefWidth="112.79998779296875" text="Final" />
         </columns>
          <VBox.margin>
             <Insets bottom="15.0" left="200.0" right="15.0" top="25.0" />

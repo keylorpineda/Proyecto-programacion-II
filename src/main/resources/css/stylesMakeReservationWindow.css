@@ -1,0 +1,10 @@
+.textFieldTitle{
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-font-family: "Gloucester MT Extra Condensed";
+    -fx-text-fill: White;
+    -fx-border-width: 0px;
+    -fx-border-radius: 0px;
+    -fx-font-size: 35px;
+    -fx-padding: 0px;
+}

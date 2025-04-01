@@ -10,9 +10,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #D4C9BE;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.SignUpWindowController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #D4C9BE;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.SignUpWindowController">
    <children>
-      <VBox alignment="TOP_CENTER" prefHeight="362.0" prefWidth="499.0" style="-fx-background-color: #123458;">
+      <VBox alignment="TOP_CENTER" prefHeight="506.0" prefWidth="699.0" style="-fx-background-color: #123458;">
          <children>
             <ImageView fitHeight="79.0" fitWidth="109.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS">
                <image>
@@ -27,21 +27,21 @@
                   <Insets top="-55.0" />
                </VBox.margin>
             </Label>
-            <HBox prefHeight="100.0" prefWidth="200.0" spacing="40.0">
+            <HBox prefHeight="258.0" prefWidth="699.0" spacing="40.0">
                <children>
-                  <VBox prefHeight="170.0" prefWidth="70.0" spacing="10.0">
+                  <VBox prefHeight="203.0" prefWidth="71.0" spacing="15.0">
                      <children>
                         <Label styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Nombre" />
-                        <Label styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Apellido" />
-                        <Label styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Cedula" />
-                        <Label styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Usuario" />
-                        <Label styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Contraseña" />
+                        <Label prefHeight="31.0" prefWidth="58.0" styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Apellido" />
+                        <Label prefHeight="20.0" prefWidth="41.0" styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Cedula" />
+                        <Label prefHeight="27.0" prefWidth="64.0" styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Usuario" />
+                        <Label prefHeight="30.0" prefWidth="67.0" styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Contraseña" />
                      </children>
                      <HBox.margin>
-                        <Insets left="15.0" />
+                        <Insets left="15.0" top="5.0" />
                      </HBox.margin>
                   </VBox>
-                  <VBox prefHeight="170.0" prefWidth="178.0" spacing="10.0">
+                  <VBox prefHeight="204.0" prefWidth="178.0" spacing="17.0">
                      <children>
                         <TextField fx:id="txtName" promptText="Nombre" />
                         <TextField fx:id="txtLastName" promptText="Apellido" />
@@ -50,7 +50,7 @@
                         <PasswordField fx:id="txtUserPassword" promptText="Contraseña:" />
                      </children>
                      <HBox.margin>
-                        <Insets left="50.0" />
+                        <Insets bottom="15.0" left="50.0" top="5.0" />
                      </HBox.margin>
                   </VBox>
                </children>
@@ -71,7 +71,7 @@
                <children>
                   <Button fx:id="btnCreateAccount" mnemonicParsing="false" onAction="#clickOnCreate" prefHeight="42.0" prefWidth="123.0" styleClass="buttonSignIn" stylesheets="@../css/styles.css" text="Crear Cuenta">
                      <HBox.margin>
-                        <Insets left="200.0" top="10.0" />
+                        <Insets left="300.0" top="10.0" />
                      </HBox.margin>
                   </Button>
                </children>

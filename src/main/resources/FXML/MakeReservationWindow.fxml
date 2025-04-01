@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" spacing="5.0" style="-fx-background-color: #D4C9BE;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.MakeReservationWindowController">
+   <children>
+      <!-- Encabezado -->
+      <HBox alignment="CENTER_LEFT" prefHeight="114.0" prefWidth="800.0" spacing="230.0" style="-fx-background-color: #123458;" VBox.vgrow="ALWAYS">
+         <children>
+            <Button fx:id="btnBack" mnemonicParsing="false" onAction="#backUserView" text="Volver">
+               <HBox.margin>
+                  <Insets left="30.0" />
+               </HBox.margin>
+            </Button>
+            <Label prefHeight="74.0" prefWidth="190.0" styleClass="textFieldTitle" stylesheets="@../css/stylesMakeReservationWindow.css" text="Hacer Reservacion" />
+         </children>
+      </HBox>
+      <!-- Selector de fecha -->
+      <DatePicker fx:id="dpDateOption" prefHeight="26.0" prefWidth="199.0" promptText="Seleccione una fecha" VBox.vgrow="ALWAYS">
+         <VBox.margin>
+            <Insets bottom="25.0" left="25.0" top="25.0" />
+         </VBox.margin>
+      </DatePicker>
+      <!-- Selección de hora -->
+      <HBox prefHeight="32.0" prefWidth="800.0" spacing="15.0">
+         <children>
+            <ComboBox fx:id="cbStartTime" prefWidth="150.0" promptText="Hora Inicio">
+               <HBox.margin>
+                  <Insets left="25.0" />
+               </HBox.margin>
+            </ComboBox>
+            <ComboBox fx:id="cbEndTime" prefWidth="150.0" promptText="Hora Final" />
+         </children>
+      </HBox>
+      <!-- TabPane para seleccionar el piso -->
+      <TabPane fx:id="tpTabChooseSpace" prefHeight="370.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <!-- Piso 1 -->
+          <Tab fx:id="tabFloor1" text="Piso 1">
+            <content>
+              <AnchorPane fx:id="apFloor1" prefHeight="370.0" prefWidth="800.0" />
+            </content>
+          </Tab>
+          <!-- Piso 2 -->
+          <Tab fx:id="tabFloor2" text="Piso 2">
+            <content>
+              <AnchorPane fx:id="apFloor2" prefHeight="370.0" prefWidth="800.0" />
+            </content>
+          </Tab>
+          <!-- Piso 3 -->
+          <Tab fx:id="tabFloor3" text="Piso 3">
+            <content>
+              <AnchorPane fx:id="apFloor3" prefHeight="370.0" prefWidth="800.0" />
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</VBox>

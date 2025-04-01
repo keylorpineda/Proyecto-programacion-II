@@ -33,4 +33,53 @@ public class Room {
     public List<Space> getAvailableSpaces(){
         return spaceList;
     }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
+    public int getRoomCapacity() {
+        return roomCapacity;
+    }
+
+    public void setRoomCapacity(int roomCapacity) {
+        this.roomCapacity = roomCapacity;
+    }
+
+    public boolean isIsReserved() {
+        return isReserved;
+    }
+
+    public void setIsReserved(boolean isReserved) {
+        this.isReserved = isReserved;
+    }
+
+    public String getIdRoom() {
+        return idRoom;
+    }
+
+    public void setIdRoom(String idRoom) {
+        this.idRoom = idRoom;
+    }
+
+    public String getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(String roomType) {
+        this.roomType = roomType;
+    }
+
+    public List<Space> getSpaceList() {
+        return spaceList;
+    }
+
+    public void setSpaceList(List<Space> spaceList) {
+        this.spaceList = spaceList;
+    }
+    
 }
