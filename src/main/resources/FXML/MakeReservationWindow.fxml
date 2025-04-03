@@ -16,7 +16,7 @@
       <!-- Encabezado -->
       <HBox alignment="CENTER_LEFT" prefHeight="114.0" prefWidth="800.0" spacing="230.0" style="-fx-background-color: #123458;" VBox.vgrow="ALWAYS">
          <children>
-            <Button fx:id="btnBack" mnemonicParsing="false" onAction="#backUserView" text="Volver">
+            <Button fx:id="btnBack" mnemonicParsing="false" onAction="#backUserView" styleClass="backButton" stylesheets="@../css/stylesUserWindow.css" text="Volver">
                <HBox.margin>
                   <Insets left="30.0" />
                </HBox.margin>
