@@ -51,7 +51,7 @@ public class UserViewWindowController {
 
     private ObservableList<Reservation> reservationList;
     @FXML
-    private Button btnMakeReservation;
+    private Button btnHacerReservacion;
 
     public void initialize() {
         reservationManager = ReservationManager.getInstance();
@@ -68,6 +68,10 @@ public class UserViewWindowController {
 
     public void setUserName(String userName) {
         lblUserName.setText(userName);
+    }
+    @FXML
+    private void clickChangeToReservation(ActionEvent event) throws IOException {
+        App.setRoot("MakeReservationWindow");
     }
     @FXML
     private void showReservationTable(ActionEvent event) {
@@ -90,8 +94,5 @@ public class UserViewWindowController {
         tbvReservationTable.refresh();
     }
 
-    @FXML
-    private void clickChange(ActionEvent event) throws IOException {
-        App.setRoot("MakeReservationWindow");
-    }
+   
 }
