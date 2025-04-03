@@ -8,3 +8,15 @@
     -fx-font-size: 35px;
     -fx-padding: 0px;
 }
+.backButton{
+    -fx-background-color : transparent;
+    -fx-border-color : transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 25px;
+    -fx-font-family: "Gloucester MT Extra Condensed";
+}
+
+.backButton:hover{
+    -fx-background-color: white; 
+    -fx-text-fill : red;
+}

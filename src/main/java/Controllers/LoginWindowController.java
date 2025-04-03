@@ -47,21 +47,12 @@ public class LoginWindowController implements Initializable {
     }    
     
     @FXML
-    private void LoginAccount(ActionEvent event) {
+    private void LoginAccount(ActionEvent event) { 
         String username = txtUserNameLogin.getText();
         String password = txtUserPassword.getText();
         if (userManager.authenticateUser(username, password)) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/UserViewWindow.fxml"));
-                Parent root = loader.load();
-                UserViewWindowController controller = loader.getController();
-                controller.setUserName(username);
-                Stage stage = new Stage();
-                stage.setTitle("Panel de Usuario");
-                stage.setScene(new Scene(root));
-                stage.show();
-
-                ((Stage) btnLogin.getScene().getWindow()).close();
+                App.setRoot("UserViewWindow"); 
             } catch (IOException e) {
                 e.printStackTrace();
                 utilities.showAlert(Alert.AlertType.ERROR, "Error", "No se pudo cargar la vista de usuario.");

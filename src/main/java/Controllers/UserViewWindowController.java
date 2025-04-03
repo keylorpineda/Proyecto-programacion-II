@@ -21,8 +21,6 @@ public class UserViewWindowController {
 
     @FXML
     private Label lblUserName;
-
-
     @FXML
     private ToggleButton tgbShowReservation;
 
@@ -70,7 +68,7 @@ public class UserViewWindowController {
         lblUserName.setText(userName);
     }
     @FXML
-    private void clickChangeToReservation(ActionEvent event) throws IOException {
+    private void clickChange(ActionEvent event) throws IOException {
         App.setRoot("MakeReservationWindow");
     }
     @FXML

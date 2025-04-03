@@ -10,9 +10,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #D4C9BE;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.SignUpWindowController">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #D4C9BE;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.SignUpWindowController">
    <children>
-      <VBox alignment="TOP_CENTER" prefHeight="506.0" prefWidth="699.0" style="-fx-background-color: #123458;">
+      <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="518.0" prefWidth="699.0" style="-fx-background-color: #123458;" VBox.vgrow="ALWAYS">
          <children>
             <ImageView fitHeight="79.0" fitWidth="109.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS">
                <image>
@@ -24,12 +24,12 @@
             </ImageView>
             <Label alignment="CENTER" prefHeight="20.0" prefWidth="121.0" styleClass="textFieldTitle" stylesheets="@../css/styles.css" text="Crear Cuenta" textAlignment="CENTER" VBox.vgrow="ALWAYS">
                <VBox.margin>
-                  <Insets top="-55.0" />
+                  <Insets left="35.0" top="-55.0" />
                </VBox.margin>
             </Label>
-            <HBox prefHeight="258.0" prefWidth="699.0" spacing="40.0">
+            <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="304.0" prefWidth="699.0" VBox.vgrow="ALWAYS">
                <children>
-                  <VBox prefHeight="203.0" prefWidth="71.0" spacing="15.0">
+                  <VBox prefHeight="230.0" prefWidth="72.0" spacing="15.0">
                      <children>
                         <Label styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Nombre" />
                         <Label prefHeight="31.0" prefWidth="58.0" styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Apellido" />
@@ -38,19 +38,19 @@
                         <Label prefHeight="30.0" prefWidth="67.0" styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Contraseña" />
                      </children>
                      <HBox.margin>
-                        <Insets left="15.0" top="5.0" />
+                        <Insets left="75.0" top="5.0" />
                      </HBox.margin>
                   </VBox>
-                  <VBox prefHeight="204.0" prefWidth="178.0" spacing="17.0">
+                  <VBox prefHeight="204.0" prefWidth="178.0" spacing="17.0" HBox.hgrow="NEVER">
                      <children>
                         <TextField fx:id="txtName" promptText="Nombre" />
                         <TextField fx:id="txtLastName" promptText="Apellido" />
                         <TextField fx:id="txtUserId" prefHeight="26.0" prefWidth="189.0" promptText="Cedula" />
                         <TextField fx:id="txtUserName" promptText="Usuario" />
-                        <PasswordField fx:id="txtUserPassword" promptText="Contraseña:" />
+                        <PasswordField fx:id="txtUserPassword" promptText="Contraseña" />
                      </children>
                      <HBox.margin>
-                        <Insets bottom="15.0" left="50.0" top="5.0" />
+                        <Insets bottom="15.0" left="50.0" top="7.0" />
                      </HBox.margin>
                   </VBox>
                </children>
@@ -61,24 +61,21 @@
                   <Insets left="100.0" />
                </padding>
             </HBox>
-            <HBox prefHeight="45.0" prefWidth="516.0" spacing="50.0">
+            <HBox alignment="CENTER" prefHeight="55.0" prefWidth="699.0" VBox.vgrow="ALWAYS">
                <VBox.margin>
                   <Insets />
                </VBox.margin>
-               <padding>
-                  <Insets top="12.0" />
-               </padding>
                <children>
-                  <Button fx:id="btnCreateAccount" mnemonicParsing="false" onAction="#clickOnCreate" prefHeight="42.0" prefWidth="123.0" styleClass="buttonSignIn" stylesheets="@../css/styles.css" text="Crear Cuenta">
+                  <Button fx:id="btnCreateAccount" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#clickOnCreate" prefHeight="50.0" prefWidth="120.0" styleClass="buttonSignIn" stylesheets="@../css/styles.css" text="Crear Cuenta" HBox.hgrow="ALWAYS">
                      <HBox.margin>
-                        <Insets left="300.0" top="10.0" />
+                        <Insets top="10.0" />
                      </HBox.margin>
                   </Button>
                </children>
             </HBox>
          </children>
          <VBox.margin>
-            <Insets bottom="25.0" left="50.0" right="50.0" top="25.0" />
+            <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
          </VBox.margin>
       </VBox>
    </children>
