@@ -82,10 +82,6 @@ public class UserViewWindowController {
         }
     }
 
-    private void handleMakeReservation(ActionEvent event) throws IOException {
-        
-    }
-
     private void loadUserReservations() {
         String username = lblUserName.getText();
 
@@ -95,7 +91,7 @@ public class UserViewWindowController {
     }
 
     @FXML
-    private void changeMakeReservationWindow(ActionEvent event) throws IOException {
+    private void clickChange(ActionEvent event) throws IOException {
         App.setRoot("MakeReservationWindow");
     }
 }

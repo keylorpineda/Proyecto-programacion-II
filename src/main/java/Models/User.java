@@ -10,15 +10,15 @@ public class User {
     protected String lastName;
     protected String identification;
     protected String password;
-    protected String userRol;
+    protected String userRole;
 
-    public User(String userName, String name, String lastName, String identification, String password, String userRol) {
+    public User(String name, String lastName, String id,String userName, String password, String userRole) {
         this.userName = userName;
         this.name = name;
         this.lastName = lastName;
         this.identification = identification;
         this.password = password;
-        this.userRol = userRol;
+        this.userRole = userRole;
     }
 
     public String getUserName() {
@@ -61,7 +61,7 @@ public class User {
         this.password = password;
     }
 
-    public void setUserRol(String userRol) {this.userRol = userRol;}
+    public void setUserRol(String userRol) {this.userRole = userRol;}
 
     public void updatePassword(String newPassword){
         password = newPassword;

@@ -46,6 +46,8 @@ public class MakeReservationWindowController implements Initializable {
     @FXML
     private AnchorPane apFloor3;
 
+    @FXML
+    private Button btnBack;
     // Listas de Rooms para cada piso
     private List<Room> floor1Rooms;
     private List<Room> floor2Rooms;

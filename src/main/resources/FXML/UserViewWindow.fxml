@@ -28,7 +28,7 @@
             <Insets />
          </VBox.margin>
       </HBox>
-      <Button fx:id="btnMakeReservation" mnemonicParsing="false" onAction="#changeMakeReservationWindow" prefHeight="42.0" prefWidth="196.0" styleClass="makeReservationButton" stylesheets="@../css/stylesUserWindow.css" text="Hacer una reservacion" VBox.vgrow="ALWAYS">
+      <Button fx:id="btnMakeReservation" mnemonicParsing="false" onAction="#clickChange" prefHeight="42.0" prefWidth="196.0" styleClass="makeReservationButton" stylesheets="@../css/stylesUserWindow.css" text="Hacer una reservacion" VBox.vgrow="ALWAYS">
          <VBox.margin>
             <Insets right="600.0" top="25.0" />
          </VBox.margin>
