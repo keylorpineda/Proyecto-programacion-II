@@ -6,7 +6,7 @@
     -fx-border-width: 0px;
     -fx-border-radius: 0px;
     -fx-font-size: 35px;
-    -fx-padding: 0px;
+    -fx-padding: 1px;
 }
 .backButton{
     -fx-background-color : transparent;
