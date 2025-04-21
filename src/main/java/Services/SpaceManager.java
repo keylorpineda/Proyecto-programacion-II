@@ -1,5 +1,6 @@
-package Models;
+package Services;
 
+import Models.Space;
 import java.time.LocalDateTime;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -43,7 +44,7 @@ public class SpaceManager {
     public ObservableList<Space> getAvailableSpaces(LocalDateTime from, LocalDateTime to) {
         ObservableList<Space> availableSpaces = FXCollections.observableArrayList();
         for (Space space : spaces) {
-            if (!space.isReserved()) {
+            if (!space.getReserved()) {
                 availableSpaces.add(space);
             }
         }
@@ -52,7 +53,7 @@ public class SpaceManager {
 
     public boolean reserveSpace(String spaceId) {
         Space space = getSpaceById(spaceId);
-        if (space != null && !space.isReserved()) {
+        if (space != null && !space.getReserved()) { 
             space.reserve();
             return true;
         }

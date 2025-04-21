@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #007074;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.UserViewWindowController">
+   <children>
+      <HBox alignment="TOP_RIGHT" prefHeight="79.0" prefWidth="670.0" spacing="20.0" style="-fx-background-color: #034C53;">
+         <children>
+            <Label prefHeight="32.0" prefWidth="232.0" styleClass="textFieldTitle" stylesheets="@../css/styles.css" text="Panel De Administrador">
+               <HBox.margin>
+                  <Insets right="100.0" top="22.0" />
+               </HBox.margin>
+            </Label>
+            <Label prefHeight="38.0" prefWidth="117.0" styleClass="textFieldGlobal" stylesheets="@../css/AdminPrincipalWindow.css" text="BIENVENIDO">
+               <HBox.margin>
+                  <Insets top="22.0" />
+               </HBox.margin>
+            </Label>
+            <Label fx:id="lblUserName" prefHeight="38.0" prefWidth="126.0" styleClass="textFieldUserName" stylesheets="@../css/stylesUserWindow.css">
+               <HBox.margin>
+                  <Insets right="30.0" top="20.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </HBox>
+      <HBox prefHeight="524.0" prefWidth="800.0" VBox.vgrow="ALWAYS">
+         <children>
+            <VBox alignment="TOP_CENTER" prefHeight="522.0" prefWidth="189.0" spacing="25.0">
+               <children>
+                  <Label prefHeight="42.0" prefWidth="67.0" styleClass="textFieldGlobal" stylesheets="@../css/AdminPrincipalWindow.css" text="Opciones" textAlignment="JUSTIFY" />
+                  <ToggleButton fx:id="tgViewUsers" mnemonicParsing="false" prefHeight="60.0" prefWidth="166.0" styleClass="buttonToggle" stylesheets="@../css/AdminPrincipalWindow.css" text="Usuarios" />
+                  <ToggleButton fx:id="tgViewRooms" mnemonicParsing="false" prefHeight="60.0" prefWidth="166.0" styleClass="buttonToggle" stylesheets="@../css/AdminPrincipalWindow.css" text="Salas" />
+                  <ToggleButton fx:id="tgViewReservations" mnemonicParsing="false" prefHeight="60.0" prefWidth="166.0" styleClass="buttonToggle" text="Reservas" />
+                  <ToggleButton fx:id="tgViewReports" mnemonicParsing="false" prefHeight="60.0" prefWidth="166.0" styleClass="buttonToggle" text="Reportes" />
+                  <ToggleButton fx:id="tgCreateAdmin" mnemonicParsing="false" prefHeight="59.0" prefWidth="166.0" styleClass="buttonToggle" stylesheets="@../css/AdminPrincipalWindow.css" text="Crear un Administrador" />
+               </children>
+            </VBox>
+            <StackPane fx:id="spGeneralContent" prefHeight="522.0" prefWidth="606.0" HBox.hgrow="ALWAYS" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

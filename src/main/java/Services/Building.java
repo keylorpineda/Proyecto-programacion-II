@@ -1,5 +1,6 @@
-package Models;
+package Services;
 
+import Models.Room;
 import java.util.List;
 
 public class Building {
@@ -12,7 +13,7 @@ public class Building {
     }
     public boolean addRoom(Room room) {
         for(Room r : roomList) {
-            if(r.idRoom.equals(room.idRoom)) {
+            if(r.getIdRoom().equals(room.getIdRoom())) {
                 return false;
             }
         }
@@ -22,7 +23,7 @@ public class Building {
 
     public boolean deleteRoom(String idRoom) {
         for (Room room : roomList) {
-            if (room.idRoom.equals(idRoom)) {
+            if (room.getIdRoom().equals(idRoom)) {
                 roomList.remove(room);
                 return true;
             }

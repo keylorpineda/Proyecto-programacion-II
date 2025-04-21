@@ -13,7 +13,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import Models.Reservation;
-import Models.ReservationManager;
+import Services.ReservationManager;
 import com.mycompany.proyectoprogramacionii.App;
 import java.io.IOException;
 

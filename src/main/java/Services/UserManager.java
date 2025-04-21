@@ -1,5 +1,6 @@
-package Models;
+package Services;
 
+import Models.User;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,7 @@ public class UserManager {
     private static UserManager instance;
     protected List<User> users;
 
-    private UserManager(){
+    public UserManager(){
         users = new ArrayList<>();
     }
 
@@ -45,14 +46,13 @@ public class UserManager {
     }
 
 
-    public boolean changeUserData(String userName, String name, String lastName, String identification, String password, String userRol ){
+    public boolean changeUserData(String userName, String name, String lastName, String identification, String password){
         User option= getUserByUsername(name);
         if(option != null) {
             option.setName(name);
             option.setLastName(lastName);
             option.setIdentification(identification);
             option.setPassword(password);
-            option.setUserRol(userRol);
             return true;
         }
         else {

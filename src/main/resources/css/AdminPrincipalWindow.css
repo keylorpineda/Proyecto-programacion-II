@@ -1,0 +1,57 @@
+.textFieldTitle{
+    -fx-background-color: transparent;   
+    -fx-border-color: transparent;    
+    -fx-font-family: "Gloucester MT Extra Condensed";
+    -fx-text-fill: White;
+    -fx-border-width: 0px;          
+    -fx-border-radius: 0px;         
+    -fx-font-size: 30px;              
+    -fx-padding: 0px;  
+}
+.textFieldGlobal {
+    -fx-background-color: transparent;   
+    -fx-border-color: transparent;    
+    -fx-font-family: "Gloucester MT Extra Condensed";
+    -fx-text-fill: White;
+    -fx-border-width: 0px;          
+    -fx-border-radius: 0px;         
+    -fx-font-size: 25px;             
+    -fx-padding: 0px;  
+}
+.buttonNormal {
+    -fx-background-color : white;
+    -fx-border-color : white; 
+    -fx-text-fill: black;
+    -fx-font-size: 15px;
+    -fx-font-family: "Gloucester MT Extra Condensed"; 
+}
+
+.buttonNormal:hover {
+    -fx-background-color: white; 
+    -fx-text-fill : blue;  
+}
+
+.buttonToggle {
+    -fx-background-color : white;
+    -fx-border-color : white;
+    -fx-text-fill:  #123458;
+    -fx-font-size: 20px;
+    -fx-border-radius: 5px; 
+    -fx-font-family: "Gloucester MT Extra Condensed";
+}
+.buttonToggle:hover{
+    -fx-background-color: white;  
+    -fx-text-fill : #83B4FF;
+}
+.buttonSecondary {
+    -fx-background-color : transparent;
+    -fx-border-color : transparent;
+    -fx-text-fill: White;
+    -fx-font-size: 20px;
+    -fx-font-family: "Gloucester MT Extra Condensed";
+}
+.buttonSecondary:hover {
+    -fx-background-color: transparent;  
+    -fx-text-fill : red;  
+}
+

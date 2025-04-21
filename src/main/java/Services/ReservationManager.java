@@ -1,5 +1,6 @@
-package Models;
+package Services;
 
+import Models.Reservation;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +21,9 @@ public class ReservationManager {
     }
 
     public boolean createReservation(Reservation reservation) {
-        if (isSpaceAvailable(String.valueOf(reservation.space.spaceId), reservation.startTime, reservation.endTime)) {
+        if (isSpaceAvailable(String.valueOf(reservation.getSpace().getSpaceId()), reservation.getStartTime(), reservation.getEndTime())) {
             reservations.add(reservation);
-            reservation.space.reserve();
+            reservation.getSpace().reserve();
             return true;
         }
         return false;
@@ -30,8 +31,8 @@ public class ReservationManager {
 
     public boolean cancelReservation(String reservationId) {
         for (Reservation reservation : reservations) {
-            if (reservation.reservationId.equals(reservationId)) {
-                reservation.space.unReserve();
+            if (reservation.getReservationId().equals(reservationId)) {
+                reservation.getSpace().unreserved();
                 reservations.remove(reservation);
                 return true;
             }
@@ -42,7 +43,7 @@ public class ReservationManager {
     public List<Reservation> getReservationsByUser(String username) {
         List<Reservation> userReservations = new ArrayList<>();
         for (Reservation reservation : reservations) {
-            if (reservation.user.userName.equals(username)) {
+            if (reservation.getUser().getUserName().equals(username)) {
                 userReservations.add(reservation);
             }
         }
@@ -51,8 +52,8 @@ public class ReservationManager {
 
     public boolean isSpaceAvailable(String spaceId, LocalDateTime start, LocalDateTime end) {
         for (Reservation reservation : reservations) {
-            if (reservation.space.getSpaceId().equals(spaceId)) {
-                if (!(reservation.endTime.isBefore(start) || reservation.startTime.isAfter(end))) {
+            if (reservation.getSpace().getSpaceId().equals(spaceId)) {
+                if (!(reservation.getEndTime().isBefore(start) || reservation.getStartTime().isAfter(end))) {
                     return false;
                 }
             }

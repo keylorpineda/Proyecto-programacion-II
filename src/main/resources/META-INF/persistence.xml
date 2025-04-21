@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             version="2.2">
+
+  <persistence-unit name="CoworkingProgram" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+    <properties>
+      <!-- Conexión JDBC -->
+      <property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@localhost:1521/XEPDB1"/>
+      <property name="javax.persistence.jdbc.user" value="C##COWORKING"/>
+      <property name="javax.persistence.jdbc.password" value="1234"/> 
+
+      <!-- Dialecto de Oracle para Hibernate -->
+      <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle12cDialect"/>
+
+      <!-- Actualiza la estructura de la base de datos (puede ser update, validate, create, create-drop) -->
+      <property name="hibernate.hbm2ddl.auto" value="update"/>
+
+      <!-- Mostrar el SQL en consola (opcional para debug) -->
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.format_sql" value="true"/>
+    </properties>
+  </persistence-unit>
+</persistence>
+

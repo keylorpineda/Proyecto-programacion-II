@@ -1,5 +1,7 @@
-package Models;
+package Services;
 
+import Models.Space;
+import Models.User;
 import java.util.List;
 
 public class Report {

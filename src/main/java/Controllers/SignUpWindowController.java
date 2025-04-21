@@ -1,11 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
+
 package Controllers;
 
 import Models.User;
-import Models.UserManager;
+import Services.UserManager;
 import com.mycompany.proyectoprogramacionii.App;
 import com.mycompany.proyectoprogramacionii.Utilities;
 
@@ -22,11 +19,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 
-/**
- * FXML Controller class
- *
- * @author Keylo
- */
 public class SignUpWindowController implements Initializable {
    @FXML
     private TextField txtName;
@@ -60,7 +52,6 @@ public class SignUpWindowController implements Initializable {
         String id = txtUserId.getText().trim();
         String userName = txtUserName.getText().trim();
         String password = txtUserPassword.getText().trim();
-        String role = "Usuario";
         if (name.isEmpty() || lastName.isEmpty() || id.isEmpty() || userName.isEmpty() || password.isEmpty()) {
             utilities.showAlert(AlertType.ERROR, "Campos incompletos", "Por favor, complete todos los campos.");
             return;
@@ -71,7 +62,7 @@ public class SignUpWindowController implements Initializable {
             utilities.showAlert(AlertType.ERROR, "Contraseña debil", "La contraseña debe tener al menos 6 caracteres.");
             return;
         }
-        User newUser = new User(name, lastName, id, userName, password,role);
+        User newUser = new User(name, lastName, id, userName, password); 
         userManager.addUser(newUser);
         utilities.showAlert(AlertType.INFORMATION, "Usuario creado", "Usuario creado exitosamente.");
         App.setRoot("LoginWindow");

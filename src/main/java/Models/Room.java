@@ -1,18 +1,30 @@
 package Models;
 import java.util.List;
+import jakarta.persistence.*;
+import javax.persistence.Table;
+@Entity
+@Table(name = "room")
 public class Room {
 
-    protected String roomName;
-    protected int roomCapacity;
-    protected boolean isReserved;
-    protected String idRoom;
-    protected String roomType;
-    protected List<Space> spaceList;
+    @Id
+    @Column(name = "room_id")
+    private String idRoom;
 
-    public Room(String roomName, int roomCapacity, boolean isReserved, String idRoom, String roomType, List<Space> spaceList) {
+    @Column(name = "room_name", nullable = false)
+    private String roomName;
+
+    @Column(name = "capacity")
+    private int roomCapacity;
+
+    @Column(name = "room_type", length = 50)
+    private String roomType;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    private List<Space> spaceList;
+
+    public Room(String roomName, int roomCapacity, String idRoom, String roomType, List<Space> spaceList) {
         this.roomName = roomName;
         this.roomCapacity = roomCapacity;
-        this.isReserved = isReserved;
         this.idRoom = idRoom;
         this.roomType = roomType;
         this.spaceList = spaceList;
@@ -48,14 +60,6 @@ public class Room {
 
     public void setRoomCapacity(int roomCapacity) {
         this.roomCapacity = roomCapacity;
-    }
-
-    public boolean isIsReserved() {
-        return isReserved;
-    }
-
-    public void setIsReserved(boolean isReserved) {
-        this.isReserved = isReserved;
     }
 
     public String getIdRoom() {

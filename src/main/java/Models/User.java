@@ -1,24 +1,38 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Models;
-
+import jakarta.persistence.*;
+import javax.persistence.Table;
+@Entity                      
+@Table(name = "user")    
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE) 
+@DiscriminatorColumn(name = "role")
 public class User {
-    protected String userName;
-    protected String name;
-    protected String lastName;
-    protected String identification;
-    protected String password;
-    protected String userRole;
+    @Id                    
+    @Column(name = "username", length = 50)
+    private String userName;
 
-    public User(String name, String lastName, String id,String userName, String password, String userRole) {
+    @Column(name = "name", nullable = false, length = 30)
+    private String name;
+
+    @Column(name = "last_name", nullable = false, length = 30)
+    private String lastName;
+
+    @Column(name = "identification", unique = true, length = 9)
+    private String identification;
+
+    @Column(name = "password", nullable = false, length = 8)  
+    private String password;
+
+    @Column(name = "role", insertable = false, updatable = false)
+    private String role;
+    public User() {
+    }
+  
+    public User(String name, String lastName, String id,String userName, String password) {
         this.userName = userName;
         this.name = name;
         this.lastName = lastName;
-        this.identification = identification;
+        this.identification = id;
         this.password = password;
-        this.userRole = userRole;
     }
 
     public String getUserName() {
@@ -60,10 +74,15 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public void setUserRol(String userRol) {this.userRole = userRol;}
-
     public void updatePassword(String newPassword){
         password = newPassword;
+    }
+     public String getRole() {
+        return role;
+    }
+     
+    @Transient
+    public boolean isAdmin() {
+        return "admin".equals(role);
     }
 }
