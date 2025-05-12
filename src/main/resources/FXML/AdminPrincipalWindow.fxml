@@ -38,8 +38,8 @@
                   <Label prefHeight="42.0" prefWidth="67.0" styleClass="textFieldGlobal" stylesheets="@../css/AdminPrincipalWindow.css" text="Opciones" textAlignment="JUSTIFY" />
                   <ToggleButton fx:id="tgViewUsers" mnemonicParsing="false" prefHeight="60.0" prefWidth="166.0" styleClass="buttonToggle" stylesheets="@../css/AdminPrincipalWindow.css" text="Usuarios" />
                   <ToggleButton fx:id="tgViewRooms" mnemonicParsing="false" prefHeight="60.0" prefWidth="166.0" styleClass="buttonToggle" stylesheets="@../css/AdminPrincipalWindow.css" text="Salas" />
-                  <ToggleButton fx:id="tgViewReservations" mnemonicParsing="false" prefHeight="60.0" prefWidth="166.0" styleClass="buttonToggle" text="Reservas" />
-                  <ToggleButton fx:id="tgViewReports" mnemonicParsing="false" prefHeight="60.0" prefWidth="166.0" styleClass="buttonToggle" text="Reportes" />
+                  <ToggleButton fx:id="tgViewReservations" mnemonicParsing="false" prefHeight="60.0" prefWidth="166.0" styleClass="buttonToggle" stylesheets="@../css/AdminPrincipalWindow.css" text="Reservas" />
+                  <ToggleButton fx:id="tgViewReports" mnemonicParsing="false" prefHeight="60.0" prefWidth="166.0" styleClass="buttonToggle" stylesheets="@../css/AdminPrincipalWindow.css" text="Reportes" />
                   <ToggleButton fx:id="tgCreateAdmin" mnemonicParsing="false" prefHeight="59.0" prefWidth="166.0" styleClass="buttonToggle" stylesheets="@../css/AdminPrincipalWindow.css" text="Crear un Administrador" />
                </children>
             </VBox>

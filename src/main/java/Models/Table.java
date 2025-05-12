@@ -1,5 +1,6 @@
 package Models;
 import jakarta.persistence.*;
+
 @Entity
 @DiscriminatorValue("table")
 public class Table extends Space {

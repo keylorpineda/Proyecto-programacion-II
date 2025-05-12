@@ -1,66 +1,101 @@
 package Services;
 
 import Models.Space;
-import java.time.LocalDateTime;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import com.mycompany.proyectoprogramacionii.DataBaseManager;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+
+import java.util.List;
 
 public class SpaceManager {
-    private ObservableList<Space> spaces;
 
-    public SpaceManager() {
-        this.spaces = FXCollections.observableArrayList();
-    }
-
-    public boolean addSpace(Space space) {
-        for (Space spaceAux : spaces) {
-            if (spaceAux.getSpaceId().equals(space.getSpaceId())) {
-                return false;
-            }
+    public List<Space> getAllSpaces() {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            TypedQuery<Space> query = em.createQuery("SELECT s FROM Space s", Space.class);
+            return query.getResultList();
+        } finally {
+            em.close();
         }
-        spaces.add(space);
-        return true;
-    }
-
-    public boolean deleteSpace(String spaceId) {
-        for (Space space : spaces) {
-            if (space.getSpaceId().equals(spaceId)) {
-                spaces.remove(space);
-                return true;
-            }
-        }
-        return false;
     }
 
     public Space getSpaceById(String spaceId) {
-        for (Space space : spaces) {
-            if (space.getSpaceId().equals(spaceId)) {
-                return space;
-            }
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            return em.find(Space.class, spaceId);
+        } finally {
+            em.close();
         }
-        return null;
-    }
-
-    public ObservableList<Space> getAvailableSpaces(LocalDateTime from, LocalDateTime to) {
-        ObservableList<Space> availableSpaces = FXCollections.observableArrayList();
-        for (Space space : spaces) {
-            if (!space.getReserved()) {
-                availableSpaces.add(space);
-            }
-        }
-        return availableSpaces;
     }
 
     public boolean reserveSpace(String spaceId) {
-        Space space = getSpaceById(spaceId);
-        if (space != null && !space.getReserved()) { 
-            space.reserve();
-            return true;
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            Space space = em.find(Space.class, spaceId);
+            if (space != null && !space.getReserved()) {
+                em.getTransaction().begin();
+                space.setReserved(true);
+                em.merge(space);
+                em.getTransaction().commit();
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            e.printStackTrace();
+            return false;
+        } finally {
+            em.close();
         }
-        return false;
     }
 
-    public ObservableList<Space> getSpaces() {
-        return spaces;
+    public List<Space> getAvailableSpaces() {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            TypedQuery<Space> query = em.createQuery(
+                "SELECT s FROM Space s WHERE s.isReserved = false", Space.class);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    public boolean addSpace(Space space) {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            if (em.find(Space.class, space.getSpaceId()) != null) {
+                return false; // Ya existe
+            }
+            em.getTransaction().begin();
+            em.persist(space);
+            em.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            e.printStackTrace();
+            return false;
+        } finally {
+            em.close();
+        }
+    }
+
+    public boolean deleteSpace(String spaceId) {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            Space space = em.find(Space.class, spaceId);
+            if (space != null) {
+                em.getTransaction().begin();
+                em.remove(space);
+                em.getTransaction().commit();
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            e.printStackTrace();
+            return false;
+        } finally {
+            em.close();
+        }
     }
 }

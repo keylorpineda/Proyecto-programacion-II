@@ -1,13 +1,13 @@
 package Models;
 import jakarta.persistence.*;
-import javax.persistence.Table;
+import jakarta.persistence.Table;
 @Entity                      
-@Table(name = "user")    
+@Table(name = "users")    
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) 
 @DiscriminatorColumn(name = "role")
 public class User {
     @Id                    
-    @Column(name = "username", length = 50)
+    @Column(name = "user_name", length = 50)
     private String userName;
 
     @Column(name = "name", nullable = false, length = 30)

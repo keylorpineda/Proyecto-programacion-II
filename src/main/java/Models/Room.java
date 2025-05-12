@@ -1,7 +1,7 @@
 package Models;
 import java.util.List;
 import jakarta.persistence.*;
-import javax.persistence.Table;
+import jakarta.persistence.Table;
 @Entity
 @Table(name = "room")
 public class Room {
@@ -22,6 +22,8 @@ public class Room {
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Space> spaceList;
 
+    public Room() {
+    }
     public Room(String roomName, int roomCapacity, String idRoom, String roomType, List<Space> spaceList) {
         this.roomName = roomName;
         this.roomCapacity = roomCapacity;

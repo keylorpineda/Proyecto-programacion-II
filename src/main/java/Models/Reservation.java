@@ -1,6 +1,6 @@
 package Models;
 import jakarta.persistence.*;
-import javax.persistence.Table;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 @Entity
 @Table(name = "reservation") 
@@ -10,7 +10,7 @@ public class Reservation {
     private String reservationId;
 
     @ManyToOne
-    @JoinColumn(name = "user", nullable = false)
+    @JoinColumn(name = "user_name", nullable = false)
     private User user;
 
     @ManyToOne
@@ -26,7 +26,6 @@ public class Reservation {
     public Reservation() {
     }
 
-    
     public Reservation(User user, String reservationId, Space space, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         this.user = user;
         this.reservationId = reservationId;

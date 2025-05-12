@@ -1,6 +1,6 @@
 package Models;
 import jakarta.persistence.*;
-import javax.persistence.Table;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "space")

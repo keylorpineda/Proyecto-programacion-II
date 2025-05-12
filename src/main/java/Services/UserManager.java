@@ -1,68 +1,76 @@
 package Services;
 
 import Models.User;
-import java.util.ArrayList;
-import java.util.List;
+import Models.Customer;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import com.mycompany.proyectoprogramacionii.DataBaseManager;
 
 public class UserManager {
 
     private static UserManager instance;
-    protected List<User> users;
+    private User currentUser;
 
-    public UserManager(){
-        users = new ArrayList<>();
+    private UserManager() {
     }
 
-    public static UserManager getInstance(){
-        if(instance == null){
+    public static UserManager getInstance() {
+        if (instance == null) {
             instance = new UserManager();
         }
         return instance;
     }
 
-
-    public void addUser(User user){
-        users.add(user);
-    }
-    public void deleteUser(String username){
-
-    }
-    public User getUserByUsername(String username) {
-        for(User user : users) {
-            if(user.getUserName().equals(username)) {
-                return user;
+    public void addUser(User user) {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.persist(user);
+            em.getTransaction().commit();
+            System.out.println("✔ Usuario persistido correctamente: " + user.getUserName());
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
             }
+            e.printStackTrace();
+        } finally {
+            em.close();
         }
-        return null;
     }
 
-    public boolean authenticateUser(String username, String password){
-        for(User user : users){
-            if(user.getUserName().equals(username) && user.getPassword().equals(password)){
+    public boolean authenticateUser(String username, String password) {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            TypedQuery<User> q = em.createQuery(
+                    "SELECT u FROM User u WHERE u.userName = :u AND u.password = :p",
+                    User.class);
+            q.setParameter("u", username);
+            q.setParameter("p", password);
+            User found = q.getResultStream().findFirst().orElse(null);
+            if (found != null) {
+                this.currentUser = found;
                 return true;
             }
-        }
-        return false;
-    }
-
-
-    public boolean changeUserData(String userName, String name, String lastName, String identification, String password){
-        User option= getUserByUsername(name);
-        if(option != null) {
-            option.setName(name);
-            option.setLastName(lastName);
-            option.setIdentification(identification);
-            option.setPassword(password);
-            return true;
-        }
-        else {
             return false;
+        } finally {
+            em.close();
         }
     }
 
-    public List<User> getUsers() {
-        return users;
+    public User getUserByUsername(String username) {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            return em.find(User.class, username);
+        } finally {
+            em.close();
+        }
     }
 
+    public User getCurrentUser() {
+        return currentUser;
+    }
 
+    public void logout() {
+        this.currentUser = null;
+    }
 }
