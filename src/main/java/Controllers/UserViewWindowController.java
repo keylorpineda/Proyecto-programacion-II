@@ -60,7 +60,7 @@ public class UserViewWindowController {
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         startColumn.setCellValueFactory(new PropertyValueFactory<>("startTime"));
         endColumn.setCellValueFactory(new PropertyValueFactory<>("endTime"));
-
+//hola
         reservationList = FXCollections.observableArrayList();
         tbvReservationTable.setItems(reservationList);
     }
