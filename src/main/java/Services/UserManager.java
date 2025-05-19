@@ -73,4 +73,16 @@ public class UserManager {
     public void logout() {
         this.currentUser = null;
     }
+    
+    public User getUserByIdentification(String identification) {
+    EntityManager em = DataBaseManager.getEntityManager();
+    try {
+        TypedQuery<User> query = em.createQuery(
+            "SELECT u FROM User u WHERE u.identification = :id", User.class);
+        query.setParameter("id", identification);
+        return query.getResultStream().findFirst().orElse(null);
+    } finally {
+        em.close();
+    }
+}
 }
