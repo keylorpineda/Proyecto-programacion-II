@@ -9,10 +9,35 @@ import java.util.List;
 
 public class SpaceManager {
 
+    private static SpaceManager instance;
+
+    private SpaceManager() { }
+
+    public static SpaceManager getInstance() {
+        if (instance == null) {
+            instance = new SpaceManager();
+        }
+        return instance;
+    }
+
     public List<Space> getAllSpaces() {
         EntityManager em = DataBaseManager.getEntityManager();
         try {
-            TypedQuery<Space> query = em.createQuery("SELECT s FROM Space s", Space.class);
+            TypedQuery<Space> query = em.createQuery(
+                "SELECT s FROM Space s", Space.class);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    public List<Space> getSpacesByRoom(String roomId) {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            TypedQuery<Space> query = em.createQuery(
+                "SELECT s FROM Space s WHERE s.room.idRoom = :rid",
+                Space.class);
+            query.setParameter("rid", roomId);
             return query.getResultList();
         } finally {
             em.close();
@@ -53,7 +78,8 @@ public class SpaceManager {
         EntityManager em = DataBaseManager.getEntityManager();
         try {
             TypedQuery<Space> query = em.createQuery(
-                "SELECT s FROM Space s WHERE s.isReserved = false", Space.class);
+                "SELECT s FROM Space s WHERE s.isReserved = false",
+                Space.class);
             return query.getResultList();
         } finally {
             em.close();
@@ -64,7 +90,7 @@ public class SpaceManager {
         EntityManager em = DataBaseManager.getEntityManager();
         try {
             if (em.find(Space.class, space.getSpaceId()) != null) {
-                return false; // Ya existe
+                return false;
             }
             em.getTransaction().begin();
             em.persist(space);
