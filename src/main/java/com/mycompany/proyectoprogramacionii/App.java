@@ -1,5 +1,6 @@
 package com.mycompany.proyectoprogramacionii;
 
+import Utilities.FlowController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,9 +14,8 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("LoginWindow"), 800, 600);      
-        stage.setScene(scene);
-        stage.show();
+    FlowController.getInstance().initFlow(stage);
+    FlowController.getInstance().goView("LoginWindow");
     }
 
     public static void setRoot(String fxml) throws IOException {

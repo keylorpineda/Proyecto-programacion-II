@@ -12,24 +12,36 @@
 
 <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #D4C9BE;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.SignUpWindowController">
    <children>
-      <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="518.0" prefWidth="699.0" style="-fx-background-color: #123458;" VBox.vgrow="ALWAYS">
+      <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="500.0" prefWidth="720.0" style="-fx-background-color: #123458;" VBox.vgrow="ALWAYS">
          <children>
-            <ImageView fitHeight="79.0" fitWidth="109.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS">
+            <Button fx:id="btnBack" mnemonicParsing="false" onAction="#backWindow" prefHeight="77.0" prefWidth="122.0" style="-fx-background-color: invisible;" stylesheets="@../css/styles.css" VBox.vgrow="ALWAYS">
+               <graphic>
+                  <ImageView fitHeight="77.0" fitWidth="122.0" pickOnBounds="true" preserveRatio="true" styleClass="buttonback">
+                     <image>
+                        <Image url="@../images/btnBackImage.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <VBox.margin>
+                  <Insets right="600.0" top="25.0" />
+               </VBox.margin>
+            </Button>
+            <Label alignment="CENTER" prefHeight="40.0" prefWidth="146.0" styleClass="textFieldTitle" stylesheets="@../css/styles.css" text="Crear Cuenta" textAlignment="CENTER" VBox.vgrow="ALWAYS">
+               <VBox.margin>
+                  <Insets left="35.0" top="-60.0" />
+               </VBox.margin>
+            </Label>
+            <ImageView fitHeight="87.0" fitWidth="135.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS">
                <image>
                   <Image url="@../images/userImage.png" />
                </image>
                <VBox.margin>
-                  <Insets right="415.0" top="10.0" />
+                  <Insets right="310.0" top="-65.0" />
                </VBox.margin>
             </ImageView>
-            <Label alignment="CENTER" prefHeight="20.0" prefWidth="121.0" styleClass="textFieldTitle" stylesheets="@../css/styles.css" text="Crear Cuenta" textAlignment="CENTER" VBox.vgrow="ALWAYS">
-               <VBox.margin>
-                  <Insets left="35.0" top="-55.0" />
-               </VBox.margin>
-            </Label>
             <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="304.0" prefWidth="699.0" VBox.vgrow="ALWAYS">
                <children>
-                  <VBox prefHeight="230.0" prefWidth="72.0" spacing="15.0">
+                  <VBox prefHeight="307.0" prefWidth="74.0" spacing="15.0">
                      <children>
                         <Label styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Nombre" />
                         <Label prefHeight="31.0" prefWidth="58.0" styleClass="textFieldGlobal" stylesheets="@../css/styles.css" text="Apellido" />
@@ -63,7 +75,7 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="55.0" prefWidth="699.0" VBox.vgrow="ALWAYS">
                <VBox.margin>
-                  <Insets />
+                  <Insets top="-50.0" />
                </VBox.margin>
                <children>
                   <Button fx:id="btnCreateAccount" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#clickOnCreate" prefHeight="50.0" prefWidth="120.0" styleClass="buttonSignIn" stylesheets="@../css/styles.css" text="Crear Cuenta" HBox.hgrow="ALWAYS">

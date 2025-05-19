@@ -1,5 +1,5 @@
 
-package com.mycompany.proyectoprogramacionii;
+package Utilities;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;

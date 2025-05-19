@@ -2,8 +2,9 @@ package Controllers;
 
 import Models.Customer;
 import Services.UserManager;
+import Utilities.FlowController;
 import com.mycompany.proyectoprogramacionii.App;
-import com.mycompany.proyectoprogramacionii.Utilities;
+import Utilities.graphicUtilities;
 
 import java.io.IOException;
 import java.net.URL;
@@ -30,12 +31,14 @@ public class SignUpWindowController implements Initializable {
     @FXML
     private Button btnCreateAccount;
 
-    private Utilities utilities;
+    private graphicUtilities utilities;
     private UserManager userManager;
+    @FXML
+    private Button btnBack;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        utilities = new Utilities();
+        utilities = new graphicUtilities();
         userManager = UserManager.getInstance();
     }
 
@@ -61,6 +64,11 @@ public class SignUpWindowController implements Initializable {
         userManager.addUser(newCustomer); 
 
         utilities.showAlert(AlertType.INFORMATION, "Usuario creado", "Usuario creado exitosamente.");
-        App.setRoot("LoginWindow");
+        FlowController.getInstance().goView("LoginWindow");
+    }
+
+    @FXML
+    private void backWindow(ActionEvent event) throws IOException {
+        FlowController.getInstance().goView("LoginWindow");
     }
 }

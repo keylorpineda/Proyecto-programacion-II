@@ -2,7 +2,8 @@ package Controllers;
 
 import Services.UserManager;
 import com.mycompany.proyectoprogramacionii.App;
-import com.mycompany.proyectoprogramacionii.Utilities;
+import Utilities.graphicUtilities;
+import Utilities.FlowController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,7 +18,7 @@ import java.util.ResourceBundle;
 
 public class LoginWindowController implements Initializable {
 
-    private Utilities utilities;
+    private graphicUtilities utilities;
     private UserManager userManager;
 
     @FXML
@@ -31,7 +32,7 @@ public class LoginWindowController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        utilities = new Utilities();
+        utilities = new graphicUtilities();
         userManager = UserManager.getInstance();
     }
 
@@ -42,9 +43,8 @@ public class LoginWindowController implements Initializable {
 
         if (userManager.authenticateUser(username, password)) {
             try {
-                App.setRoot("UserViewWindow");
+                FlowController.getInstance().goView("UserViewWindow");
             } catch (IOException e) {
-                e.printStackTrace();
                 utilities.showAlert(Alert.AlertType.ERROR, "Error", "No se pudo cargar la vista de usuario.");
             }
         } else {
@@ -54,6 +54,11 @@ public class LoginWindowController implements Initializable {
 
     @FXML
     private void CreateAccount(ActionEvent event) throws IOException {
-        App.setRoot("SignUpWindow");
+        try {
+            FlowController.getInstance().goView("SignUpWindow");
+        } catch (IOException e) {
+            utilities.showAlert(
+                    Alert.AlertType.ERROR, "Error", "No se pudo cargar la ventana de registro.");
+        }
     }
 }

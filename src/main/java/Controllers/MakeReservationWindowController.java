@@ -5,6 +5,7 @@ import Models.Space;
 import Models.Desk;
 import Models.Table;
 import Models.Chair;
+import Utilities.FlowController;
 import com.mycompany.proyectoprogramacionii.App;
 import java.io.IOException;
 import java.net.URL;
@@ -162,6 +163,6 @@ public class MakeReservationWindowController implements Initializable {
     
     @FXML
     private void backUserView(ActionEvent event) throws IOException {
-        App.setRoot("UserViewWindow");
+        FlowController.getInstance().goView("UserViewWindow");
     }
 }

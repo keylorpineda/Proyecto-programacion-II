@@ -1,7 +1,7 @@
 package Services;
 
 import Models.Space;
-import com.mycompany.proyectoprogramacionii.DataBaseManager;
+import Utilities.DataBaseManager;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 

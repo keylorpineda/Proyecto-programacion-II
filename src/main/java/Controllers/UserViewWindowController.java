@@ -14,6 +14,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import Models.Reservation;
 import Services.ReservationManager;
+import Utilities.FlowController;
 import com.mycompany.proyectoprogramacionii.App;
 import java.io.IOException;
 
@@ -69,7 +70,7 @@ public class UserViewWindowController {
     }
     @FXML
     private void clickChange(ActionEvent event) throws IOException {
-        App.setRoot("MakeReservationWindow");
+        FlowController.getInstance().goView("MakeReservationWindow");
     }
     @FXML
     private void showReservationTable(ActionEvent event) {

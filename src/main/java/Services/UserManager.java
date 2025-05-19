@@ -4,7 +4,7 @@ import Models.User;
 import Models.Customer;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import com.mycompany.proyectoprogramacionii.DataBaseManager;
+import Utilities.DataBaseManager;
 
 public class UserManager {
 

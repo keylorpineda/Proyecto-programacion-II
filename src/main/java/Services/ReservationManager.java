@@ -3,7 +3,7 @@ package Services;
 import Models.Reservation;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import com.mycompany.proyectoprogramacionii.DataBaseManager;
+import Utilities.DataBaseManager;
 import java.time.LocalDateTime;
 import java.util.List;
 
