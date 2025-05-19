@@ -35,6 +35,8 @@ public class SignUpWindowController implements Initializable {
     private UserManager userManager;
     @FXML
     private Button btnBack;
+    @FXML
+    private Button btnEditUser;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -70,5 +72,10 @@ public class SignUpWindowController implements Initializable {
     @FXML
     private void backWindow(ActionEvent event) throws IOException {
         FlowController.getInstance().goView("LoginWindow");
+    }
+
+    @FXML
+    private void clickEditUser(ActionEvent event) throws IOException {
+        FlowController.getInstance().goView("EditCustomer");
     }
 }
