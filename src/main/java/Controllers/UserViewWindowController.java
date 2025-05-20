@@ -17,6 +17,8 @@ import Services.ReservationManager;
 import Utilities.FlowController;
 import com.mycompany.proyectoprogramacionii.App;
 import java.io.IOException;
+import javafx.scene.control.Alert;
+import Utilities.graphicUtilities;
 
 public class UserViewWindowController {
 
@@ -50,9 +52,14 @@ public class UserViewWindowController {
 
     private ObservableList<Reservation> reservationList;
     @FXML
-    private Button btnHacerReservacion;
+    private Button btnCerrarSesion;
+    @FXML
+    private Button btnMakeReservation;
+    
+     private graphicUtilities utilities;
 
     public void initialize() {
+        utilities = new graphicUtilities();
         reservationManager = ReservationManager.getInstance();
         idColumn.setCellValueFactory(new PropertyValueFactory<>("reservationId"));
         placeColumn.setCellValueFactory(new PropertyValueFactory<>("place"));
@@ -92,5 +99,9 @@ public class UserViewWindowController {
         tbvReservationTable.refresh();
     }
 
-   
+    @FXML
+    private void clickCerrarSesionUsuario(ActionEvent event) throws IOException {
+        utilities.showAlert(Alert.AlertType.INFORMATION, "Sesión cerrada", "Haz cerrado sesión correctamente!!");
+         FlowController.getInstance().goView("LoginWindow");
+    }
 }
