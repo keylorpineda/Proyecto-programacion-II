@@ -1,18 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #007074;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.UserViewWindowController">
-   <children>
+   <stylesheets>
+       <URL value="@../css/styles.css" />
+    </stylesheets>
+    <children>
       <HBox alignment="TOP_RIGHT" prefHeight="79.0" prefWidth="670.0" spacing="20.0" style="-fx-background-color: #034C53;">
          <children>
+            <Button fx:id="btnCerrarSesion" mnemonicParsing="false" onAction="#clickCerrarSesionUsuario" prefHeight="35.0" prefWidth="49.0" style="-fx-background-color: #034C53;">
+               <HBox.margin>
+                  <Insets right="420.0" top="20.0" />
+               </HBox.margin>
+               <graphic>
+                  <ImageView fitHeight="39.0" fitWidth="59.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/btnLogOut.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
             <Label prefHeight="38.0" prefWidth="117.0" styleClass="textFieldTitle" stylesheets="@../css/stylesUserWindow.css" text="BIENVENIDO">
                <HBox.margin>
                   <Insets top="22.0" />
