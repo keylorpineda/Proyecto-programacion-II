@@ -43,7 +43,10 @@ public class LoginWindowController implements Initializable {
 
         if (userManager.authenticateUser(username, password)) {
             try {
-                FlowController.getInstance().goView("UserViewWindow");
+                FlowController flow = FlowController.getInstance();
+                flow.goView("UserViewWindow");
+                UserViewWindowController controller = flow.getController("UserViewWindow");
+                controller.setUserName(username);
             } catch (IOException e) {
                 utilities.showAlert(Alert.AlertType.ERROR, "Error", "No se pudo cargar la vista de usuario.");
             }
