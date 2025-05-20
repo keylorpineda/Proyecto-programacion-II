@@ -5,6 +5,7 @@ import Utilities.DataBaseManager;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SpaceManager {
@@ -123,5 +124,22 @@ public class SpaceManager {
         } finally {
             em.close();
         }
+    }
+
+    public List<Space> flattenMatrix(Space[][] matrix) {
+        List<Space> list = new ArrayList<>();
+        if (matrix == null) {
+            return list;
+        }
+        for (Space[] row : matrix) {
+            if (row != null) {
+                for (Space s : row) {
+                    if (s != null) {
+                        list.add(s);
+                    }
+                }
+            }
+        }
+        return list;
     }
 }

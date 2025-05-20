@@ -4,10 +4,12 @@ import Models.Reservation;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import Utilities.DataBaseManager;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class ReservationManager {
+
     private static ReservationManager instance;
 
     private ReservationManager() {}
@@ -76,12 +78,24 @@ public class ReservationManager {
         EntityManager em = DataBaseManager.getEntityManager();
         try {
             TypedQuery<Reservation> query = em.createQuery(
-                "SELECT r FROM Reservation r WHERE r.space.spaceId = :spaceId AND " +
-                "(:end > r.startTime AND :start < r.endTime)", Reservation.class);
+                "SELECT r FROM Reservation r WHERE r.space.spaceId = :spaceId "
+              + "AND (:end > r.startTime AND :start < r.endTime)",
+                Reservation.class);
             query.setParameter("spaceId", spaceId);
             query.setParameter("start", start);
             query.setParameter("end", end);
             return query.getResultList().isEmpty();
+        } finally {
+            em.close();
+        }
+    }
+
+    public List<Reservation> getAllReservations() {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            TypedQuery<Reservation> q = em.createQuery(
+                "SELECT r FROM Reservation r", Reservation.class);
+            return q.getResultList();
         } finally {
             em.close();
         }

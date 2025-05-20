@@ -74,12 +74,10 @@ public class MakeReservationWindowController implements Initializable {
         Space chairA1 = new Chair("ChrA1", "Chair A1", 1, false);
         Room roomA = new Room("Room A", 50,  "A", "Sala", new ArrayList<>(Arrays.asList(deskA1, tableA1, chairA1)));
 
-        // Room B
         Space deskB1 = new Desk("DskB1", "Desk B1", 4, false);
         Space chairB1 = new Chair("ChrB1", "Chair B1", 1, true);
         Room roomB = new Room("Room B", 40, "B", "Sala", new ArrayList<>(Arrays.asList(deskB1, chairB1)));
 
-        // Room C
         Space tableC1 = new Table("TblC1", "Table C1", 6, false);
         Space chairC1 = new Chair("ChrC1", "Chair C1", 1, false);
         Space chairC2 = new Chair("ChrC2", "Chair C2", 1, false);

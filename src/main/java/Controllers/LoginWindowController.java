@@ -1,5 +1,6 @@
 package Controllers;
 
+import Models.User;
 import Services.UserManager;
 import com.mycompany.proyectoprogramacionii.App;
 import Utilities.graphicUtilities;
@@ -44,14 +45,22 @@ public class LoginWindowController implements Initializable {
         if (userManager.authenticateUser(username, password)) {
             try {
                 FlowController flow = FlowController.getInstance();
-                flow.goView("UserViewWindow");
-                UserViewWindowController controller = flow.getController("UserViewWindow");
-                controller.setUserName(username);
+                User u = userManager.getCurrentUser();
+                if (u.isAdmin()) {
+                    flow.goView("AdminPrincipalWindow");
+
+                } else {
+                    flow.goView("UserViewWindow");
+                    UserViewWindowController usrCtrl
+                            = flow.getController("UserViewWindow");
+                    usrCtrl.setUserName(u.getName());
+                }
             } catch (IOException e) {
-                utilities.showAlert(Alert.AlertType.ERROR, "Error", "No se pudo cargar la vista de usuario.");
+                utilities.showAlert(Alert.AlertType.ERROR,"Error", "No se pudo cargar la siguiente ventana.");
+                e.printStackTrace();
             }
         } else {
-            utilities.showAlert(Alert.AlertType.ERROR, "Error al iniciar sesión", "Datos de ingreso incorrectos");
+            utilities.showAlert(Alert.AlertType.ERROR, "Error al iniciar sesión","Datos de ingreso incorrectos");
         }
     }
 

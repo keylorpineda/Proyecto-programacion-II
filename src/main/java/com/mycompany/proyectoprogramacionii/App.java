@@ -1,5 +1,6 @@
 package com.mycompany.proyectoprogramacionii;
 
+import Utilities.DataBaseManager;
 import Utilities.FlowController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -14,8 +15,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-    FlowController.getInstance().initFlow(stage);
-    FlowController.getInstance().goView("LoginWindow");
+        DataBaseManager.init();
+        FlowController.getInstance().initFlow(stage);
+        FlowController.getInstance().goView("LoginWindow");
     }
 
     public static void setRoot(String fxml) throws IOException {
