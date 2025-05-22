@@ -125,4 +125,18 @@ public class UserManager {
             em.close();
         }
     }
+    
+    public User getUserByUsername(String username) {
+    EntityManager em = DataBaseManager.getEntityManager();
+    try {
+        TypedQuery<User> query = em.createQuery(
+            "SELECT u FROM User u WHERE u.userName = :username", User.class
+        );
+        query.setParameter("username", username);
+        return query.getResultStream().findFirst().orElse(null);
+    } finally {
+        em.close();
+    }
+}
+
 }
