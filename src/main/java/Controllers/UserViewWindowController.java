@@ -19,6 +19,7 @@ import com.mycompany.proyectoprogramacionii.App;
 import java.io.IOException;
 import javafx.scene.control.Alert;
 import Utilities.graphicUtilities;
+import javafx.scene.layout.VBox;
 
 public class UserViewWindowController {
 
@@ -57,6 +58,14 @@ public class UserViewWindowController {
     private Button btnMakeReservation;
     
      private graphicUtilities utilities;
+    @FXML
+    private Button btnConfiguracion;
+    @FXML
+    private VBox VBoxMenuUsuario;
+    @FXML
+    private Button btnPerfilUusuario;
+    @FXML
+    private Button btnEditarUsuario;
 
     public void initialize() {
         utilities = new graphicUtilities();
@@ -98,10 +107,24 @@ public class UserViewWindowController {
         reservationList.addAll(reservationManager.getReservationsByUser(username));
         tbvReservationTable.refresh();
     }
+    
+    @FXML
+    private void toggleMenuOpciones(ActionEvent event) {
+    VBoxMenuUsuario.setVisible(!VBoxMenuUsuario.isVisible());
+    }   
 
     @FXML
     private void clickCerrarSesionUsuario(ActionEvent event) throws IOException {
         utilities.showAlert(Alert.AlertType.INFORMATION, "Sesión cerrada", "Haz cerrado sesión correctamente!!");
          FlowController.getInstance().goView("LoginWindow");
+    }
+
+    @FXML
+    private void clickVerPerfilUsuario(ActionEvent event) {
+    }
+
+    @FXML
+    private void clickEditarUsuario(ActionEvent event) throws IOException {
+         FlowController.getInstance().goView("EditCustomer");
     }
 }
