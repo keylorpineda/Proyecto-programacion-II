@@ -30,13 +30,11 @@ public class SignUpWindowController implements Initializable {
     private PasswordField txtUserPassword;
     @FXML
     private Button btnCreateAccount;
+    @FXML
+    private Button btnBack;
 
     private graphicUtilities utilities;
     private UserManager userManager;
-    @FXML
-    private Button btnBack;
-    @FXML
-    private Button btnEditUser;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -62,6 +60,16 @@ public class SignUpWindowController implements Initializable {
             return;
         }
 
+        if (userManager.getUserByIdentification(id) != null) {
+            utilities.showAlert(AlertType.ERROR, "Cédula duplicada", "Ya existe un usuario con esta cédula.");
+            return;
+        }
+
+        if (userManager.getUserByUsername(userName) != null) {
+            utilities.showAlert(AlertType.ERROR, "Nombre de usuario duplicado", "El nombre de usuario ya está en uso.");
+            return;
+        }
+
         Customer newCustomer = new Customer(name, lastName, id, userName, password);
         userManager.addUser(newCustomer); 
 
@@ -72,10 +80,5 @@ public class SignUpWindowController implements Initializable {
     @FXML
     private void backWindow(ActionEvent event) throws IOException {
         FlowController.getInstance().goView("LoginWindow");
-    }
-
-    @FXML
-    private void clickEditUser(ActionEvent event) throws IOException {
-        FlowController.getInstance().goView("EditCustomer");
     }
 }
