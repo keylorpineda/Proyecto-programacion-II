@@ -21,7 +21,7 @@
          <children>
             <Button fx:id="btnCerrarSesion" mnemonicParsing="false" onAction="#clickCerrarSesionUsuario" prefHeight="35.0" prefWidth="49.0" style="-fx-background-color: #034C53;">
                <HBox.margin>
-                  <Insets right="420.0" top="20.0" />
+                  <Insets right="340.0" top="20.0" />
                </HBox.margin>
                <graphic>
                   <ImageView fitHeight="39.0" fitWidth="59.0" pickOnBounds="true" preserveRatio="true">
@@ -31,26 +31,55 @@
                   </ImageView>
                </graphic>
             </Button>
-            <Label prefHeight="38.0" prefWidth="117.0" styleClass="textFieldTitle" stylesheets="@../css/stylesUserWindow.css" text="BIENVENIDO">
+            <Label prefHeight="38.0" prefWidth="150.0" styleClass="textFieldTitle" stylesheets="@../css/stylesUserWindow.css" text="BIENVENIDO">
                <HBox.margin>
                   <Insets top="22.0" />
                </HBox.margin>
             </Label>
-            <Label fx:id="lblUserName" prefHeight="38.0" prefWidth="126.0" styleClass="textFieldUserName" stylesheets="@../css/stylesUserWindow.css">
+            <Label fx:id="lblUserName" prefHeight="38.0" prefWidth="181.0" styleClass="textFieldUserName" stylesheets="@../css/stylesUserWindow.css">
                <HBox.margin>
-                  <Insets right="30.0" top="20.0" />
+                  <Insets right="10.0" top="20.0" />
                </HBox.margin>
             </Label>
+            <Button fx:id="btnConfiguracion" mnemonicParsing="false" onAction="#toggleMenuOpciones" prefHeight="39.0" prefWidth="81.0" style="-fx-background-color: #034C53;">
+               <HBox.margin>
+                  <Insets right="10.0" top="20.0" />
+               </HBox.margin>
+               <graphic>
+                  <ImageView fitHeight="38.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/btnConfiguration.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
          </children>
          <VBox.margin>
             <Insets />
          </VBox.margin>
+         <padding>
+            <Insets right="10.0" />
+         </padding>
       </HBox>
-      <Button fx:id="btnMakeReservation" mnemonicParsing="false" onAction="#clickChange" prefHeight="42.0" prefWidth="196.0" styleClass="makeReservationButton" stylesheets="@../css/stylesUserWindow.css" text="Hacer una reservacion" VBox.vgrow="ALWAYS">
-         <VBox.margin>
-            <Insets right="600.0" top="25.0" />
-         </VBox.margin>
-      </Button>
+      <HBox prefHeight="100.0" prefWidth="200.0">
+         <children>
+            <Button fx:id="btnMakeReservation" mnemonicParsing="false" onAction="#clickChange" prefHeight="42.0" prefWidth="196.0" styleClass="makeReservationButton" stylesheets="@../css/stylesUserWindow.css" text="Hacer una reservacion">
+               <HBox.margin>
+                  <Insets left="10.0" top="25.0" />
+               </HBox.margin>
+            </Button>
+            <VBox fx:id="VBoxMenuUsuario" prefHeight="100.0" prefWidth="57.0" spacing="10.0" visible="false">
+               <children>
+                  <Button fx:id="btnPerfilUusuario" mnemonicParsing="false" onAction="#clickVerPerfilUsuario" text="PERFIL" />
+                  <Button fx:id="btnEditarUsuario" mnemonicParsing="false" onAction="#clickEditarUsuario" text="EDITAR" />
+                  <Button mnemonicParsing="false" text="#3" />
+               </children>
+               <HBox.margin>
+                  <Insets left="520.0" />
+               </HBox.margin>
+            </VBox>
+         </children>
+      </HBox>
       <ToggleButton fx:id="tgbShowReservation" mnemonicParsing="false" onAction="#showReservationTable" prefHeight="42.0" prefWidth="158.0" styleClass="toggleButton" stylesheets="@../css/stylesUserWindow.css" text="Mostrar Reservaciones" VBox.vgrow="ALWAYS">
          <VBox.margin>
             <Insets left="200.0" />
