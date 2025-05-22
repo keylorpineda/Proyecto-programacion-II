@@ -1,91 +1,33 @@
 package Models;
-import java.util.List;
+
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
-@Table(name = "room")
+@Table(name = "rooms")
 public class Room {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Id
-    @Column(name = "room_id")
-    private String idRoom;
+    private int rows;
+    private int cols;
 
-    @Column(name = "room_name", nullable = false)
-    private String roomName;
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Space> spaces = new ArrayList<>();
 
-    @Column(name = "capacity")
-    private int roomCapacity;
+    public Room() { }
 
-    @Column(name = "room_type", length = 50)
-    private String roomType;
-
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
-    private List<Space> spaceList;
-
-    public Room() {
-    }
-    public Room(String roomName, int roomCapacity, String idRoom, String roomType, List<Space> spaceList) {
-        this.roomName = roomName;
-        this.roomCapacity = roomCapacity;
-        this.idRoom = idRoom;
-        this.roomType = roomType;
-        this.spaceList = spaceList;
-    }
-    public void addSpace(Space space) {
-        spaceList.add(space);
-    }
-    public void eliminatedSpace(Space space) {
-        spaceList.remove(space);
-    }
-    public Space getSpecificSpace(int index) {
-        if (index >= 0 && index < spaceList.size()) {
-            return spaceList.get(index);
-        }
-        return null;
+    public Room(int rows, int cols) {
+        this.rows = rows;
+        this.cols = cols;
     }
 
-    public List<Space> getAvailableSpaces(){
-        return spaceList;
-    }
-
-    public String getRoomName() {
-        return roomName;
-    }
-
-    public void setRoomName(String roomName) {
-        this.roomName = roomName;
-    }
-
-    public int getRoomCapacity() {
-        return roomCapacity;
-    }
-
-    public void setRoomCapacity(int roomCapacity) {
-        this.roomCapacity = roomCapacity;
-    }
-
-    public String getIdRoom() {
-        return idRoom;
-    }
-
-    public void setIdRoom(String idRoom) {
-        this.idRoom = idRoom;
-    }
-
-    public String getRoomType() {
-        return roomType;
-    }
-
-    public void setRoomType(String roomType) {
-        this.roomType = roomType;
-    }
-
-    public List<Space> getSpaceList() {
-        return spaceList;
-    }
-
-    public void setSpaceList(List<Space> spaceList) {
-        this.spaceList = spaceList;
-    }
-    
+    public Long getId() { return id; }
+    public int getRows() { return rows; }
+    public void setRows(int rows) { this.rows = rows; }
+    public int getCols() { return cols; }
+    public void setCols(int cols) { this.cols = cols; }
+    public List<Space> getSpaces() { return spaces; }
+    public void setSpaces(List<Space> spaces) { this.spaces = spaces; }
 }
