@@ -149,7 +149,7 @@ public class AdminPrincipalWindowController implements Initializable {
             private final Button btn = new Button("Eliminar");
             { btn.setOnAction(e -> {
                 User u = getTableView().getItems().get(getIndex());
-                userService.delete(u.getIdentification());
+                userService.delete(u.getId());
                 usersList.remove(u);
             }); }
             @Override protected void updateItem(Void item, boolean empty) {
@@ -180,7 +180,7 @@ private void onCreateAdmin(ActionEvent ev) {
     }
 
     // 3) Instanciar tu entidad con el constructor requerido
-    Administrator admin = new Administrator(nm, ln, id, usr, pwd);
+    Administrator admin = new Administrator(Long.valueOf(id), nm, ln, usr, pwd);
 
     // 4) Intentar persistir con el servicio y manejar excepciones
     UserService userService = new UserService();

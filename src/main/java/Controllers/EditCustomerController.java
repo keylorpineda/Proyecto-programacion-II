@@ -1,93 +1,95 @@
 package Controllers;
 
 import Models.User;
-import Services.UserManager;
-import Utilities.DataBaseManager;
+import Services.UserService;
 import Utilities.FlowController;
 import Utilities.graphicUtilities;
-import jakarta.persistence.EntityManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-
+import javafx.scene.control.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class EditCustomerController implements Initializable {
 
-    @FXML
-    private TextField txtIdentificationToEdit;
-    @FXML
-    private TextField txtNameToEdit;
-    @FXML
-    private TextField txtLastNameToEdit;
-    @FXML
-    private TextField txtUserToEdit;
-    @FXML
-    private TextField txtPasswordToEdit;
-    @FXML
-    private Button btnCancelarEditado;
-    @FXML
-    private Button btnGuardarEditado;
+    @FXML private TextField    txtIdentificationToEdit;
+    @FXML private TextField    txtNameToEdit;
+    @FXML private TextField    txtLastNameToEdit;
+    @FXML private TextField    txtUserToEdit;
+    @FXML private PasswordField txtPasswordToEdit;
+    @FXML private Button       btnCancelarEditado;
+    @FXML private Button       btnGuardarEditado;
 
-    private final UserManager userManager = UserManager.getInstance();
-    private final graphicUtilities utilities = new graphicUtilities();
-
-    private User currentUser;
+    private final UserService       userService = new UserService();
+    private final graphicUtilities  utilities   = new graphicUtilities();
+    private User                    currentUser;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // El campo de identificación no se edita
         txtIdentificationToEdit.setDisable(true);
-
         if (currentUser == null) {
-            currentUser = userManager.getCurrentUser();
-            if (currentUser != null) {
-                fillFields(currentUser);
-            } else {
-                utilities.showAlert(AlertType.ERROR, "Error", "No se pudo cargar la información del usuario.");
-            }
+            // Si no se cargó el usuario, mostramos error
+            utilities.showAlert(AlertType.ERROR,
+                                "Error",
+                                "No se pudo cargar la información del usuario.");
         }
     }
 
+    /** Será llamado desde el controlador padre para inyectar el User */
     public void setUser(User u) {
         this.currentUser = u;
         fillFields(u);
     }
 
+    /** Rellena los campos con los datos actuales del usuario */
     private void fillFields(User u) {
-        txtIdentificationToEdit.setText(u.getIdentification());
+        txtIdentificationToEdit.setText(String.valueOf(u.getId()));
         txtNameToEdit.setText(u.getName());
         txtLastNameToEdit.setText(u.getLastName());
-        txtUserToEdit.setText(u.getUserName());
+        txtUserToEdit.setText(u.getName());
         txtPasswordToEdit.setText(u.getPassword());
     }
 
+    /** Maneja el guardado de los cambios */
     @FXML
     private void clickGuardarEdit(ActionEvent event) {
-        String nuevoNombre = txtNameToEdit.getText().trim();
-        String nuevoApellido = txtLastNameToEdit.getText().trim();
-        String nuevoUsuario = txtUserToEdit.getText().trim();
+        String nuevoNombre     = txtNameToEdit.getText().trim();
+        String nuevoApellido   = txtLastNameToEdit.getText().trim();
+        String nuevoUsername   = txtUserToEdit.getText().trim();
         String nuevaContrasena = txtPasswordToEdit.getText().trim();
 
-        if (nuevoNombre.isEmpty() || nuevoApellido.isEmpty()
-                || nuevoUsuario.isEmpty() || nuevaContrasena.isEmpty()) {
-            utilities.showAlert(AlertType.WARNING, "Campos incompletos", "Todos los campos deben llenarse.");
+        // Validaciones básicas
+        if (nuevoNombre.isEmpty()
+         || nuevoApellido.isEmpty()
+         || nuevoUsername.isEmpty()
+         || nuevaContrasena.isEmpty()) {
+            utilities.showAlert(AlertType.WARNING,
+                                "Campos incompletos",
+                                "Todos los campos deben llenarse.");
+            return;
+        }
+        // La contraseña debe tener 6 caracteres si cambia
+        if (!nuevaContrasena.equals(currentUser.getPassword())
+         && nuevaContrasena.length() != 6) {
+            utilities.showAlert(AlertType.WARNING,
+                                "Contraseña inválida",
+                                "Debe tener exactamente 6 caracteres.");
+            return;
+        }
+        // Comprobar unicidad de username
+        User existente = userService.findByUserName(nuevoUsername);
+        if (existente != null
+         && !existente.getId().equals(currentUser.getId())) {
+            utilities.showAlert(AlertType.ERROR,
+                                "Usuario en uso",
+                                "Ese nombre ya está tomado.");
             return;
         }
 
-        if (!nuevaContrasena.equals(currentUser.getPassword()) && nuevaContrasena.length() != 6) {
-            utilities.showAlert(AlertType.WARNING, "Contraseña inválida", "Debe tener exactamente 6 caracteres.");
-            return;
-        }
-
-        User existente = userManager.getUserByIdentification(nuevoUsuario);
-        if (existente != null && !existente.getIdentification().equals(currentUser.getIdentification())) {
-            utilities.showAlert(AlertType.ERROR, "Usuario en uso", "Ese nombre ya está tomado.");
-            return;
-        }
-
+        // Aplicar cambios
         boolean huboCambios = false;
         if (!nuevoNombre.equals(currentUser.getName())) {
             currentUser.setName(nuevoNombre);
@@ -97,44 +99,47 @@ public class EditCustomerController implements Initializable {
             currentUser.setLastName(nuevoApellido);
             huboCambios = true;
         }
-        if (!nuevoUsuario.equals(currentUser.getUserName())) {
-            currentUser.setUserName(nuevoUsuario);
+        if (!nuevoUsername.equals(currentUser.getName())) {
+            currentUser.setName(nuevoUsername);
             huboCambios = true;
         }
         if (!nuevaContrasena.equals(currentUser.getPassword())) {
             currentUser.setPassword(nuevaContrasena);
             huboCambios = true;
         }
-
         if (!huboCambios) {
-            utilities.showAlert(AlertType.INFORMATION, "Sin cambios", "No hay nada para guardar.");
+            utilities.showAlert(AlertType.INFORMATION,
+                                "Sin cambios",
+                                "No hay nada para guardar.");
             return;
         }
 
-        EntityManager em = DataBaseManager.getEntityManager();
+        // Persistir cambios usando el servicio
         try {
-            em.getTransaction().begin();
-            em.merge(currentUser);
-            em.getTransaction().commit();
-            utilities.showAlert(AlertType.INFORMATION, "Éxito", "Datos actualizados correctamente.");
+            userService.update(currentUser);
+            utilities.showAlert(AlertType.INFORMATION,
+                                "Éxito",
+                                "Datos actualizados correctamente.");
         } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            utilities.showAlert(AlertType.ERROR, "Error", "No se pudieron guardar los cambios.");
+            utilities.showAlert(AlertType.ERROR,
+                                "Error",
+                                "No se pudieron guardar los cambios.");
             e.printStackTrace();
-        } finally {
-            em.close();
         }
     }
 
+    /** Cancela la edición y vuelve atrás */
     @FXML
     private void clickCancelarEdit(ActionEvent event) {
-        utilities.showAlert(AlertType.INFORMATION, "Cancelado", "No se realizaron cambios.");
+        utilities.showAlert(AlertType.INFORMATION,
+                            "Cancelado",
+                            "No se realizaron cambios.");
         try {
             FlowController.getInstance().goBack();
         } catch (Exception e) {
-            utilities.showAlert(AlertType.ERROR, "Error", "No se pudo cerrar la ventana.");
+            utilities.showAlert(AlertType.ERROR,
+                                "Error",
+                                "No se pudo cerrar la ventana.");
             e.printStackTrace();
         }
     }

@@ -1,23 +1,23 @@
 package Controllers;
 
 import Models.Customer;
-import Services.UserManager;
-import Utilities.FlowController;
-import com.mycompany.proyectoprogramacionii.App;
+import Models.User;
+import Services.UserService;
 import Utilities.graphicUtilities;
+import Utilities.FlowController;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.PersistenceException;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 
 public class SignUpWindowController implements Initializable {
+
     @FXML
     private TextField txtName;
     @FXML
@@ -34,51 +34,82 @@ public class SignUpWindowController implements Initializable {
     private Button btnBack;
 
     private graphicUtilities utilities;
-    private UserManager userManager;
+    private UserService userService;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         utilities = new graphicUtilities();
-        userManager = UserManager.getInstance();
+        userService = new UserService();
     }
 
     @FXML
-    private void clickOnCreate(ActionEvent event) throws IOException {
+    private void clickOnCreate(ActionEvent event) {
         String name = txtName.getText().trim();
         String lastName = txtLastName.getText().trim();
         String id = txtUserId.getText().trim();
         String userName = txtUserName.getText().trim();
         String password = txtUserPassword.getText().trim();
 
-        if (name.isEmpty() || lastName.isEmpty() || id.isEmpty() || userName.isEmpty() || password.isEmpty()) {
-            utilities.showAlert(AlertType.ERROR, "Campos incompletos", "Por favor, complete todos los campos.");
+        // 1) Validaciones
+        if (name.isEmpty() || lastName.isEmpty() || id.isEmpty()
+                || userName.isEmpty() || password.isEmpty()) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Campos incompletos",
+                    "Por favor complete todos los campos.");
             return;
         }
-
         if (password.length() < 6) {
-            utilities.showAlert(AlertType.ERROR, "Contraseña débil", "La contraseña debe tener al menos 6 caracteres.");
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Contraseña débil",
+                    "La contraseña debe tener al menos 6 caracteres.");
+            return;
+        }
+        if (userService.findByIdentification(id) != null) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Cédula duplicada",
+                    "Ya existe un usuario con esta cédula.");
+            return;
+        }
+        if (userService.findByUserName(userName) != null) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Nombre de usuario duplicado",
+                    "El nombre de usuario ya está en uso.");
             return;
         }
 
-        if (userManager.getUserByIdentification(id) != null) {
-            utilities.showAlert(AlertType.ERROR, "Cédula duplicada", "Ya existe un usuario con esta cédula.");
-            return;
+        User newUser = new Customer(Long.valueOf(id), name, lastName, userName, password);
+        try {
+            userService.save(newUser);
+            utilities.showAlert(Alert.AlertType.INFORMATION,
+                    "Usuario creado",
+                    "Usuario creado exitosamente.");
+            FlowController.getInstance().goView("LoginWindow");
+
+        } catch (EntityExistsException ex) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Cédula duplicada",
+                    "Ya existe un usuario con esta cédula.");
+        } catch (PersistenceException ex) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Nombre de usuario duplicado",
+                    "El nombre de usuario ya está en uso.");
+        } catch (IOException ex) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Error",
+                    "No se pudo cargar la ventana de login.");
+            ex.printStackTrace();
         }
-
-        if (userManager.getUserByUsername(userName) != null) {
-            utilities.showAlert(AlertType.ERROR, "Nombre de usuario duplicado", "El nombre de usuario ya está en uso.");
-            return;
-        }
-
-        Customer newCustomer = new Customer(name, lastName, id, userName, password);
-        userManager.addUser(newCustomer); 
-
-        utilities.showAlert(AlertType.INFORMATION, "Usuario creado", "Usuario creado exitosamente.");
-        FlowController.getInstance().goView("LoginWindow");
     }
 
     @FXML
-    private void backWindow(ActionEvent event) throws IOException {
-        FlowController.getInstance().goView("LoginWindow");
+    private void backWindow(ActionEvent event) {
+        try {
+            FlowController.getInstance().goView("LoginWindow");
+        } catch (IOException ex) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Error",
+                    "No se pudo regresar a la ventana de login.");
+            ex.printStackTrace();
+        }
     }
 }

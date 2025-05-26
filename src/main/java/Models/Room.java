@@ -20,7 +20,7 @@ public class Room {
     @Column(nullable = false)
     private int floor;
 
-    @Column(nullable = false)
+    @Column(name="rowsNumber",nullable = false)
     private int rows;
 
     @Column(nullable = false)

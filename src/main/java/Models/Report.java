@@ -12,7 +12,7 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name="description", nullable=false)
     private String description;
 
     @Column(nullable = false)

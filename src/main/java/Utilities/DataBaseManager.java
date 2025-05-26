@@ -9,33 +9,31 @@ import Services.UserService;
 
 public class DataBaseManager {
 
-    private static final EntityManagerFactory emf =
-        Persistence.createEntityManagerFactory("CoworkingProgram");
+    private static final EntityManagerFactory emf
+            = Persistence.createEntityManagerFactory("CoworkingProgram");
 
     public static void init() {
         seedDefaultAdmin();
     }
 
     private static void seedDefaultAdmin() {
-        
         UserService userService = new UserService();
-
         boolean hasAdmin = userService.findAll()
-                         .stream()
-                         .anyMatch(User::isAdmin);
-if (!hasAdmin) {
+                .stream()
+                .anyMatch(User::isAdmin);
+        if (!hasAdmin) {
+            // ID = 1, lo asignamos nosotros
             Administrator sysAdmin = new Administrator(
-                1L,
-                "Sistema",
-                "Administrador",
-                "admin@coworking.com",
-                "123456"
+                    1L,
+                    "Sistema",
+                    "Administrador",
+                    "admin@coworking.com",
+                    "123456"
             );
             userService.save(sysAdmin);
         }
     }
 
-   
     public static EntityManager getEntityManager() {
         return emf.createEntityManager();
     }

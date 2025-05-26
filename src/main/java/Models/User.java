@@ -1,4 +1,3 @@
-
 package Models;
 
 import jakarta.persistence.*;
@@ -9,49 +8,79 @@ import jakarta.persistence.*;
 public abstract class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
     private Long id;
 
-    @Column(nullable = false, length = 30)
-    private String firstName;
+    @Column(name="name",nullable = false, length = 30)
+    private String name;
 
-    @Column(nullable = false, length = 30)
+    @Column(name="lastName", nullable = false, length = 30)
     private String lastName;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(name="email",nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(nullable = false, length = 100)
+    @Column(name="password",nullable = false, length = 100)
     private String password;
 
-    public User() { }
+    public User() {
+    }
 
-    public User(Long id, String firstName, String lastName, String email, String password) {
+    public User(Long id, String name, String lastName, String email, String password) {
         this.id = id;
-        this.firstName = firstName;
+        this.name = name;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
     }
 
-    public Long getId() { return id; }
-    protected void setId(Long id) { this.id = id; }
+    public String getName() {
+        return name;
+    }
 
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    protected void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     @Transient
-    public String getFullName() { return firstName + " " + lastName; }
+    public String getFullName() {
+        return name + " " + lastName;
+    }
 
     @Transient
-    public boolean isAdmin() { return this instanceof Administrator; }
+    public boolean isAdmin() {
+        return this instanceof Administrator;
+    }
 }

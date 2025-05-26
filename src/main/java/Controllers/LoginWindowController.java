@@ -1,8 +1,7 @@
 package Controllers;
 
 import Models.User;
-import Services.UserManager;
-import com.mycompany.proyectoprogramacionii.App;
+import Services.UserService;
 import Utilities.graphicUtilities;
 import Utilities.FlowController;
 import javafx.event.ActionEvent;
@@ -19,9 +18,6 @@ import java.util.ResourceBundle;
 
 public class LoginWindowController implements Initializable {
 
-    private graphicUtilities utilities;
-    private UserManager userManager;
-
     @FXML
     private TextField txtUserNameLogin;
     @FXML
@@ -31,10 +27,13 @@ public class LoginWindowController implements Initializable {
     @FXML
     private Button btnCreateAccount;
 
+    private graphicUtilities utilities;
+    private UserService userService;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         utilities = new graphicUtilities();
-        userManager = UserManager.getInstance();
+        userService = new UserService();
     }
 
     @FXML
@@ -42,13 +41,19 @@ public class LoginWindowController implements Initializable {
         String username = txtUserNameLogin.getText().trim();
         String password = txtUserPassword.getText().trim();
 
-        if (userManager.authenticateUser(username, password)) {
+        if (username.isEmpty() || password.isEmpty()) {
+            utilities.showAlert(Alert.AlertType.WARNING,
+                    "Campos incompletos",
+                    "Debe ingresar usuario y contraseña.");
+            return;
+        }
+
+        User u = userService.authenticate(username, password);
+        if (u != null) {
             try {
                 FlowController flow = FlowController.getInstance();
-                User u = userManager.getCurrentUser();
                 if (u.isAdmin()) {
                     flow.goView("AdminPrincipalWindow");
-
                 } else {
                     flow.goView("UserViewWindow");
                     UserViewWindowController usrCtrl
@@ -56,21 +61,42 @@ public class LoginWindowController implements Initializable {
                     usrCtrl.setUserName(u.getName());
                 }
             } catch (IOException e) {
-                utilities.showAlert(Alert.AlertType.ERROR,"Error", "No se pudo cargar la siguiente ventana.");
+                utilities.showAlert(Alert.AlertType.ERROR,
+                        "Error",
+                        "No se pudo cargar la siguiente ventana.");
                 e.printStackTrace();
             }
         } else {
-            utilities.showAlert(Alert.AlertType.ERROR, "Error al iniciar sesión","Datos de ingreso incorrectos");
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Error al iniciar sesión",
+                    "Usuario o contraseña incorrectos.");
         }
     }
 
     @FXML
-    private void CreateAccount(ActionEvent event) throws IOException {
+    private void clickConfiguracionUsuario(ActionEvent event) {
+        // Aquí pones lo que deba hacer ese botón,
+        // por ejemplo navegar a la ventana de configuración:
+        try {
+            FlowController.getInstance().goView("UserConfigWindow");
+        } catch (IOException e) {
+            new graphicUtilities().showAlert(
+                    Alert.AlertType.ERROR,
+                    "Error",
+                    "No se pudo abrir configuración de usuario."
+            );
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void CreateAccount(ActionEvent event) {
         try {
             FlowController.getInstance().goView("SignUpWindow");
         } catch (IOException e) {
-            utilities.showAlert(
-                    Alert.AlertType.ERROR, "Error", "No se pudo cargar la ventana de registro.");
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Error",
+                    "No se pudo cargar la ventana de registro.");
         }
     }
 }
