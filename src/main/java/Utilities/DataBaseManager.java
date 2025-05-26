@@ -2,37 +2,40 @@ package Utilities;
 
 import Models.Administrator;
 import Models.User;
-import Services.UserManager;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import Services.UserService;
 
 public class DataBaseManager {
 
-    private static final EntityManagerFactory emf
-            = Persistence.createEntityManagerFactory("CoworkingProgram");
+    private static final EntityManagerFactory emf =
+        Persistence.createEntityManagerFactory("CoworkingProgram");
 
     public static void init() {
         seedDefaultAdmin();
     }
 
     private static void seedDefaultAdmin() {
-        UserManager um = UserManager.getInstance();
-        boolean hasAdmin = um.getAllUsers()
-                .stream()
-                .anyMatch(User::isAdmin);
-        if (!hasAdmin) {
+        
+        UserService userService = new UserService();
+
+        boolean hasAdmin = userService.findAll()
+                         .stream()
+                         .anyMatch(User::isAdmin);
+if (!hasAdmin) {
             Administrator sysAdmin = new Administrator(
-                    "Sistema",
-                    "Administrador",
-                    "000000000",
-                    "admin",
-                    "123456"
+                1L,
+                "Sistema",
+                "Administrador",
+                "admin@coworking.com",
+                "123456"
             );
-            um.addUser(sysAdmin);
+            userService.save(sysAdmin);
         }
     }
 
+   
     public static EntityManager getEntityManager() {
         return emf.createEntityManager();
     }

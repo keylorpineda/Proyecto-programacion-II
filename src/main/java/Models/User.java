@@ -1,88 +1,57 @@
+
 package Models;
+
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
-@Entity                      
-@Table(name = "users")    
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE) 
-@DiscriminatorColumn(name = "role")
-public class User {
-    @Id                    
-    @Column(name = "user_name", length = 50)
-    private String userName;
 
-    @Column(name = "name", nullable = false, length = 30)
-    private String name;
+@Entity
+@Table(name = "users")
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class User {
 
-    @Column(name = "last_name", nullable = false, length = 30)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 30)
+    private String firstName;
+
+    @Column(nullable = false, length = 30)
     private String lastName;
 
-    @Column(name = "identification", unique = true, length = 9)
-    private String identification;
+    @Column(nullable = false, unique = true, length = 100)
+    private String email;
 
-    @Column(name = "password", nullable = false, length = 8)  
+    @Column(nullable = false, length = 100)
     private String password;
 
-    @Column(name = "role", insertable = false, updatable = false)
-    private String role;
-    public User() {
-    }
-  
-    public User(String name, String lastName, String id,String userName, String password) {
-        this.userName = userName;
-        this.name = name;
+    public User() { }
+
+    public User(Long id, String firstName, String lastName, String email, String password) {
+        this.id = id;
+        this.firstName = firstName;
         this.lastName = lastName;
-        this.identification = id;
+        this.email = email;
         this.password = password;
     }
 
-    public String getUserName() {
-        return userName;
-    }
+    public Long getId() { return id; }
+    protected void setId(Long id) { this.id = id; }
 
-    public String getName() {
-        return name;
-    }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
 
-    public String getLastName() {
-        return lastName;
-    }
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
 
-    public String getIdentification() {
-        return identification;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setIdentification(String identification) {
-        this.identification = identification;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    public void updatePassword(String newPassword){
-        password = newPassword;
-    }
-     public String getRole() {
-        return role;
-    }
-     
     @Transient
-    public boolean isAdmin() {
-        return "admin".equals(role);
-    }
+    public String getFullName() { return firstName + " " + lastName; }
+
+    @Transient
+    public boolean isAdmin() { return this instanceof Administrator; }
 }

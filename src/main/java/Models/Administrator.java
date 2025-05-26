@@ -1,18 +1,16 @@
+
 package Models;
-import jakarta.persistence.*; 
+
+import jakarta.persistence.*;
+
 @Entity
-@DiscriminatorValue("admin")
+@Table(name = "administrators")
+@PrimaryKeyJoinColumn(name = "id")
 public class Administrator extends User {
 
-    public Administrator() {
-        super();
-    }
-    
-    public Administrator(String userName, String name, String lastName, String identification, String password) {
-        super(userName, name, lastName, identification, password);
-    }
-    public void manageUsers(){}
-    public void manageSpaces(){}
-    public void manageReservations(){}
+    public Administrator() { }
 
+    public Administrator(Long id, String firstName, String lastName, String email, String password) {
+        super(id, firstName, lastName, email, password);
+    }
 }

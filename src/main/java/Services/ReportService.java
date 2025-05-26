@@ -1,35 +1,21 @@
 package Services;
 
-import Models.Space;
-import Models.User;
+import Models.Report;
+import Utilities.DataBaseManager;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import java.util.List;
 
 public class ReportService {
 
-    private static ReportService instance;
-
-    private ReportService() {}
-
-    public static ReportService getInstance() {
-        if (instance == null) {
-            instance = new ReportService();
+    public List<Report> findAll() {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            TypedQuery<Report> q = em.createQuery(
+                "SELECT r FROM Report r", Report.class);
+            return q.getResultList();
+        } finally {
+            em.close();
         }
-        return instance;
     }
-
-    /*public List<Space> mostReservedSpaces() {
-        return 
-    }
-
-    public List<User> mostActiveUsers() {
-       
-    }
-
-    public List<String> peakHours() {
-       
-    }
-
-    public void generateReport() {
-        
-    }*/
 }

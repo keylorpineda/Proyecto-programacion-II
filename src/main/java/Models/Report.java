@@ -1,53 +1,36 @@
+
 package Models;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "report")
+@Table(name = "reports")
 public class Report {
 
     @Id
-    @Column(name = "report_id", length = 50)
-    private String reportId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "description", nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "date_created", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime dateCreated;
 
-    public Report() {
-    }
+    public Report() { }
 
-    public Report(String reportId, String description, LocalDateTime dateCreated) {
-        this.reportId = reportId;
+    public Report(String description, LocalDateTime dateCreated) {
         this.description = description;
         this.dateCreated = dateCreated;
     }
 
-    public String getReportId() {
-        return reportId;
-    }
+    public Long getId() { return id; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public LocalDateTime getDateCreated() { return dateCreated; }
+    public void setDateCreated(LocalDateTime dateCreated) { this.dateCreated = dateCreated; }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public LocalDateTime getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setReportId(String reportId) {
-        this.reportId = reportId;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setDateCreated(LocalDateTime dateCreated) {
-        this.dateCreated = dateCreated;
-    }
+    @Transient
+    public LocalDateTime getDate() { return dateCreated; }
 }

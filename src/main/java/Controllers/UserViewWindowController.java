@@ -13,7 +13,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import Models.Reservation;
-import Services.ReservationManager;
 import Utilities.FlowController;
 import com.mycompany.proyectoprogramacionii.App;
 import java.io.IOException;
@@ -49,7 +48,6 @@ public class UserViewWindowController {
     @FXML
     private TableColumn<Reservation, String> endColumn;
 
-    private ReservationManager reservationManager;
 
     private ObservableList<Reservation> reservationList;
     @FXML
@@ -69,7 +67,6 @@ public class UserViewWindowController {
 
     public void initialize() {
         utilities = new graphicUtilities();
-        reservationManager = ReservationManager.getInstance();
         idColumn.setCellValueFactory(new PropertyValueFactory<>("reservationId"));
         placeColumn.setCellValueFactory(new PropertyValueFactory<>("place"));
         spaceColumn.setCellValueFactory(new PropertyValueFactory<>("spaceName"));
@@ -104,7 +101,6 @@ public class UserViewWindowController {
         String username = lblUserName.getText();
 
         reservationList.clear();
-        reservationList.addAll(reservationManager.getReservationsByUser(username));
         tbvReservationTable.refresh();
     }
     
