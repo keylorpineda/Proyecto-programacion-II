@@ -2,7 +2,7 @@ package Controllers;
 
 import Models.User;
 import Services.UserService;
-import Utilities.graphicUtilities;
+import Utilities.GraphicUtilities;
 import Utilities.FlowController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -27,12 +27,12 @@ public class LoginWindowController implements Initializable {
     @FXML
     private Button btnCreateAccount;
 
-    private graphicUtilities utilities;
+    private GraphicUtilities utilities;
     private UserService userService;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        utilities = new graphicUtilities();
+        utilities = new GraphicUtilities();
         userService = new UserService();
     }
 
@@ -75,12 +75,10 @@ public class LoginWindowController implements Initializable {
 
     @FXML
     private void clickConfiguracionUsuario(ActionEvent event) {
-        // Aquí pones lo que deba hacer ese botón,
-        // por ejemplo navegar a la ventana de configuración:
         try {
             FlowController.getInstance().goView("UserConfigWindow");
         } catch (IOException e) {
-            new graphicUtilities().showAlert(
+            new GraphicUtilities().showAlert(
                     Alert.AlertType.ERROR,
                     "Error",
                     "No se pudo abrir configuración de usuario."

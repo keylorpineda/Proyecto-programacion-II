@@ -22,12 +22,11 @@ public class DataBaseManager {
                 .stream()
                 .anyMatch(User::isAdmin);
         if (!hasAdmin) {
-            // ID = 1, lo asignamos nosotros
             Administrator sysAdmin = new Administrator(
                     1L,
                     "Sistema",
                     "Administrador",
-                    "admin@coworking.com",
+                    "admin",
                     "123456"
             );
             userService.save(sysAdmin);

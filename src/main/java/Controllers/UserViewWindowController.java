@@ -17,7 +17,7 @@ import Utilities.FlowController;
 import com.mycompany.proyectoprogramacionii.App;
 import java.io.IOException;
 import javafx.scene.control.Alert;
-import Utilities.graphicUtilities;
+import Utilities.GraphicUtilities;
 import javafx.scene.layout.VBox;
 
 public class UserViewWindowController {
@@ -55,7 +55,7 @@ public class UserViewWindowController {
     @FXML
     private Button btnMakeReservation;
     
-     private graphicUtilities utilities;
+     private GraphicUtilities utilities;
     @FXML
     private Button btnConfiguracion;
     @FXML
@@ -66,7 +66,7 @@ public class UserViewWindowController {
     private Button btnEditarUsuario;
 
     public void initialize() {
-        utilities = new graphicUtilities();
+        utilities = new GraphicUtilities();
         idColumn.setCellValueFactory(new PropertyValueFactory<>("reservationId"));
         placeColumn.setCellValueFactory(new PropertyValueFactory<>("place"));
         spaceColumn.setCellValueFactory(new PropertyValueFactory<>("spaceName"));

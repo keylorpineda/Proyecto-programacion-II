@@ -3,7 +3,7 @@ package Controllers;
 import Models.Customer;
 import Models.User;
 import Services.UserService;
-import Utilities.graphicUtilities;
+import Utilities.GraphicUtilities;
 import Utilities.FlowController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -33,12 +33,12 @@ public class SignUpWindowController implements Initializable {
     @FXML
     private Button btnBack;
 
-    private graphicUtilities utilities;
+    private GraphicUtilities utilities;
     private UserService userService;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        utilities = new graphicUtilities();
+        utilities = new GraphicUtilities();
         userService = new UserService();
     }
 

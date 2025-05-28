@@ -3,7 +3,7 @@ package Controllers;
 import Models.User;
 import Services.UserService;
 import Utilities.FlowController;
-import Utilities.graphicUtilities;
+import Utilities.GraphicUtilities;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -23,7 +23,7 @@ public class EditCustomerController implements Initializable {
     @FXML private Button       btnGuardarEditado;
 
     private final UserService       userService = new UserService();
-    private final graphicUtilities  utilities   = new graphicUtilities();
+    private final GraphicUtilities  utilities   = new GraphicUtilities();
     private User                    currentUser;
 
     @Override

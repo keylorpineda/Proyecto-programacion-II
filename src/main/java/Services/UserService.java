@@ -64,7 +64,10 @@ public class UserService {
     public User findByUserName(String userName) {
         EntityManager em = DataBaseManager.getEntityManager();
         try {
-            return em.find(User.class, userName);
+            TypedQuery<User> q = em.createQuery(
+                    "SELECT u FROM User u WHERE u.userName = :usr", User.class);
+            q.setParameter("usr", userName);
+            return q.getResultStream().findFirst().orElse(null);
         } finally {
             em.close();
         }

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -15,115 +14,164 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #007074;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.AdminPrincipalWindowController">
+<VBox prefHeight="600.0" prefWidth="800.0"
+      style="-fx-background-color: #007074;"
+      xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="Controllers.AdminPrincipalWindowController">
 
   <children>
-
+    <!-- Cabecera -->
     <HBox prefHeight="79.0" spacing="20.0" style="-fx-background-color: #034C53;">
       <children>
-        <Label styleClass="textFieldTitle" stylesheets="@../css/styles.css" text="Panel De Administrador">
-               <HBox.margin>
-                  <Insets left="150.0" top="15.0" />
-               </HBox.margin></Label>
-        <Label styleClass="textFieldGlobal" stylesheets="@../css/AdminPrincipalWindow.css" text="BIENVENIDO">
-               <HBox.margin>
-                  <Insets left="100.0" top="20.0" />
-               </HBox.margin></Label>
-        <Label fx:id="lblUserName" prefHeight="38.0" prefWidth="92.0" styleClass="textFieldUserName" stylesheets="@../css/stylesUserWindow.css">
-               <HBox.margin>
-                  <Insets top="15.0" />
-               </HBox.margin></Label>
+        <Label text="Panel De Administrador"
+               styleClass="textFieldTitle"
+               stylesheets="@../css/styles.css">
+          <HBox.margin>
+            <Insets left="150.0" top="15.0"/>
+          </HBox.margin>
+        </Label>
+        <Label text="BIENVENIDO"
+               styleClass="textFieldGlobal"
+               stylesheets="@../css/AdminPrincipalWindow.css">
+          <HBox.margin>
+            <Insets left="100.0" top="20.0"/>
+          </HBox.margin>
+        </Label>
+        <Label fx:id="lblUserName"
+               prefHeight="38.0" prefWidth="92.0"
+               styleClass="textFieldUserName"
+               stylesheets="@../css/stylesUserWindow.css">
+          <HBox.margin>
+            <Insets top="15.0"/>
+          </HBox.margin>
+        </Label>
       </children>
     </HBox>
 
-
+    <!-- Cuerpo -->
     <HBox VBox.vgrow="ALWAYS">
-      <children>
+      <!-- Menú lateral -->
+      <VBox alignment="TOP_CENTER" prefWidth="189.0" spacing="25.0">
+        <children>
+          <Label text="Opciones"
+                 styleClass="textFieldGlobal"
+                 stylesheets="@../css/AdminPrincipalWindow.css"/>
+          <ToggleButton fx:id="tgViewUsers"
+                        text="Usuarios"
+                        onAction="#tgShowUsersTable"
+                        styleClass="buttonToggle"
+                        stylesheets="@../css/AdminPrincipalWindow.css"/>
+          <ToggleButton fx:id="tgViewRooms"
+                        text="Plano"
+                        onAction="#tgShowRoomTable"
+                        styleClass="buttonToggle"
+                        stylesheets="@../css/AdminPrincipalWindow.css"/>
+          <ToggleButton fx:id="tgViewReservations"
+                        text="Reservas"
+                        onAction="#tgShowReservationsTable"
+                        styleClass="buttonToggle"
+                        stylesheets="@../css/AdminPrincipalWindow.css"/>
+          <ToggleButton fx:id="tgViewReports"
+                        text="Reportes"
+                        onAction="#tgShowReport"
+                        styleClass="buttonToggle"
+                        stylesheets="@../css/AdminPrincipalWindow.css"/>
+          <ToggleButton fx:id="tgCreateAdmin"
+                        text="Crear Admin"
+                        onAction="#tgCreateAdmin"
+                        styleClass="buttonToggle"
+                        stylesheets="@../css/AdminPrincipalWindow.css"/>
+        </children>
+      </VBox>
 
-        <VBox alignment="TOP_CENTER" prefWidth="189.0" spacing="25.0">
-          <children>
-            <Label styleClass="textFieldGlobal" stylesheets="@../css/AdminPrincipalWindow.css" text="Opciones" />
-            <ToggleButton fx:id="tgViewUsers" onAction="#tgShowUsersTable" prefHeight="73.0" prefWidth="156.0" styleClass="buttonToggle" stylesheets="@../css/AdminPrincipalWindow.css" text="Usuarios" />
-            <ToggleButton fx:id="tgViewRooms" onAction="#tgShowRoomTable" prefHeight="73.0" prefWidth="154.0" styleClass="buttonToggle" stylesheets="@../css/AdminPrincipalWindow.css" text="Salas" />
-            <ToggleButton fx:id="tgViewReservations" onAction="#tgShowReservationsTable" prefHeight="64.0" prefWidth="156.0" styleClass="buttonToggle" stylesheets="@../css/AdminPrincipalWindow.css" text="Reservas" />
-            <ToggleButton fx:id="tgViewReports" onAction="#tgShowReport" prefHeight="66.0" prefWidth="162.0" styleClass="buttonToggle" stylesheets="@../css/AdminPrincipalWindow.css" text="Reportes" />
-            <ToggleButton fx:id="tgCreateAdmin" onAction="#tgCreateAdmin" prefHeight="74.0" prefWidth="166.0" styleClass="buttonToggle" stylesheets="@../css/AdminPrincipalWindow.css" text="Crear un Administrador" />
-          </children>
-        </VBox>
+      <!-- Área dinámica -->
+      <StackPane fx:id="spGeneralContent" HBox.hgrow="ALWAYS" style="-fx-padding:20;">
+        <children>
+          <!-- Tabla de Usuarios -->
+          <TableView fx:id="tblUsers" prefHeight="400.0" visible="true">
+            <columns>
+              <TableColumn fx:id="colId"       prefWidth="80.0"  text="Cédula"/>
+              <TableColumn fx:id="colName"     prefWidth="120.0" text="Nombre"/>
+              <TableColumn fx:id="colLastName" prefWidth="120.0" text="Apellido"/>
+              <TableColumn fx:id="colUsername" prefWidth="120.0" text="Usuario"/>
+              <TableColumn fx:id="colEdit"     prefWidth="80.0"  text="Editar"/>
+              <TableColumn fx:id="colDelete"   prefWidth="80.0"  text="Eliminar"/>
+            </columns>
+          </TableView>
 
-    
-        <StackPane fx:id="spGeneralContent" style="-fx-padding:20;" HBox.hgrow="ALWAYS">
-          <children>
-            <TableView fx:id="tblUsers" prefHeight="400.0" visible="false">
-              <columns>
-                <TableColumn fx:id="colId" prefWidth="80.0" text="Cédula" />
-                <TableColumn fx:id="colName" prefWidth="120.0" text="Nombre" />
-                <TableColumn fx:id="colLastName" prefWidth="120.0" text="Apellido" />
-                <TableColumn fx:id="colUsername" prefWidth="120.0" text="Usuario" />
-                <TableColumn fx:id="colEdit" prefWidth="80.0" text="Editar" />
-                <TableColumn fx:id="colDelete" prefWidth="80.0" text="Eliminar" />
-              </columns>
-            </TableView>
+          <!-- “Plano” -->
+          <TableView fx:id="tblRooms" prefHeight="400.0" visible="false">
+            <columns>
+              <TableColumn fx:id="colRoomId"   prefWidth="100.0" text="ID Plano"/>
+              <TableColumn fx:id="colRoomName" prefWidth="150.0" text="Nombre"/>
+              <TableColumn fx:id="colCapacity" prefWidth="100.0" text="Capacidad"/>
+              <TableColumn fx:id="colRoomType" prefWidth="150.0" text="Tipo"/>
+            </columns>
+          </TableView>
 
-            <TableView fx:id="tblRooms" prefHeight="400.0" visible="false">
-              <columns>
-                <TableColumn fx:id="colRoomId" prefWidth="100.0" text="ID Sala" />
-                <TableColumn fx:id="colRoomName" prefWidth="150.0" text="Nombre" />
-                <TableColumn fx:id="colCapacity" prefWidth="100.0" text="Capacidad" />
-                <TableColumn fx:id="colRoomType" prefWidth="150.0" text="Tipo" />
-              </columns>
-            </TableView>
+          <!-- Reservas -->
+          <TableView fx:id="tblReservations" prefHeight="400.0" visible="false">
+            <columns>
+              <TableColumn fx:id="colResId"    prefWidth="100.0" text="ID Reserva"/>
+              <TableColumn fx:id="colResUser"  prefWidth="120.0" text="Usuario"/>
+              <TableColumn fx:id="colResRoom"  prefWidth="120.0" text="Plano/Espacio"/>
+              <TableColumn fx:id="colResDate"  prefWidth="100.0" text="Fecha"/>
+              <TableColumn fx:id="colResStart" prefWidth="80.0"  text="Inicio"/>
+              <TableColumn fx:id="colResEnd"   prefWidth="80.0"  text="Fin"/>
+            </columns>
+          </TableView>
 
-            <TableView fx:id="tblReservations" prefHeight="400.0" visible="false">
-              <columns>
-                <TableColumn fx:id="colResId" prefWidth="100.0" text="ID Reserva" />
-                <TableColumn fx:id="colResUser" prefWidth="120.0" text="Usuario" />
-                <TableColumn fx:id="colResRoom" prefWidth="120.0" text="Sala/Espacio" />
-                <TableColumn fx:id="colResDate" prefWidth="100.0" text="Fecha" />
-                <TableColumn fx:id="colResStart" prefWidth="80.0" text="Inicio" />
-                <TableColumn fx:id="colResEnd" prefWidth="80.0" text="Fin" />
-              </columns>
-            </TableView>
+          <!-- Reportes -->
+          <TableView fx:id="tblReports" prefHeight="400.0" visible="false">
+            <columns>
+              <TableColumn fx:id="colReportId"   prefWidth="100.0" text="ID Rep"/>
+              <TableColumn fx:id="colReportName" prefWidth="200.0" text="Descripción"/>
+              <TableColumn fx:id="colReportDate" prefWidth="100.0" text="Fecha"/>
+            </columns>
+          </TableView>
 
-            <TableView fx:id="tblReports" prefHeight="400.0" visible="false">
-              <columns>
-                <TableColumn fx:id="colReportId" prefWidth="100.0" text="ID Reporte" />
-                <TableColumn fx:id="colReportName" prefWidth="200.0" text="Descripción" />
-                <TableColumn fx:id="colReportDate" prefWidth="100.0" text="Fecha" />
-              </columns>
-            </TableView>
-
-            <GridPane fx:id="formAdmin" hgap="10.0" vgap="10.0" visible="false">
-              <columnConstraints>
-                <ColumnConstraints percentWidth="30.0" />
-                <ColumnConstraints percentWidth="70.0" />
-              </columnConstraints>
-              <children>
-                <Label text="Cédula:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                <TextField fx:id="txtAdminId" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                <Label text="Nombre:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                <TextField fx:id="txtAdminName" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <Label text="Apellido:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                <TextField fx:id="txtAdminLastName" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                <Label text="Usuario:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                <TextField fx:id="txtAdminUser" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                <Label text="Contraseña:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                <PasswordField fx:id="txtAdminPass" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                <Button onAction="#onCreateAdmin" text="Guardar" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-              </children>
-                     <rowConstraints>
-                        <RowConstraints />
-                        <RowConstraints />
-                        <RowConstraints />
-                        <RowConstraints />
-                        <RowConstraints />
-                        <RowConstraints />
-                     </rowConstraints>
-            </GridPane>
-
-          </children>
-        </StackPane>
-      </children>
+          <!-- Formulario Crear Administrador -->
+          <GridPane fx:id="formAdmin" hgap="10.0" vgap="10.0" visible="false">
+            <columnConstraints>
+              <ColumnConstraints percentWidth="30.0"/>
+              <ColumnConstraints percentWidth="70.0"/>
+            </columnConstraints>
+            <rowConstraints>
+              <RowConstraints/>
+              <RowConstraints/>
+              <RowConstraints/>
+              <RowConstraints/>
+              <RowConstraints/>
+              <RowConstraints/>
+            </rowConstraints>
+            <children>
+              <Label       text="Cédula:"         GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+              <TextField   fx:id="txtAdminId"     GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+              
+              <Label       text="Nombre:"         GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+              <TextField   fx:id="txtAdminName"   GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+              
+              <Label       text="Apellido:"       GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+              <TextField   fx:id="txtAdminLastName"
+                           GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+              
+              <Label       text="Usuario:"        GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+              <TextField   fx:id="txtAdminUser"
+                           GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+              
+              <Label         text="Contraseña:"     GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+              <PasswordField fx:id="txtAdminPass"
+                             GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+              
+              <Button text="Guardar"
+                      onAction="#onCreateAdmin"
+                      GridPane.rowIndex="5"
+                      GridPane.columnIndex="1"/>
+            </children>
+          </GridPane>
+        </children>
+      </StackPane>
     </HBox>
   </children>
 </VBox>
