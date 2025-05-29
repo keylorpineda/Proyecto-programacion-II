@@ -14,18 +14,6 @@
    <children>
       <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="540.0" prefWidth="654.0" style="-fx-background-color: #123458;" VBox.vgrow="ALWAYS">
          <children>
-            <Button fx:id="btnConfiguracion" mnemonicParsing="false" onAction="#clickConfiguracionUsuario" prefHeight="43.0" prefWidth="39.0" style="-fx-background-color: #123458;">
-               <graphic>
-                  <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/btnConfiguration.png" />
-                     </image>
-                  </ImageView>
-               </graphic>
-               <VBox.margin>
-                  <Insets bottom="-40.0" left="590.0" top="5.0" />
-               </VBox.margin>
-            </Button>
             <ImageView fitHeight="123.0" fitWidth="130.0" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS">
                <image>
                   <Image url="@../images/userImage.png" />

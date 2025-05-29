@@ -2,7 +2,7 @@ package Controllers;
 
 import Models.User;
 import Services.UserService;
-import Utilities.GraphicUtilities;
+import Utilities.graphicUtilities;
 import Utilities.FlowController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -27,12 +27,12 @@ public class LoginWindowController implements Initializable {
     @FXML
     private Button btnCreateAccount;
 
-    private GraphicUtilities utilities;
+    private graphicUtilities utilities;
     private UserService userService;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        utilities = new GraphicUtilities();
+        utilities = new graphicUtilities();
         userService = new UserService();
     }
 
@@ -49,7 +49,9 @@ public class LoginWindowController implements Initializable {
         }
 
         User u = userService.authenticate(username, password);
+        
         if (u != null) {
+            UserService.setCurrentUser(u);
             try {
                 FlowController flow = FlowController.getInstance();
                 if (u.isAdmin()) {
@@ -78,7 +80,7 @@ public class LoginWindowController implements Initializable {
         try {
             FlowController.getInstance().goView("UserConfigWindow");
         } catch (IOException e) {
-            new GraphicUtilities().showAlert(
+            new graphicUtilities().showAlert(
                     Alert.AlertType.ERROR,
                     "Error",
                     "No se pudo abrir configuración de usuario."

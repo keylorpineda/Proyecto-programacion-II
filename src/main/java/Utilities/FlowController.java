@@ -46,7 +46,6 @@ public class FlowController {
     }
 
     public void goView(String viewName) throws IOException {
-        // Guardar la vista actual en el historial
         if (mainStage.getScene() != null) {
             String current = getCurrentViewName();
             if (current != null) {
@@ -65,7 +64,6 @@ public class FlowController {
             loaderCache.put(viewName, loader);
         }
 
-        // Mostrarla
         mainStage.setScene(scene);
         mainStage.sizeToScene();
         mainStage.show();

@@ -3,7 +3,7 @@ package Controllers;
 import Models.Customer;
 import Models.User;
 import Services.UserService;
-import Utilities.GraphicUtilities;
+import Utilities.graphicUtilities;
 import Utilities.FlowController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -33,12 +33,12 @@ public class SignUpWindowController implements Initializable {
     @FXML
     private Button btnBack;
 
-    private GraphicUtilities utilities;
+    private graphicUtilities utilities;
     private UserService userService;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        utilities = new GraphicUtilities();
+        utilities = new graphicUtilities();
         userService = new UserService();
     }
 
@@ -80,6 +80,7 @@ public class SignUpWindowController implements Initializable {
         User newUser = new Customer(Long.valueOf(id), name, lastName, userName, password);
         try {
             userService.save(newUser);
+              UserService.setCurrentUser(newUser);
             utilities.showAlert(Alert.AlertType.INFORMATION,
                     "Usuario creado",
                     "Usuario creado exitosamente.");

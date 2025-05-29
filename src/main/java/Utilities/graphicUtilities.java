@@ -14,7 +14,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-public class GraphicUtilities {
+public class graphicUtilities {
 
     public void showAlert(AlertType type, String title, String message) {
         Alert alert = new Alert(type);
