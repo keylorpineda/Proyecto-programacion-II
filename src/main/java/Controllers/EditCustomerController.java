@@ -4,6 +4,7 @@ import Models.User;
 import Services.UserService;
 import Utilities.FlowController;
 import Utilities.graphicUtilities;
+import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -40,22 +41,20 @@ public class EditCustomerController implements Initializable {
     private final graphicUtilities utilities = new graphicUtilities();
     private User currentUser;
 
-   @Override
-public void initialize(URL location, ResourceBundle resources) {
-    txtIdentificationToEdit.setDisable(true);
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        txtIdentificationToEdit.setDisable(true);
 
-    currentUser = UserService.getCurrentUser();
-    if (currentUser != null) {
-        fillFields(currentUser);
-    } else {
-        utilities.showAlert(AlertType.ERROR,
-                "Error",
-                "No se pudo cargar la información del usuario.");
+        currentUser = UserService.getCurrentUser();
+        if (currentUser != null) {
+            fillFields(currentUser);
+        } else {
+            utilities.showAlert(AlertType.ERROR,
+                    "Error",
+                    "No se pudo cargar la información del usuario.");
+        }
     }
-}
 
-
-    /** Rellena los campos con los datos actuales del usuario */
     private void fillFields(User u) {
         txtIdentificationToEdit.setText(String.valueOf(u.getId()));
         txtNameToEdit.setText(u.getName());
@@ -64,9 +63,8 @@ public void initialize(URL location, ResourceBundle resources) {
         txtPasswordToEdit.setText(u.getPassword());
     }
 
-    /** Maneja el guardado de los cambios */
     @FXML
-    private void clickGuardarEdit(ActionEvent event) {
+    private void clickGuardarEdit(ActionEvent event) throws IOException {
         String nuevoNombre = txtNameToEdit.getText().trim();
         String nuevoApellido = txtLastNameToEdit.getText().trim();
         String nuevoUsername = txtUserToEdit.getText().trim();
@@ -79,23 +77,19 @@ public void initialize(URL location, ResourceBundle resources) {
                     "Todos los campos deben llenarse.");
             return;
         }
-
-        if (!nuevaContrasena.equals(currentUser.getPassword())
-                && nuevaContrasena.length() < 6) {
+        if (nuevaContrasena.length() > 6) {
             utilities.showAlert(AlertType.WARNING,
                     "Contraseña inválida",
-                    "Debe tener al menos 6 caracteres.");
+                    "La contraseña no debe tener más de 6 caracteres.");
             return;
         }
-
         User existente = userService.findByUserName(nuevoUsername);
         if (existente != null && !existente.getId().equals(currentUser.getId())) {
             utilities.showAlert(AlertType.ERROR,
                     "Usuario en uso",
-                    "Ese nombre ya está tomado.");
+                    "Ese nombre de usuario ya está registrado.");
             return;
         }
-
         boolean huboCambios = false;
         if (!nuevoNombre.equals(currentUser.getName())) {
             currentUser.setName(nuevoNombre);
@@ -113,19 +107,18 @@ public void initialize(URL location, ResourceBundle resources) {
             currentUser.setPassword(nuevaContrasena);
             huboCambios = true;
         }
-
         if (!huboCambios) {
             utilities.showAlert(AlertType.INFORMATION,
                     "Sin cambios",
                     "No hay nada para guardar.");
             return;
         }
-
         try {
             userService.update(currentUser);
             utilities.showAlert(AlertType.INFORMATION,
                     "Éxito",
                     "Datos actualizados correctamente.");
+            FlowController.getInstance().goView("UserViewWindow");
         } catch (Exception e) {
             utilities.showAlert(AlertType.ERROR,
                     "Error",
@@ -133,20 +126,21 @@ public void initialize(URL location, ResourceBundle resources) {
             e.printStackTrace();
         }
     }
-
-    /** Cancela la edición y vuelve atrás */
     @FXML
-    private void clickCancelarEdit(ActionEvent event) {
+    private void clickCancelarEdit(ActionEvent event) throws IOException {
         utilities.showAlert(AlertType.INFORMATION,
                 "Cancelado",
                 "No se realizaron cambios.");
-        try {
-            FlowController.getInstance().goBack();
-        } catch (Exception e) {
+        User original = userService.findByIdentification(currentUser.getId());
+
+        if (original != null) {
+            currentUser = original;       
+            fillFields(currentUser);      
+        } else {
             utilities.showAlert(AlertType.ERROR,
                     "Error",
-                    "No se pudo cerrar la ventana.");
-            e.printStackTrace();
+                    "No se pudo recargar la información del usuario.");
         }
+        FlowController.getInstance().goView("UserViewWindow");
     }
 }

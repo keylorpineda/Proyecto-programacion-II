@@ -49,7 +49,7 @@ public class LoginWindowController implements Initializable {
         }
 
         User u = userService.authenticate(username, password);
-        
+
         if (u != null) {
             UserService.setCurrentUser(u);
             try {

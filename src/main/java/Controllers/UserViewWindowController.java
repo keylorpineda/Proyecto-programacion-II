@@ -48,14 +48,13 @@ public class UserViewWindowController {
     @FXML
     private TableColumn<Reservation, String> endColumn;
 
-
     private ObservableList<Reservation> reservationList;
     @FXML
     private Button btnCerrarSesion;
     @FXML
     private Button btnMakeReservation;
-    
-     private graphicUtilities utilities;
+
+    private graphicUtilities utilities;
     @FXML
     private Button btnConfiguracion;
     @FXML
@@ -80,10 +79,12 @@ public class UserViewWindowController {
     public void setUserName(String userName) {
         lblUserName.setText(userName);
     }
+
     @FXML
     private void clickChange(ActionEvent event) throws IOException {
         FlowController.getInstance().goView("MakeReservationWindow");
     }
+
     @FXML
     private void showReservationTable(ActionEvent event) {
         boolean isSelected = tgbShowReservation.isSelected();
@@ -103,24 +104,22 @@ public class UserViewWindowController {
         reservationList.clear();
         tbvReservationTable.refresh();
     }
-    
+
     @FXML
     private void toggleMenuOpciones(ActionEvent event) {
-    VBoxMenuUsuario.setVisible(!VBoxMenuUsuario.isVisible());
-    }   
-
+        VBoxMenuUsuario.setVisible(!VBoxMenuUsuario.isVisible());
+    }
     @FXML
     private void clickCerrarSesionUsuario(ActionEvent event) throws IOException {
         utilities.showAlert(Alert.AlertType.INFORMATION, "Sesión cerrada", "Haz cerrado sesión correctamente!!");
-         FlowController.getInstance().goView("LoginWindow");
+        FlowController.getInstance().goView("LoginWindow");
     }
-
     @FXML
     private void clickVerPerfilUsuario(ActionEvent event) {
     }
 
     @FXML
     private void clickEditarUsuario(ActionEvent event) throws IOException {
-         FlowController.getInstance().goView("EditCustomer");
+        FlowController.getInstance().goView("EditCustomer");
     }
 }

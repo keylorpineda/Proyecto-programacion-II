@@ -74,7 +74,7 @@ public class UserService {
         }
     }
 
-    public User findByIdentification(String identification) {
+    public User findByIdentification(Long identification) {
         EntityManager em = DataBaseManager.getEntityManager();
         try {
             return em.find(User.class, identification);

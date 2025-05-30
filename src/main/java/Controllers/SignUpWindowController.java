@@ -46,12 +46,13 @@ public class SignUpWindowController implements Initializable {
     private void clickOnCreate(ActionEvent event) {
         String name = txtName.getText().trim();
         String lastName = txtLastName.getText().trim();
-        String id = txtUserId.getText().trim();
+        Long id = Long.parseLong(txtUserId.getText().trim());
         String userName = txtUserName.getText().trim();
         String password = txtUserPassword.getText().trim();
+        String idText = txtUserId.getText().trim();
 
         // 1) Validaciones
-        if (name.isEmpty() || lastName.isEmpty() || id.isEmpty()
+        if (name.isEmpty() || lastName.isEmpty() || idText.isEmpty()
                 || userName.isEmpty() || password.isEmpty()) {
             utilities.showAlert(Alert.AlertType.ERROR,
                     "Campos incompletos",
@@ -80,7 +81,7 @@ public class SignUpWindowController implements Initializable {
         User newUser = new Customer(Long.valueOf(id), name, lastName, userName, password);
         try {
             userService.save(newUser);
-              UserService.setCurrentUser(newUser);
+            UserService.setCurrentUser(newUser);
             utilities.showAlert(Alert.AlertType.INFORMATION,
                     "Usuario creado",
                     "Usuario creado exitosamente.");
