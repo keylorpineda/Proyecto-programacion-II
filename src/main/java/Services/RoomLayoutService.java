@@ -14,7 +14,7 @@ public class RoomLayoutService {
         var room = roomService.findById(roomId);
         List<SpaceDTO> spaces = room.getSpaces()
                                     .stream()
-                                    .map(SpaceMapper::toDTO)
+                                     .map(SpaceMapper::toDTO)
                                     .collect(Collectors.toList());
         return new RoomLayoutDTO(spaces, room.getRows(), room.getCols());
     }
