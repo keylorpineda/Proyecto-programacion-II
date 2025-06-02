@@ -16,8 +16,10 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         DataBaseManager.init();
+        Utilities.DataInitializer.initializeIfNeeded();
         FlowController.getInstance().initFlow(stage);
         FlowController.getInstance().goView("LoginWindow");
+
     }
 
     public static void setRoot(String fxml) throws IOException {

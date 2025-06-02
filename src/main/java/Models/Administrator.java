@@ -11,6 +11,6 @@ public class Administrator extends User {
     public Administrator() { }
 
     public Administrator(Long id, String firstName, String lastName, String email, String password) {
-        super(id, firstName, lastName, email, password);
+        super(id, firstName, lastName, email, password, "ADMIN"); 
     }
 }

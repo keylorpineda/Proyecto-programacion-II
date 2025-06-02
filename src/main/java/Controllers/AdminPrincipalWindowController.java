@@ -1,191 +1,143 @@
 package Controllers;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
-// Asegúrate de que la ruta sea la correcta a tu FlowController:
+import Models.Room;
+import Models.Space;
+import Models.User;
+import Models.Reservation;
+import Models.Report;
+import Models.SpaceType;
+import Services.RoomService;
+import Services.SpaceService;
+import Utilities.DataInitializer;
 import Utilities.FlowController;
-
+import Utilities.SpaceVisualFactory;
+import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import java.net.URL;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 public class AdminPrincipalWindowController implements Initializable {
 
-    // ===== 1) CABECERA =====
+    @FXML
+    private Label lblUserName;
+    @FXML
+    private Button btnBack;
+    @FXML
+    private VBox sidebar;
+    @FXML
+    private HBox breadcrumb;
+    @FXML
+    private ToggleButton tgViewUsers;
+    @FXML
+    private ToggleButton tgViewRooms;
+    @FXML
+    private ToggleButton tgViewReservations;
+    @FXML
+    private ToggleButton tgViewReports;
+    @FXML
+    private ToggleButton tgCreateAdmin;
+    @FXML
+    private StackPane spGeneralContent;
 
-    /** Etiqueta donde se muestra el nombre de usuario */
-    @FXML private Label lblUserName;
+    @FXML
+    private ScrollPane spUsersScroll;
+    @FXML
+    private ScrollPane spRoomsScroll;
+    @FXML
+    private ScrollPane spReservationsScroll;
+    @FXML
+    private ScrollPane spReportsScroll;
 
-    /** Botón “Back” (flecha) que vuelve a LoginWindow o retrocede en historial */
-    @FXML private Button btnBack;
+    @FXML
+    private TableView<User> tblUsers;
+    @FXML
+    private TableView<Room> tblRooms;
+    @FXML
+    private TableView<Reservation> tblReservations;
+    @FXML
+    private TableView<Report> tblReports;
 
-    // ===== 2) SIDEBAR =====
+    @FXML
+    private TableColumn<User, Long> colId;
+    @FXML
+    private TableColumn<User, String> colName;
+    @FXML
+    private TableColumn<User, String> colLastName;
+    @FXML
+    private TableColumn<User, String> colUsername;
+    @FXML
+    private TableColumn<User, String> colRole;
 
-    /** Botón para colapsar/expandir el sidebar */
-    @FXML private Button btnToggleSidebar;
+    @FXML
+    private GridPane formAdmin;
+    @FXML
+    private TextField txtAdminId;
+    @FXML
+    private TextField txtAdminName;
+    @FXML
+    private TextField txtAdminLastName;
+    @FXML
+    private TextField txtAdminUser;
+    @FXML
+    private PasswordField txtAdminPass;
 
-    /** Contenedor del sidebar (VBox) */
-    @FXML private VBox sidebar;
+    @FXML
+    private GridPane gridPlano;
+    @FXML
+    private Button btnAddSpace;
+    @FXML
+    private ComboBox<Room> comboBoxPiso;
 
-    // ===== 3) BREADCRUMB =====
-
-    /** HBox que contiene “Inicio > Usuarios” */
-    @FXML private HBox breadcrumb;
-
-    // ===== 4) TOGGLE BUTTONS del menú lateral =====
-
-    @FXML private ToggleButton tgViewUsers;
-    @FXML private ToggleButton tgViewRooms;
-    @FXML private ToggleButton tgViewReservations;
-    @FXML private ToggleButton tgViewReports;
-    @FXML private ToggleButton tgCreateAdmin;
-
-    // ===== 5) ÁREA DINÁMICA =====
-
-    @FXML private StackPane spGeneralContent;
-
-    // ===== 6) TABLAS =====
-
-    @FXML private TableView<?> tblUsers;
-    @FXML private TableView<?> tblRooms;
-    @FXML private TableView<?> tblReservations;
-    @FXML private TableView<?> tblReports;
-
-    // ===== 7) FORMULARIO “Crear Administrador” =====
-
-    @FXML private GridPane formAdmin;
-    @FXML private TextField txtAdminId;
-    @FXML private TextField txtAdminName;
-    @FXML private TextField txtAdminLastName;
-    @FXML private TextField txtAdminUser;
-    @FXML private PasswordField txtAdminPass;
+    private Room currentRoom;
+    private RoomService roomService = new RoomService();
+    private SpaceService spaceService = new SpaceService();
+    private boolean[][] ocupado;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Al cargar la ventana, mostramos por defecto la tabla de usuarios:
+        DataInitializer.initializeIfNeeded();
+        cargarComboBoxPisos();
         showUsers();
-
-        // Ocultamos el breadcrumb (“Inicio > Usuarios”) al iniciar:
         breadcrumb.setVisible(false);
 
-        // (Opcional) Aquí podrías inyectar datos de prueba en tblUsers para comprobar
-        // visualmente que se ve correctamente. Ejemplo:
-        //
-        // colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        // colName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        // colLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-        // colUsername.setCellValueFactory(new PropertyValueFactory<>("userName"));
-        // tblUsers.getItems().addAll(
-        //     new Usuario("123", "Juan", "Pérez", "juanp"),
-        //     new Usuario("456", "María", "Gómez", "mariag")
-        // );
-    }
+        tgViewUsers.setOnAction(this::tgShowUsersTable);
+        tgViewRooms.setOnAction(this::tgShowRoomTable);
+        tgViewReservations.setOnAction(this::tgShowReservationsTable);
+        tgViewReports.setOnAction(this::tgShowReport);
+        tgCreateAdmin.setOnAction(this::tgCreateAdmin);
+        btnAddSpace.setOnAction(this::onAddSpace);
 
-    // ===============================================
-    // 1) HANDLER DEL BOTÓN “Back” (flecha en la cabecera)
-    // ===============================================
-    @FXML
-    private void onBackAction(ActionEvent event) {
-        try {
-            // Si quieres ir siempre a LoginWindow:
-            FlowController.getInstance().goView("LoginWindow");
-
-            // Si en vez de forzar a LoginWindow prefieres usar el historial:
-            // FlowController.getInstance().goBack();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            // Si quieres, aquí puedes mostrar un Alert en pantalla si falla.
+        if (tblUsers != null) {
+            colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+            colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+            colLastName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+            colUsername.setCellValueFactory(new PropertyValueFactory<>("userName"));
+            colRole.setCellValueFactory(new PropertyValueFactory<>("userRole"));
         }
     }
 
-    // ===============================================
-    // 2) HANDLER PARA COLAPSAR / EXPANDIR EL SIDEBAR
-    // ===============================================
-    @FXML
-    private void onToggleSidebar(ActionEvent event) {
-        double currentWidth = sidebar.getPrefWidth();
-
-        if (currentWidth > 80) {
-            // --------------- Colapsar --------------- 
-            // Reducimos a 80px de ancho, y ocultamos el texto de los toggles
-            sidebar.setPrefWidth(80);
-
-            tgViewUsers.setText("");
-            tgViewRooms.setText("");
-            tgViewReservations.setText("");
-            tgViewReports.setText("");
-            tgCreateAdmin.setText("");
-        } else {
-            // -------------- Expandir --------------- 
-            // Restauramos 189px de ancho y ponemos de nuevo el texto
-            sidebar.setPrefWidth(189);
-
-            tgViewUsers.setText("Usuarios");
-            tgViewRooms.setText("Plano");
-            tgViewReservations.setText("Reservas");
-            tgViewReports.setText("Reportes");
-            tgCreateAdmin.setText("Crear Admin");
+    private void cargarComboBoxPisos() {
+        List<Room> rooms = roomService.findAll();
+        comboBoxPiso.getItems().setAll(rooms);
+        if (!rooms.isEmpty()) {
+            comboBoxPiso.getSelectionModel().select(0);
+            currentRoom = rooms.get(0);
+            cargarPlanoDeRoomActual();
         }
+        comboBoxPiso.setOnAction(event -> {
+            currentRoom = comboBoxPiso.getValue();
+            cargarPlanoDeRoomActual();
+        });
     }
 
-    // =================================================
-    // 3) HANDLERS PARA LOS TOGGLEBUTTONS DEL MENÚ LATERAL
-    // =================================================
-    @FXML private void tgShowUsersTable(ActionEvent event)         { showUsers(); }
-    @FXML private void tgShowRoomTable(ActionEvent event)          { showRooms(); }
-    @FXML private void tgShowReservationsTable(ActionEvent event)  { showReservations(); }
-    @FXML private void tgShowReport(ActionEvent event)             { showReports(); }
-    @FXML private void tgCreateAdmin(ActionEvent event)            { showCreateAdminForm(); }
-
-    // ===================================================
-    // 4) HANDLER DEL “Breadcrumb”: volver a la tabla “Usuarios”
-    // ===================================================
-    @FXML
-    private void onBreadcrumbHome() {
-        showUsers();
-    }
-
-    // ===================================================
-    // 5) HANDLER PARA EL BOTÓN “Guardar” DEL FORMULARIO
-    //      Crear Administrador
-    // ===================================================
-    @FXML
-    private void onCreateAdmin(ActionEvent event) {
-        // Recogemos los datos del formulario:
-        String id       = txtAdminId.getText();
-        String name     = txtAdminName.getText();
-        String lastName = txtAdminLastName.getText();
-        String user     = txtAdminUser.getText();
-        String pass     = txtAdminPass.getText();
-
-        // TODO: aquí persiste tu nuevo administrador. Por ejemplo:
-        //    AdminService.save(new Administrator(id, name, lastName, user, pass));
-
-        // Limpiamos los campos del formulario:
-        txtAdminId.clear();
-        txtAdminName.clear();
-        txtAdminLastName.clear();
-        txtAdminUser.clear();
-        txtAdminPass.clear();
-
-        // Volvemos a la tabla de usuarios:
-        showUsers();
-    }
-
-    // ================================
-    // 6) MÉTODOS PRIVADOS DE AYUDA (MOSTRAR/OCULTAR VISTAS)
-    // ================================
     private void resetToggles() {
         tgViewUsers.setSelected(false);
         tgViewRooms.setSelected(false);
@@ -197,66 +149,271 @@ public class AdminPrincipalWindowController implements Initializable {
     private void showUsers() {
         resetToggles();
         tgViewUsers.setSelected(true);
-
-        tblUsers.setVisible(true);
-        tblRooms.setVisible(false);
-        tblReservations.setVisible(false);
-        tblReports.setVisible(false);
+        spUsersScroll.setVisible(true);
+        spRoomsScroll.setVisible(false);
+        spReservationsScroll.setVisible(false);
+        spReportsScroll.setVisible(false);
         formAdmin.setVisible(false);
-
-        // Mostramos el breadcrumb “Inicio > Usuarios”
         breadcrumb.setVisible(true);
     }
 
     private void showRooms() {
         resetToggles();
         tgViewRooms.setSelected(true);
-
-        tblUsers.setVisible(false);
-        tblRooms.setVisible(true);
-        tblReservations.setVisible(false);
-        tblReports.setVisible(false);
+        spUsersScroll.setVisible(false);
+        spRoomsScroll.setVisible(true);
+        spReservationsScroll.setVisible(false);
+        spReportsScroll.setVisible(false);
         formAdmin.setVisible(false);
-
         breadcrumb.setVisible(false);
+        cargarPlanoDeRoomActual();
     }
 
     private void showReservations() {
         resetToggles();
         tgViewReservations.setSelected(true);
-
-        tblUsers.setVisible(false);
-        tblRooms.setVisible(false);
-        tblReservations.setVisible(true);
-        tblReports.setVisible(false);
+        spUsersScroll.setVisible(false);
+        spRoomsScroll.setVisible(false);
+        spReservationsScroll.setVisible(true);
+        spReportsScroll.setVisible(false);
         formAdmin.setVisible(false);
-
         breadcrumb.setVisible(false);
     }
 
     private void showReports() {
         resetToggles();
         tgViewReports.setSelected(true);
-
-        tblUsers.setVisible(false);
-        tblRooms.setVisible(false);
-        tblReservations.setVisible(false);
-        tblReports.setVisible(true);
+        spUsersScroll.setVisible(false);
+        spRoomsScroll.setVisible(false);
+        spReservationsScroll.setVisible(false);
+        spReportsScroll.setVisible(true);
         formAdmin.setVisible(false);
-
         breadcrumb.setVisible(false);
     }
 
     private void showCreateAdminForm() {
         resetToggles();
         tgCreateAdmin.setSelected(true);
-
-        tblUsers.setVisible(false);
-        tblRooms.setVisible(false);
-        tblReservations.setVisible(false);
-        tblReports.setVisible(false);
+        spUsersScroll.setVisible(false);
+        spRoomsScroll.setVisible(false);
+        spReservationsScroll.setVisible(false);
+        spReportsScroll.setVisible(false);
         formAdmin.setVisible(true);
-
         breadcrumb.setVisible(false);
+    }
+
+    @FXML
+    private void tgShowUsersTable(ActionEvent event) {
+        showUsers();
+    }
+
+    @FXML
+    private void tgShowRoomTable(ActionEvent event) {
+        showRooms();
+    }
+
+    @FXML
+    private void tgShowReservationsTable(ActionEvent event) {
+        showReservations();
+    }
+
+    @FXML
+    private void tgShowReport(ActionEvent event) {
+        showReports();
+    }
+
+    @FXML
+    private void tgCreateAdmin(ActionEvent event) {
+        showCreateAdminForm();
+    }
+
+    @FXML
+    private void onBackAction(ActionEvent event) throws IOException {
+        FlowController.getInstance().goView("LoginWindow");
+    }
+
+    @FXML
+    private void onAddSpace(ActionEvent event) {
+        if (currentRoom == null) {
+            return;
+        }
+        // Selección de tipo de espacio
+        ChoiceDialog<SpaceType> tipoDialog = new ChoiceDialog<>(SpaceType.ESCRITORIO, SpaceType.values());
+        tipoDialog.setTitle("Agregar Espacio");
+        tipoDialog.setHeaderText("Selecciona el tipo de espacio a agregar");
+        tipoDialog.setContentText("Tipo:");
+        Optional<SpaceType> tipoResult = tipoDialog.showAndWait();
+        if (!tipoResult.isPresent()) {
+            return;
+        }
+        SpaceType tipo = tipoResult.get();
+        int width = 1, height = 1, capacidad = 1;
+        switch (tipo) {
+            case ESCRITORIO:
+                width = 1;
+                height = 1;
+                capacidad = 1;
+                break;
+            case AREA_COMUN:
+                width = 2;
+                height = 2;
+                capacidad = 6;
+                break;
+            case SALA_REUNIONES:
+                width = 3;
+                height = 2;
+                capacidad = 10;
+                break;
+            case PASILLO:
+                width = 1;
+                height = 1;
+                capacidad = 1;
+                break;
+        }
+        // Selección de nombre
+        TextInputDialog nombreDialog = new TextInputDialog(tipo.toString());
+        nombreDialog.setTitle("Nombre");
+        nombreDialog.setHeaderText("Ponle un nombre al espacio:");
+        nombreDialog.setContentText("Nombre:");
+        Optional<String> nombreResult = nombreDialog.showAndWait();
+        if (!nombreResult.isPresent() || nombreResult.get().trim().isEmpty()) {
+            return;
+        }
+        String nombre = nombreResult.get().trim();
+
+        int filas = currentRoom.getRows();
+        int columnas = currentRoom.getCols();
+        boolean[][] ocupadoTemp = new boolean[filas][columnas];
+        for (Space s : currentRoom.getSpaces()) {
+            for (int f = s.getStartRow(); f < s.getStartRow() + s.getHeight(); f++) {
+                for (int c = s.getStartCol(); c < s.getStartCol() + s.getWidth(); c++) {
+                    if (f >= 0 && f < filas && c >= 0 && c < columnas) {
+                        ocupadoTemp[f][c] = true;
+                    }
+                }
+            }
+        }
+
+        boolean added = false;
+        // Buscar la primera posición válida para el nuevo espacio
+        for (int row = 0; row <= filas - height && !added; row++) {
+            for (int col = 0; col <= columnas - width && !added; col++) {
+                boolean espacioLibre = true;
+                for (int dr = 0; dr < height; dr++) {
+                    for (int dc = 0; dc < width; dc++) {
+                        if (ocupadoTemp[row + dr][col + dc]) {
+                            espacioLibre = false;
+                        }
+                    }
+                }
+                if (espacioLibre) {
+                    // Si hay espacio, crea el espacio con esa posición
+                    Space nuevo = new Space(nombre, row, col, width, height, capacidad, tipo, currentRoom);
+                    spaceService.update(nuevo); // Aquí los valores nunca serán null
+                    added = true;
+                }
+            }
+        }
+        if (!added) {
+            // Si no se pudo añadir porque no hay espacio
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Sin espacio");
+            alert.setHeaderText("No hay suficiente espacio libre para ese tipo.");
+            alert.showAndWait();
+        }
+        cargarPlanoDeRoomActual();
+    }
+
+    private void cargarPlanoDeRoomActual() {
+        if (currentRoom == null) {
+            return;
+        }
+        // Trae el Room con todos sus spaces actualizados
+        if (currentRoom.getId() != null) {
+            currentRoom = roomService.findByIdWithSpaces(currentRoom.getId());
+        }
+        gridPlano.getChildren().clear();
+        gridPlano.getColumnConstraints().clear();
+        gridPlano.getRowConstraints().clear();
+
+        int filas = currentRoom.getRows();
+        int columnas = currentRoom.getCols();
+        for (int i = 0; i < columnas; i++) {
+            gridPlano.getColumnConstraints().add(new ColumnConstraints(60));
+        }
+        for (int i = 0; i < filas; i++) {
+            gridPlano.getRowConstraints().add(new RowConstraints(60));
+        }
+        ocupado = new boolean[filas][columnas];
+        List<Space> espacios = currentRoom.getSpaces();
+        for (Space s : espacios) {
+            Node visual = SpaceVisualFactory.createVisual(s, true, () -> confirmarEliminarEspacio(currentRoom, s));
+            gridPlano.add(visual, s.getStartCol(), s.getStartRow(), s.getWidth(), s.getHeight());
+            for (int f = s.getStartRow(); f < s.getStartRow() + s.getHeight(); f++) {
+                for (int c = s.getStartCol(); c < s.getStartCol() + s.getWidth(); c++) {
+                    if (f >= 0 && f < filas && c >= 0 && c < columnas) {
+                        ocupado[f][c] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    private void agregarNuevoEspacio(Space nuevoEspacio) {
+        spaceService.update(nuevoEspacio);
+        cargarPlanoDeRoomActual();
+    }
+
+    private void confirmarEliminarEspacio(Room room, Space space) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmar eliminación");
+        alert.setHeaderText("¿Está seguro que desea eliminar este espacio?");
+        alert.setContentText("Nombre: " + space.getName());
+        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.YES) {
+                eliminarEspacio(room, space);
+            }
+        });
+    }
+
+    private void eliminarEspacio(Room room, Space space) {
+        spaceService.delete(space);
+        cargarPlanoDeRoomActual();
+    }
+
+    @FXML
+    private void onBreadcrumbHome() {
+        showUsers();
+    }
+
+    @FXML
+    private void onCreateAdmin(ActionEvent event) {
+        txtAdminId.clear();
+        txtAdminName.clear();
+        txtAdminLastName.clear();
+        txtAdminUser.clear();
+        txtAdminPass.clear();
+        showUsers();
+    }
+
+    @FXML
+    private void onToggleSidebar(ActionEvent event) {
+        double currentWidth = sidebar.getPrefWidth();
+        if (currentWidth > 80) {
+            sidebar.setPrefWidth(80);
+            tgViewUsers.setText("");
+            tgViewRooms.setText("");
+            tgViewReservations.setText("");
+            tgViewReports.setText("");
+            tgCreateAdmin.setText("");
+        } else {
+            sidebar.setPrefWidth(189);
+            tgViewUsers.setText("Usuarios");
+            tgViewRooms.setText("Plano");
+            tgViewReservations.setText("Reservas");
+            tgViewReports.setText("Reportes");
+            tgCreateAdmin.setText("Crear Admin");
+        }
     }
 }

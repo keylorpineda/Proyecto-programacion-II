@@ -46,10 +46,9 @@ public class SignUpWindowController implements Initializable {
     private void clickOnCreate(ActionEvent event) {
         String name = txtName.getText().trim();
         String lastName = txtLastName.getText().trim();
-        Long id = Long.parseLong(txtUserId.getText().trim());
+        String idText = txtUserId.getText().trim();
         String userName = txtUserName.getText().trim();
         String password = txtUserPassword.getText().trim();
-        String idText = txtUserId.getText().trim();
 
         // 1) Validaciones
         if (name.isEmpty() || lastName.isEmpty() || idText.isEmpty()
@@ -59,18 +58,30 @@ public class SignUpWindowController implements Initializable {
                     "Por favor complete todos los campos.");
             return;
         }
+
+        if (!idText.matches("\\d+")) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Cédula inválida",
+                    "La cédula debe contener solo números.");
+            return;
+        }
+
+        Long id = Long.parseLong(idText);
+
         if (password.length() < 6) {
             utilities.showAlert(Alert.AlertType.ERROR,
                     "Contraseña débil",
                     "La contraseña debe tener al menos 6 caracteres.");
             return;
         }
+
         if (userService.findByIdentification(id) != null) {
             utilities.showAlert(Alert.AlertType.ERROR,
                     "Cédula duplicada",
                     "Ya existe un usuario con esta cédula.");
             return;
         }
+
         if (userService.findByUserName(userName) != null) {
             utilities.showAlert(Alert.AlertType.ERROR,
                     "Nombre de usuario duplicado",
@@ -78,7 +89,9 @@ public class SignUpWindowController implements Initializable {
             return;
         }
 
-        User newUser = new Customer(Long.valueOf(id), name, lastName, userName, password);
+        // 2) Crear el nuevo usuario con rol "CUSTOMER"
+        User newUser = new Customer(id, name, lastName, userName, password);
+
         try {
             userService.save(newUser);
             UserService.setCurrentUser(newUser);

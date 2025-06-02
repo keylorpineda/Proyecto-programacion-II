@@ -11,13 +11,13 @@ public class Space {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "spaceName", length = 100)
+    @Column(name = "space_name", length = 100) 
     private String name;
 
-    @Column(name = "startRow", nullable = false)
+    @Column(name = "start_row", nullable = false) 
     private int startRow;
 
-    @Column(name = "startCol", nullable = false)
+    @Column(name = "start_col", nullable = false) 
     private int startCol;
 
     @Column(name = "width", nullable = false)
@@ -25,11 +25,12 @@ public class Space {
 
     @Column(name = "height", nullable = false)
     private int height;
+
     @Column(name = "capacity", nullable = false)
     private int capacity;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "spaceType", nullable = false)
+    @Column(name = "space_type", nullable = false)
     private SpaceType type;
 
     @ManyToOne(fetch = FetchType.LAZY)

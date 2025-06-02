@@ -5,33 +5,37 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class User {
+public class User {
 
     @Id
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
 
-    @Column(name="name",nullable = false, length = 30)
+    @Column(name = "name", nullable = false, length = 30)
     private String name;
 
-    @Column(name="lastName", nullable = false, length = 30)
+    @Column(name = "lastName", nullable = false, length = 30)
     private String lastName;
 
-    @Column(name="userName",nullable = false, unique = true, length = 100)
-    private String userName; 
+    @Column(name = "userName", nullable = false, unique = true, length = 100)
+    private String userName;
 
-    @Column(name="password",nullable = false, length = 100)
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
+
+    @Column(name = "userRole", nullable = false, length = 20)
+    private String userRole;
 
     public User() {
     }
 
-    public User(Long id, String name, String lastName, String userName, String password) {
+    public User(Long id, String name, String lastName, String userName, String password, String userRole) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
         this.userName = userName;
         this.password = password;
+        this.userRole = userRole;
     }
 
     public String getName() {
@@ -66,7 +70,6 @@ public abstract class User {
         this.userName = userName;
     }
 
-    
     public String getPassword() {
         return password;
     }
@@ -75,13 +78,20 @@ public abstract class User {
         this.password = password;
     }
 
+    public String getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
+    }
+
     @Transient
     public String getFullName() {
         return name + " " + lastName;
     }
 
-    @Transient
     public boolean isAdmin() {
-        return this instanceof Administrator;
+        return "ADMIN".equalsIgnoreCase(this.userRole);
     }
 }
