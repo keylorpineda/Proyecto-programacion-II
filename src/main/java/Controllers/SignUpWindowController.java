@@ -89,7 +89,6 @@ public class SignUpWindowController implements Initializable {
             return;
         }
 
-        // 2) Crear el nuevo usuario con rol "CUSTOMER"
         User newUser = new Customer(id, name, lastName, userName, password);
 
         try {
