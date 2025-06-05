@@ -1,0 +1,356 @@
+/*------------------------------------------------------------
+  AdminPrincipalWindow.css
+  Versión “100% NEGRO Y OSCURO”
+  Paleta ajustada:
+    • Negro puro         (fondo general, sidebar):       #0C0C0C
+    • Marrón Oscuro      (header, botones seleccionados):#362222
+    • Gris muy oscuro    (rows alternas, borde de inputs):#2B2B2B
+    • Gris oscuro        (hover filas, bordes mínimos):  #423F3E
+    • Naranja (“accent”) (hover botones, focus inputs):  #FA7942
+
+  - Fondo de ScrollPane transparente para dejar ver el TableView.
+  - Tablas alternan filas entre #0C0C0C y #2B2B2B.
+  - Todas las cabeceras en marrón oscuro con texto blanco.
+  - Inputs y botones en tonos oscuros con acentos naranjas.
+------------------------------------------------------------*/
+
+
+/*=============================================================
+  1) ESTILOS GLOBALES Y RAÍZ
+   - Fondo “negro puro” en toda la ventana
+=============================================================*/
+.root {
+    -fx-background-color: #0C0C0C;   /* negro puro */
+    -fx-border-radius: 8px;          /* para esquinas redondeadas */
+    -fx-background-radius: 8px;
+}
+/* Elimina padding y spacing predeterminados */
+.vbox, .hbox {
+    -fx-padding: 0;
+    -fx-spacing: 0;
+}
+
+
+/*=============================================================
+  2) CABECERA (HBox con fx:id="header")
+   - Fondo marrón oscuro, texto en blanco
+=============================================================*/
+.header {
+    -fx-background-color: #362222;    /* marrón oscuro */
+    -fx-padding: 10 20 10 20;          /* arriba, derecha, abajo, izquierda */
+    -fx-alignment: CENTER_LEFT;
+    -fx-border-color: transparent;
+    /* Sombra suave debajo de la cabecera */
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.7), 10, 0, 0, 2);
+}
+
+/* Botón “Back” en la cabecera (solo ícono) */
+.buttonHeaderIcon {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+.buttonHeaderIcon:hover {
+    -fx-opacity: 0.8;
+}
+
+/* Título principal “Panel De Administrador” */
+.textFieldTitle {
+    -fx-font-family: "Gloucester MT Extra Condensed";
+    -fx-font-size: 34px;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: transparent;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.8), 4, 0, 0, 1);
+}
+
+/* Texto “BIENVENIDO” */
+.textFieldGlobal {
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 24px;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: transparent;
+}
+
+/* Nombre de usuario en cabecera */
+.textFieldUserName {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 18px;
+    -fx-text-fill: #FA7942; /* naranja accent */
+    -fx-background-color: transparent;
+}
+
+
+/*=============================================================
+  3) MENÚ LATERAL (VBox con fx:id="sidebar")
+   - Fondo “negro puro” y texto/blanco/naranja
+   - minWidth = 100 para que “Opciones” nunca se trunque
+=============================================================*/
+.sidebar {
+    -fx-background-color: #0C0C0C;   /* negro puro */
+    -fx-padding: 20 10 20 20;
+    -fx-spacing: 20;
+    -fx-min-width: 100px;            /* nunca baje de 100px */
+}
+
+/* Etiqueta “Opciones” en el sidebar */
+.sidebar .textFieldGlobal {
+    -fx-font-family: "Gloucester MT Extra Condensed";
+    -fx-font-size: 28px;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: transparent;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.7), 2, 0, 0, 1);
+}
+
+
+/*=============================================================
+  4) TOGGLE BUTTONS DEL MENÚ LATERAL
+   - Fondo marrón oscuro en reposo
+   - Botón seleccionado: naranja con fondo marrón
+   - Hover y armado bien definidos
+=============================================================*/
+/* Estilo base de ToggleButton */
+.buttonToggle {
+    -fx-background-color: #362222;   /* marrón oscuro */
+    -fx-text-fill: #FFFFFF;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 14px;             /* bajado a 14px */
+    -fx-border-color: #FA7942;       /* borde naranja */
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    -fx-padding: 6 15 6 15;           /* padding reducido */
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.6), 4, 0, 0, 2);
+}
+
+/* ToggleButton seleccionado */
+.buttonToggle:selected {
+    -fx-background-color: #FA7942;   /* naranja accent */
+    -fx-text-fill: #0C0C0C;          /* negro puro */
+    -fx-border-color: #FA7942;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.8), 6, 0, 0, 2);
+}
+
+/* Hover para ToggleButton */
+.buttonToggle:hover {
+    -fx-background-color: #2B2B2B;   /* gris muy oscuro al hacer hover */
+    -fx-text-fill: #FFFFFF;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* Presionado (“armed”) en ToggleButton */
+.buttonToggle:armed {
+    -fx-background-color: #171010;   /* negro más profundo al apretar */
+    -fx-text-fill: #FFFFFF;
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+
+/*=============================================================
+  5) TABLEVIEW (Todas las tablas)
+   - Sin degradados: encabezados marrón oscuro
+   - Filas alternantes: negro puro vs gris muy oscuro
+   - Hover de fila y selección en marrón
+=============================================================*/
+/* Quitar degradados y asegurar fondo transparente */
+.table-view {
+    -fx-background-color: #0C0C0C;         /* negro puro */
+    -fx-control-inner-background: #0C0C0C; /* interno de celdas */
+    -fx-table-cell-border-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Cabecera de la tabla */
+.table-view .column-header-background {
+    -fx-background-color: #362222; /* marrón oscuro */
+    -fx-border-color: #2B2B2B;     /* línea inferior gris muy oscuro */
+    -fx-border-width: 0 0 2 0;     /* solo borde abajo */
+}
+
+/* Etiquetas del encabezado */
+.table-view .column-header,
+.table-view .filler {
+    -fx-size: 32px;                     /* más alto */
+    -fx-alignment: CENTER_LEFT;
+    -fx-text-fill: #FFFFFF;             /* texto blanco */
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-background-color: transparent;
+}
+
+/* Separador vertical entre encabezados */
+.table-view .column-header .label {
+    -fx-border-color: #2B2B2B; /* gris muy oscuro */
+    -fx-border-width: 0 1 0 0; /* línea derecha */
+}
+
+/* Filas: texto blanco, padding interno */
+.table-row-cell {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-padding: 8 10 8 10;
+}
+
+/* Filas pares: negro puro */
+.table-row-cell:even {
+    -fx-background-color: #0C0C0C;
+}
+
+/* Filas impares: gris muy oscuro */
+.table-row-cell:odd {
+    -fx-background-color: #2B2B2B;
+}
+
+/* Hover de fila: levemente aclara respecto a negro puro/gris */
+.table-row-cell:hover {
+    -fx-background-color: rgba(66, 63, 62, 0.8); /* gris oscuro semi-transparente */
+}
+
+/* Fila seleccionada: fondo marrón oscuro + texto negro puro */
+.table-row-cell:filled:selected,
+.table-row-cell:filled:selected:hover {
+    -fx-background-color: #362222;
+    -fx-text-fill: #0C0C0C;
+}
+
+/* Línea separadora horizontal entre filas */
+.table-row-cell .grid-lines-visible:horizontal {
+    -fx-border-color: #0C0C0C; /* mismo negro puro, apenas perceptible */
+    -fx-border-width: 0 0 1 0; /* línea debajo de cada fila */
+}
+
+
+/*=============================================================
+  6) SCROLLPANE TRANSPARENTE (para dejar ver el fondo del TableView)
+=============================================================*/
+.transparent-scrollpane {
+    -fx-background-color: transparent;
+}
+.transparent-scrollpane .viewport {
+    -fx-background-color: transparent;
+}
+/* Fijamos un alto máximo para el ScrollPane de cada tabla */
+.transparent-scrollpane {
+    -fx-pref-height: 450;
+    -fx-max-height: 450;
+}
+
+/* Scroll vertical */
+.transparent-scrollpane .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+.transparent-scrollpane .scroll-bar:vertical .thumb {
+    -fx-background-color: #423F3E;   /* gris oscuro */
+    -fx-background-insets: 2;
+    -fx-background-radius: 4;
+}
+
+/* Scroll horizontal */
+.transparent-scrollpane .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+.transparent-scrollpane .scroll-bar:horizontal .thumb {
+    -fx-background-color: #423F3E;   /* gris oscuro */
+    -fx-background-insets: 2;
+    -fx-background-radius: 4;
+}
+
+
+/*=============================================================
+   7) GRIDPANE (Formulario “Crear Administrador”)
+   - Fondo negro puro, inputs en gris muy oscuro, botón naranja
+=============================================================*/
+/* Fondo del GridPane y espaciado */
+.grid-pane {
+    -fx-background-color: #0C0C0C;   /* negro puro */
+    -fx-padding: 20;
+    -fx-hgap: 15;
+    -fx-vgap: 15;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+/* Etiquetas dentro del formulario: texto blanco */
+.grid-pane .label {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 16px;
+    -fx-text-fill: #FFFFFF;
+    -fx-padding: 5 0 5 0;
+}
+
+/* TextField / PasswordField: fondo gris muy oscuro + borde gris oscuro */
+.grid-pane .text-field,
+.grid-pane .password-field {
+    -fx-background-color: #2B2B2B;  /* gris muy oscuro */
+    -fx-text-fill: #FFFFFF;
+    -fx-prompt-text-fill: #AAAAAA;
+    -fx-border-color: #2B2B2B;      /* borde gris muy oscuro */
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 6 10 6 10;
+}
+
+/* Focus en input: borde naranja y sombra suave */
+.grid-pane .text-field:focused,
+.grid-pane .password-field:focused {
+    -fx-border-color: #FA7942;      /* naranja accent */
+    -fx-effect: dropshadow(two-pass-box, rgba(250,121,66,0.6), 4, 0, 0, 1);
+}
+
+/* Botón “Guardar”: fondo naranja vivo, texto negro, sombra interna */
+.grid-pane .button {
+    -fx-background-color: #FA7942;  /* naranja accent */
+    -fx-text-fill: #0C0C0C;         /* negro puro */
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 16px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    -fx-padding: 8 20 8 20;
+    -fx-effect: dropshadow(inner, rgba(0,0,0,0.4), 4, 0, 0, 2);
+}
+
+/* Hover del botón “Guardar”: oscurece un poco el naranja */
+.grid-pane .button:hover {
+    -fx-background-color: #E06A3E;
+    -fx-effect: dropshadow(inner, rgba(0,0,0,0.5), 6, 0, 0, 2);
+}
+
+/* Presionado (“armed”) en el botón: se hunde un poco */
+.grid-pane .button:armed {
+    -fx-background-color: #CB5E38;
+    -fx-translate-y: 1;
+    -fx-effect: dropshadow(inner, rgba(0,0,0,0.7), 6, 0, 0, 1);
+}
+
+
+/*=============================================================
+   8) OTROS DETALLES
+   - Separator y Tooltips
+=============================================================*/
+/* Línea separadora fina (si usas <Separator>) */
+.separator {
+    -fx-background-color: #423F3E;
+    -fx-padding: 1 0 1 0;
+}
+
+/* Tooltip personalizado */
+.tooltip {
+    -fx-background-color: #362222;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-padding: 5 10 5 10;
+    -fx-background-radius: 4px;
+}
+
+/* Estilo del breadcrumb como “link” */
+.linkBreadcrumb {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 14px;
+    -fx-text-fill: #FA7942;
+    -fx-underline: true;
+    -fx-cursor: hand;
+}
