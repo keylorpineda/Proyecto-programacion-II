@@ -1,0 +1,65 @@
+.root {
+    -fx-background-color: #0C0C0C;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.info-container {
+    -fx-background-color: #1a1a1a;
+    -fx-border-color: #FA7942;
+    -fx-border-width: 3px;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(gaussian, rgba(250,121,66,0.4), 20, 0, 0, 4);
+}
+
+.info-title {
+    -fx-text-fill: white;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0 10 0;
+}
+
+.info-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.info-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.section-title {
+    -fx-text-fill: #FA7942;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.info-points {
+    -fx-background-color: #0C0C0C;
+    -fx-border-color: #FA7942;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 15;
+}
+
+.info-points Label {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+}
+
+.info-button {
+    -fx-background-color: #FA7942;
+    -fx-text-fill: #0C0C0C;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 25 10 25;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+}
+
+.info-button:hover {
+    -fx-background-color: #e56736;
+}

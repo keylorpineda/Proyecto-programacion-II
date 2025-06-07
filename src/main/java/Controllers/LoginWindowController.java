@@ -76,20 +76,6 @@ public class LoginWindowController implements Initializable {
     }
 
     @FXML
-    private void clickConfiguracionUsuario(ActionEvent event) {
-        try {
-            FlowController.getInstance().goView("UserConfigWindow");
-        } catch (IOException e) {
-            new graphicUtilities().showAlert(
-                    Alert.AlertType.ERROR,
-                    "Error",
-                    "No se pudo abrir configuración de usuario."
-            );
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
     private void CreateAccount(ActionEvent event) {
         try {
             FlowController.getInstance().goView("SignUpWindow");
@@ -99,4 +85,17 @@ public class LoginWindowController implements Initializable {
                     "No se pudo cargar la ventana de registro.");
         }
     }
+
+@FXML
+private void showInfo(ActionEvent event) {
+    try {
+        FlowController.getInstance().goView("InfoWindow");
+    } catch (IOException e) {
+        utilities.showAlert(Alert.AlertType.ERROR,
+            "Error",
+            "No se pudo cargar la ventana de información.");
+        e.printStackTrace();
+    }
+}
+
 }

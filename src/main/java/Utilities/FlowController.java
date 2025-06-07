@@ -83,7 +83,8 @@ public class FlowController {
 
     public Object openModal(String viewName) throws IOException {
         FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/fxml/" + viewName + ".fxml")
+               getClass().getResource("/FXML/" + viewName + ".fxml")
+
         );
         Parent root = loader.load();
         Stage dialog = new Stage();

@@ -1,63 +1,138 @@
-.textFieldTitle{
-    -fx-background-color: transparent;   
-    -fx-border-color: transparent;    
-    -fx-font-family: "Gloucester MT Extra Condensed";
-    -fx-text-fill: White;
-    -fx-border-width: 0px;          
-    -fx-border-radius: 0px;         
-    -fx-font-size: 30px;              
-    -fx-padding: 0px;  
-}
-.textFieldGlobal {
-    -fx-background-color: transparent;   
-    -fx-border-color: transparent;    
-    -fx-font-family: "Gloucester MT Extra Condensed";
-    -fx-text-fill: White;
-    -fx-border-width: 0px;          
-    -fx-border-radius: 0px;         
-    -fx-font-size: 20px;             
-    -fx-padding: 0px;  
-}
-.buttonNormal {
-    -fx-background-color : white;
-    -fx-border-color : white; 
-    -fx-text-fill: black;
-    -fx-font-size: 15px;
-    -fx-font-family: "Gloucester MT Extra Condensed"; 
+/*=============================================================
+  ESTILO LOGIN - NEGRO Y NARANJA
+=============================================================*/
+
+/* Fondo negro general */
+.root {
+    -fx-background-color: #0C0C0C;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
 }
 
-.buttonNormal:hover {
-    -fx-background-color: white; 
-    -fx-text-fill : blue;  
+/* Reset de padding y spacing innecesario */
+.vbox, .hbox {
+    -fx-padding: 0;
+    -fx-spacing: 0;
 }
 
+/* Contenedor principal con borde naranja */
+.login-container {
+    -fx-background-color: #0C0C0C;
+    -fx-border-color: #FA7942;
+    -fx-border-width: 3px;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-padding: 40 50 40 50;
+    -fx-effect: dropshadow(gaussian, rgba(250,121,66,0.4), 20, 0, 0, 4);
+}
+
+/* Imagen de avatar principal */
+.image-icon {
+    -fx-fit-width: 120px;
+    -fx-fit-height: 120px;
+    -fx-preserve-ratio: true;
+    -fx-padding: 0 0 30 0;
+}
+
+/* Título principal “Iniciar sesión” */
+.textFieldTitle {
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 32px;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: transparent;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.8), 4, 0, 0, 2);
+    -fx-padding: 0 0 30 0;
+    -fx-alignment: CENTER;
+}
+
+/* Contenedor de campo con ícono */
+.field-wrapper {
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 10px;
+}
+
+/* Iconos al lado de los campos */
+.field-wrapper .icon {
+    -fx-opacity: 0.9;
+    -fx-fit-width: 24px;
+    -fx-fit-height: 24px;
+}
+
+/* Campos de entrada (usuario/contraseña) */
+.text-field,
+.password-field {
+    -fx-background-color: #2B2B2B;
+    -fx-text-fill: #FFFFFF;
+    -fx-prompt-text-fill: #AAAAAA;
+    -fx-border-color: #2B2B2B;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8 12 8 12;
+    -fx-font-size: 16px;
+    -fx-pref-width: 400px;
+}
+
+.text-field:focused,
+.password-field:focused {
+    -fx-border-color: #FA7942;
+    -fx-effect: dropshadow(two-pass-box, rgba(250,121,66,0.5), 4, 0, 0, 1);
+}
+
+.text-field:hover,
+.password-field:hover {
+    -fx-background-color: #3A3A3A;
+}
+
+/* Botón principal “Ingresar” */
 .buttonSignIn {
-    -fx-background-color : white;
-    -fx-border-color : white;
-    -fx-text-fill:  #123458;
-    -fx-font-size: 20px;
-    -fx-font-family: "Gloucester MT Extra Condensed";
-}
-.buttonSignIn:hover{
-    -fx-background-color: white;  
-    -fx-text-fill : #83B4FF;
-}
-.buttonSignUp {
-    -fx-background-color : transparent;
-    -fx-border-color : transparent;
-    -fx-text-fill: White;
-    -fx-font-size: 20px;
-    -fx-font-family: "Gloucester MT Extra Condensed";
-}
-.buttonSignUp:hover {
-    -fx-background-color: transparent;  
-    -fx-text-fill : red;  
+    -fx-background-color: #FA7942;
+    -fx-text-fill: #0C0C0C;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 18px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+    -fx-padding: 10 25 10 25;
+    -fx-effect: dropshadow(inner, rgba(0,0,0,0.4), 4, 0, 0, 2);
+    -fx-min-width: 140px;
+    -fx-alignment: CENTER;
 }
 
-#btnCerrarSesion:hover{
-    -fx-border-color: white;
-    -fx-border-width: 1px;
-    -fx-border-radius: 5px;
+.buttonSignIn:hover {
+    -fx-background-color: #E06A3E;
 }
 
+.buttonSignIn:armed {
+    -fx-background-color: #CB5E38;
+    -fx-translate-y: 1;
+}
 
+/* Enlace “No tienes una cuenta?” */
+.linkCreateAccount {
+    -fx-background-color: transparent;
+    -fx-text-fill: #FA7942;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+    -fx-underline: true;
+    -fx-alignment: CENTER;
+    -fx-padding: 8 0 8 0;
+}
+
+.linkCreateAccount:hover {
+    -fx-text-fill: #FF935C;
+}
+
+/* Botón de información (icono i) */
+.info-button {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 4;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.info-button:hover {
+    -fx-background-color: rgba(250,121,66,0.2);
+}

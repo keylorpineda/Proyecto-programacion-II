@@ -1,0 +1,64 @@
+.root {
+    -fx-background-color: #0C0C0C;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.signup-container {
+    -fx-background-color: #0C0C0C;
+    -fx-padding: 30 40 30 40;
+    -fx-border-radius: 15;
+    -fx-background-radius: 15;
+    -fx-border-color: #FA7942;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(250,121,66,0.3), 20, 0, 0, 4);
+}
+
+.signup-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.label {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+.text-field,
+.password-field {
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #FA7942;
+    -fx-padding: 8 12 8 12;
+}
+
+.text-field:focused,
+.password-field:focused {
+    -fx-border-color: #FF9554;
+    -fx-background-color: #3b3b3b;
+}
+
+.signup-button {
+    -fx-background-color: #FA7942;
+    -fx-text-fill: #0C0C0C;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-cursor: hand;
+}
+
+.signup-button:hover {
+    -fx-background-color: #e56e39;
+}
+
+
+.btnBackStyle {
+    -fx-background-color: transparent;
+    -fx-padding: 5;
+    -fx-cursor: hand;
+}
