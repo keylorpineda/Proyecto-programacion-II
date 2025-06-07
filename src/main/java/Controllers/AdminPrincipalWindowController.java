@@ -21,6 +21,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 public class AdminPrincipalWindowController implements Initializable {
@@ -71,6 +75,24 @@ public class AdminPrincipalWindowController implements Initializable {
     private DatePicker dpAdminDate;
     @FXML
     private ComboBox<String> cbAdminStartTime, cbAdminEndTime;
+    @FXML
+    private TableView<Map.Entry<SpaceType, Long>> tblEspaciosReservados;
+    @FXML
+    private TableColumn<Map.Entry<SpaceType, Long>, String> colTipoEspacio;
+    @FXML
+    private TableColumn<Map.Entry<SpaceType, Long>, Long> colCantidadEspacio;
+    @FXML
+    private TableView<Map.Entry<String, Long>> tblUsuariosReservas;
+    @FXML
+    private TableColumn<Map.Entry<String, Long>, String> colUsuarioNombre;
+    @FXML
+    private TableColumn<Map.Entry<String, Long>, Long> colCantidadUsuario;
+    @FXML
+    private TableView<Map.Entry<String, Long>> tblHorariosReservas;
+    @FXML
+    private TableColumn<Map.Entry<String, Long>, String> colHoraInicio;
+    @FXML
+    private TableColumn<Map.Entry<String, Long>, Long> colCantidadHora;
 
     // Servicios
     private Room currentRoom;
@@ -263,10 +285,10 @@ public class AdminPrincipalWindowController implements Initializable {
                 break;
         }
         if (ocupado) {
-            color = "#e57373"; 
+            color = "#e57373";
             btn.setDisable(true);
         } else if (bloqueado) {
-            color = "#616161"; 
+            color = "#616161";
             btn.setDisable(true);
         }
         btn.setStyle("-fx-background-color: " + color + "; -fx-text-fill: #222; -fx-border-radius: 6; -fx-background-radius: 6;");
@@ -365,6 +387,9 @@ public class AdminPrincipalWindowController implements Initializable {
     @FXML
     private void tgShowReport(ActionEvent event) {
         showReports();
+        cargarTablaEspacios();
+        cargarTablaUsuariosTop();
+        cargarTablaHorarios();
     }
 
     @FXML
@@ -423,6 +448,7 @@ public class AdminPrincipalWindowController implements Initializable {
         spReportsScroll.setVisible(true);
         formAdmin.setVisible(false);
         breadcrumb.setVisible(false);
+        spReportsScroll.setVisible(true);
     }
 
     private void showCreateAdminForm() {
@@ -549,6 +575,7 @@ public class AdminPrincipalWindowController implements Initializable {
             tgCreateAdmin.setText("Crear Admin");
         }
     }
+
     @FXML
     private void onCreateAdmin(ActionEvent event) {
         txtAdminId.clear();
@@ -557,5 +584,29 @@ public class AdminPrincipalWindowController implements Initializable {
         txtAdminUser.clear();
         txtAdminPass.clear();
         showUsers();
+    }
+
+    private void cargarTablaEspacios() {
+        Map<SpaceType, Long> datos = reservationService.countReservationsBySpaceType();
+        ObservableList<Map.Entry<SpaceType, Long>> items = FXCollections.observableArrayList(datos.entrySet());
+        colTipoEspacio.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getKey().toString()));
+        colCantidadEspacio.setCellValueFactory(c -> new SimpleLongProperty(c.getValue().getValue()).asObject());
+        tblEspaciosReservados.setItems(items);
+    }
+
+    private void cargarTablaUsuariosTop() {
+        Map<String, Long> datos = reservationService.getTopUsersByReservations();
+        ObservableList<Map.Entry<String, Long>> items = FXCollections.observableArrayList(datos.entrySet());
+        colUsuarioNombre.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getKey()));
+        colCantidadUsuario.setCellValueFactory(c -> new SimpleLongProperty(c.getValue().getValue()).asObject());
+        tblUsuariosReservas.setItems(items);
+    }
+
+    private void cargarTablaHorarios() {
+        Map<String, Long> datos = reservationService.countReservationsByHourSlot();
+        ObservableList<Map.Entry<String, Long>> items = FXCollections.observableArrayList(datos.entrySet());
+        colHoraInicio.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getKey()));
+        colCantidadHora.setCellValueFactory(c -> new SimpleLongProperty(c.getValue().getValue()).asObject());
+        tblHorariosReservas.setItems(items);
     }
 }

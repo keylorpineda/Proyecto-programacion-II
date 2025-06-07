@@ -2,6 +2,7 @@ package Services;
 
 import Models.Reservation;
 import Models.Space;
+import Models.SpaceType;
 import Utilities.DataBaseManager;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -9,7 +10,10 @@ import jakarta.persistence.TypedQuery;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class ReservationService {
 
@@ -148,4 +152,40 @@ public class ReservationService {
             em.close();
         }
     }
+
+    public Map<String, Long> countReservationsByUser() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public Map<SpaceType, Long> countReservationsBySpaceType() {
+        Map<SpaceType, Long> result = new HashMap<>();
+        for (Reservation r : findAll()) {
+            if (r.getSpace() != null && r.getSpace().getType() != null) {
+                result.merge(r.getSpace().getType(), 1L, Long::sum);
+            }
+        }
+        return result;
+    }
+
+   public Map<String, Long> getTopUsersByReservations() {
+        Map<String, Long> result = new HashMap<>();
+        for (Reservation r : findAll()) {
+            if (r.getUser() != null && r.getUser().getUserName() != null) {
+                result.merge(r.getUser().getUserName(), 1L, Long::sum);
+            }
+        }
+        return result;
+    }
+
+    public Map<String, Long> countReservationsByHourSlot() {
+        Map<String, Long> result = new TreeMap<>();
+        for (Reservation r : findAll()) {
+            if (r.getStartTime() != null) {
+                String hora = r.getStartTime().toLocalTime().toString();
+                result.merge(hora, 1L, Long::sum);
+            }
+        }
+        return result;
+    }
+
 }
