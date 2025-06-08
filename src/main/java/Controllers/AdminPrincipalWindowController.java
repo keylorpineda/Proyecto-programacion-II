@@ -106,16 +106,17 @@ public class AdminPrincipalWindowController implements Initializable {
     private final SpaceService spaceService = new SpaceService();
     private final ReservationService reservationService = new ReservationService();
     private final ReportService reportService = new ReportService();
-    private Node draggedNode;
+
     private Space draggedSpace;
     private boolean isDragging = false;
+    private double cellWidth = 60.0;
+    private double cellHeight = 60.0;
+    private List<Region> highlightCells = new ArrayList<>();
 
     private boolean esPosicionValida(Space espacioAMover, int nuevaFila, int nuevaColumna) {
         if (espacioAMover == null || currentRoom == null) {
             return false;
         }
-
-        // Verificar límites del room
         if (nuevaFila < 0 || nuevaColumna < 0) {
             return false;
         }
@@ -125,67 +126,20 @@ public class AdminPrincipalWindowController implements Initializable {
             return false;
         }
 
-        // Verificar colisiones con otros espacios
         for (Space otroEspacio : currentRoom.getSpaces()) {
-            // No verificar colisión consigo mismo
             if (otroEspacio.getId().equals(espacioAMover.getId())) {
                 continue;
             }
 
-            // Verificar si hay superposición usando lógica de rectángulos
-            if (hayColision(
-                    nuevaColumna, nuevaFila, espacioAMover.getWidth(), espacioAMover.getHeight(),
-                    otroEspacio.getStartCol(), otroEspacio.getStartRow(), otroEspacio.getWidth(), otroEspacio.getHeight()
-            )) {
-                return false;
-            }
-        }
+            int espacioRight = nuevaColumna + espacioAMover.getWidth();
+            int espacioBottom = nuevaFila + espacioAMover.getHeight();
+            int otroRight = otroEspacio.getStartCol() + otroEspacio.getWidth();
+            int otroBottom = otroEspacio.getStartRow() + otroEspacio.getHeight();
 
-        return true;
-    }
-
-    private boolean puedeMoverMejorado(Space espacioAMover, int nuevaFila, int nuevaColumna) {
-        if (espacioAMover == null || currentRoom == null) {
-            return false;
-        }
-
-        // Verificar límites del room
-        if (nuevaFila < 0 || nuevaColumna < 0) {
-            System.out.println("Fuera de límites: posición negativa");
-            return false;
-        }
-
-        if (nuevaFila + espacioAMover.getHeight() > currentRoom.getRows()
-                || nuevaColumna + espacioAMover.getWidth() > currentRoom.getCols()) {
-            System.out.println("Fuera de límites: excede dimensiones del room");
-            return false;
-        }
-
-        // Verificar colisiones con otros espacios
-        for (Space otroEspacio : currentRoom.getSpaces()) {
-            // No verificar colisión consigo mismo
-            if (otroEspacio.getId().equals(espacioAMover.getId())) {
-                continue;
-            }
-
-            // Calcular los límites del espacio a mover en la nueva posición
-            int espacioIzquierda = nuevaColumna;
-            int espacioDerecha = nuevaColumna + espacioAMover.getWidth() - 1;
-            int espacioArriba = nuevaFila;
-            int espacioAbajo = nuevaFila + espacioAMover.getHeight() - 1;
-
-            // Calcular los límites del otro espacio
-            int otroIzquierda = otroEspacio.getStartCol();
-            int otroDerecha = otroEspacio.getStartCol() + otroEspacio.getWidth() - 1;
-            int otroArriba = otroEspacio.getStartRow();
-            int otroAbajo = otroEspacio.getStartRow() + otroEspacio.getHeight() - 1;
-
-            // Verificar si hay superposición
-            boolean superponeHorizontal = !(espacioDerecha < otroIzquierda || espacioIzquierda > otroDerecha);
-            boolean superponeVertical = !(espacioAbajo < otroArriba || espacioArriba > otroAbajo);
+            boolean superponeHorizontal = !(espacioRight <= otroEspacio.getStartCol() || nuevaColumna >= otroRight);
+            boolean superponeVertical = !(espacioBottom <= otroEspacio.getStartRow() || nuevaFila >= otroBottom);
 
             if (superponeHorizontal && superponeVertical) {
-                System.out.println("Colisión detectada con espacio: " + otroEspacio.getSpaceName());
                 return false;
             }
         }
@@ -193,7 +147,65 @@ public class AdminPrincipalWindowController implements Initializable {
         return true;
     }
 
-    // Reemplaza el método initialize() en tu AdminPrincipalWindowController
+    private Point2D calcularPosicionCelda(double sceneX, double sceneY, Space espacio) {
+        Point2D localPoint = gridPlano.sceneToLocal(sceneX, sceneY);
+
+        actualizarDimensionesCelda();
+
+        int targetCol = (int) Math.floor(localPoint.getX() / cellWidth);
+        int targetRow = (int) Math.floor(localPoint.getY() / cellHeight);
+
+        targetCol = Math.max(0, Math.min(targetCol, currentRoom.getCols() - espacio.getWidth()));
+        targetRow = Math.max(0, Math.min(targetRow, currentRoom.getRows() - espacio.getHeight()));
+
+        return new Point2D(targetCol, targetRow);
+    }
+
+    private Region previewRegion = null;
+
+    private void actualizarDimensionesCelda() {
+        if (currentRoom != null && gridPlano.getWidth() > 0 && gridPlano.getHeight() > 0) {
+            cellWidth = gridPlano.getWidth() / currentRoom.getCols();
+            cellHeight = gridPlano.getHeight() / currentRoom.getRows();
+        } else {
+            cellWidth = 60.0;
+            cellHeight = 60.0;
+        }
+    }
+
+    private void mostrarZonasValidas(Space espacio) {
+        limpiarHighlights();
+
+        if (espacio == null || currentRoom == null) {
+            return;
+        }
+
+        for (int row = 0; row <= currentRoom.getRows() - espacio.getHeight(); row++) {
+            for (int col = 0; col <= currentRoom.getCols() - espacio.getWidth(); col++) {
+                if (esPosicionValida(espacio, row, col)) {
+                    Region highlight = new Region();
+                    highlight.setStyle(
+                            "-fx-background-color: rgba(76, 175, 80, 0.3); "
+                            + "-fx-border-color: #4CAF50; "
+                            + "-fx-border-width: 2px; "
+                            + "-fx-border-style: dashed;"
+                    );
+                    highlight.setMouseTransparent(true);
+
+                    gridPlano.add(highlight, col, row, espacio.getWidth(), espacio.getHeight());
+                    highlightCells.add(highlight);
+                }
+            }
+        }
+    }
+
+    private void limpiarHighlights() {
+        for (Region highlight : highlightCells) {
+            gridPlano.getChildren().remove(highlight);
+        }
+        highlightCells.clear();
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         DataInitializer.initializeIfNeeded();
@@ -226,38 +238,69 @@ public class AdminPrincipalWindowController implements Initializable {
         colRole.setCellValueFactory(new PropertyValueFactory<>("userRole"));
         cargarPlanoDeRoomActual();
 
-        // DRAG AND DROP MEJORADO
+        configurarDragAndDrop();
+    }
+
+    private void mostrarPreviewPosicion(int col, int row, Space espacio, boolean esValida) {
+        limpiarPreview();
+
+        if (espacio == null || currentRoom == null) {
+            return;
+        }
+
+        previewRegion = new Region();
+        previewRegion.setMouseTransparent(true);
+
+        if (esValida) {
+            previewRegion.setStyle(
+                    "-fx-background-color: rgba(255, 193, 7, 0.4); "
+                    + // Amarillo transparente
+                    "-fx-border-color: #FFC107; "
+                    + "-fx-border-width: 3px; "
+                    + "-fx-border-style: solid; "
+                    + "-fx-background-radius: 8px; "
+                    + "-fx-border-radius: 8px;"
+            );
+        } else {
+            previewRegion.setStyle(
+                    "-fx-background-color: rgba(244, 67, 54, 0.4); "
+                    + // Rojo transparente
+                    "-fx-border-color: #F44336; "
+                    + "-fx-border-width: 3px; "
+                    + "-fx-border-style: dashed; "
+                    + "-fx-background-radius: 8px; "
+                    + "-fx-border-radius: 8px;"
+            );
+        }
+
+        gridPlano.add(previewRegion, col, row, espacio.getWidth(), espacio.getHeight());
+    }
+
+    private void limpiarPreview() {
+        if (previewRegion != null) {
+            gridPlano.getChildren().remove(previewRegion);
+            previewRegion = null;
+        }
+    }
+
+    private void configurarDragAndDrop() {
+
         gridPlano.setOnDragOver(event -> {
             if (event.getGestureSource() != gridPlano && event.getDragboard().hasString() && draggedSpace != null) {
                 event.acceptTransferModes(TransferMode.MOVE);
 
-                // Calcular posición objetivo más precisa
-                Point2D localPoint = gridPlano.sceneToLocal(event.getSceneX(), event.getSceneY());
+                Point2D posicion = calcularPosicionCelda(event.getSceneX(), event.getSceneY(), draggedSpace);
+                int targetCol = (int) posicion.getX();
+                int targetRow = (int) posicion.getY();
 
-                // Obtener el tamaño real de cada celda
-                double cellWidth = gridPlano.getWidth() / currentRoom.getCols();
-                double cellHeight = gridPlano.getHeight() / currentRoom.getRows();
+                boolean esValida = esPosicionValida(draggedSpace, targetRow, targetCol);
 
-                // Si las celdas no tienen tamaño aún, usar 60 por defecto
-                if (cellWidth <= 0) {
-                    cellWidth = 60;
-                }
-                if (cellHeight <= 0) {
-                    cellHeight = 60;
-                }
+                mostrarPreviewPosicion(targetCol, targetRow, draggedSpace, esValida);
 
-                int targetCol = (int) Math.floor(localPoint.getX() / cellWidth);
-                int targetRow = (int) Math.floor(localPoint.getY() / cellHeight);
-
-                // Asegurar que el espacio quepa completamente en el grid
-                targetCol = Math.max(0, Math.min(targetCol, currentRoom.getCols() - draggedSpace.getWidth()));
-                targetRow = Math.max(0, Math.min(targetRow, currentRoom.getRows() - draggedSpace.getHeight()));
-
-                // Verificar si la posición es válida
-                if (esPosicionValida(draggedSpace, targetRow, targetCol)) {
-                    gridPlano.setStyle("-fx-background-color: rgba(76, 175, 80, 0.3); -fx-border-color: #4CAF50; -fx-border-width: 3px;");
+                if (esValida) {
+                    gridPlano.setStyle("-fx-cursor: move;");
                 } else {
-                    gridPlano.setStyle("-fx-background-color: rgba(244, 67, 54, 0.3); -fx-border-color: #F44336; -fx-border-width: 3px;");
+                    gridPlano.setStyle("-fx-cursor: not-allowed;");
                 }
             }
             event.consume();
@@ -265,6 +308,7 @@ public class AdminPrincipalWindowController implements Initializable {
 
         gridPlano.setOnDragExited(event -> {
             gridPlano.setStyle("");
+            limpiarPreview();
             event.consume();
         });
 
@@ -274,48 +318,39 @@ public class AdminPrincipalWindowController implements Initializable {
 
             if (db.hasString() && draggedSpace != null) {
                 try {
-                    // Calcular posición objetivo
-                    Point2D localPoint = gridPlano.sceneToLocal(event.getSceneX(), event.getSceneY());
+                    Point2D posicion = calcularPosicionCelda(event.getSceneX(), event.getSceneY(), draggedSpace);
+                    int targetCol = (int) posicion.getX();
+                    int targetRow = (int) posicion.getY();
 
-                    double cellWidth = gridPlano.getWidth() / currentRoom.getCols();
-                    double cellHeight = gridPlano.getHeight() / currentRoom.getRows();
-
-                    if (cellWidth <= 0) {
-                        cellWidth = 60;
-                    }
-                    if (cellHeight <= 0) {
-                        cellHeight = 60;
-                    }
-
-                    int targetCol = (int) Math.floor(localPoint.getX() / cellWidth);
-                    int targetRow = (int) Math.floor(localPoint.getY() / cellHeight);
-
-                    // Asegurar límites
-                    targetCol = Math.max(0, Math.min(targetCol, currentRoom.getCols() - draggedSpace.getWidth()));
-                    targetRow = Math.max(0, Math.min(targetRow, currentRoom.getRows() - draggedSpace.getHeight()));
-
-                    // Verificar si la posición es válida
                     if (esPosicionValida(draggedSpace, targetRow, targetCol)) {
-                        // Actualizar posición del espacio
+
                         draggedSpace.setStartCol(targetCol);
                         draggedSpace.setStartRow(targetRow);
                         spaceService.update(draggedSpace);
                         success = true;
 
-                        mostrarNotificacionExito("Espacio '" + draggedSpace.getSpaceName() + "' movido correctamente");
+                        mostrarNotificacionExito(
+                                "Espacio '" + draggedSpace.getSpaceName()
+                                + "' movido a posición (" + targetCol + "," + targetRow + ")"
+                        );
                     } else {
-                        new Alert(Alert.AlertType.WARNING, "No se puede mover el espacio a esa posición").showAndWait();
+                        new Alert(Alert.AlertType.WARNING,
+                                "No se puede mover el espacio a esa posición.\n"
+                                + "Verifica que no haya colisiones con otros espacios."
+                        ).showAndWait();
                     }
                 } catch (Exception e) {
-                    new Alert(Alert.AlertType.ERROR, "Error al mover el espacio: " + e.getMessage()).showAndWait();
+                    new Alert(Alert.AlertType.ERROR,
+                            "Error al mover el espacio: " + e.getMessage()
+                    ).showAndWait();
                 }
             }
 
-            // Limpiar estado
-            draggedNode = null;
             draggedSpace = null;
             isDragging = false;
             gridPlano.setStyle("");
+            limpiarHighlights();
+            limpiarPreview();
 
             if (success) {
                 cargarPlanoDeRoomActual();
@@ -324,18 +359,6 @@ public class AdminPrincipalWindowController implements Initializable {
             event.setDropCompleted(success);
             event.consume();
         });
-    }
-
-    private boolean hayColision(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
-        if (x1 + w1 <= x2 || x2 + w2 <= x1) {
-            return false;
-        }
-
-        if (y1 + h1 <= y2 || y2 + h2 <= y1) {
-            return false;
-        }
-
-        return true;
     }
 
     private void cargarTablaUsuarios() {
@@ -402,6 +425,8 @@ public class AdminPrincipalWindowController implements Initializable {
             return;
         }
 
+        limpiarHighlights();
+
         currentRoom = roomService.findByIdWithSpaces(currentRoom.getId());
 
         gridPlano.getChildren().clear();
@@ -410,6 +435,7 @@ public class AdminPrincipalWindowController implements Initializable {
 
         int filas = currentRoom.getRows();
         int columnas = currentRoom.getCols();
+
         for (int c = 0; c < columnas; c++) {
             ColumnConstraints colConstraint = new ColumnConstraints(60);
             colConstraint.setHgrow(Priority.NEVER);
@@ -460,15 +486,10 @@ public class AdminPrincipalWindowController implements Initializable {
             }
         }
 
-        draggedNode = null;
+        actualizarDimensionesCelda();
+
         draggedSpace = null;
         isDragging = false;
-    }
-
-    private static class DragContext {
-
-        double offsetX;
-        double offsetY;
     }
 
     private Node crearVisualEspacio(Space s, boolean isOcup, boolean isBloq) {
@@ -476,7 +497,6 @@ public class AdminPrincipalWindowController implements Initializable {
         btn.setFont(Font.font("Segoe UI", 12));
         btn.setPrefSize(60 * s.getWidth(), 60 * s.getHeight());
 
-        // Colores y precios por tipo
         String color;
         String precio;
         switch (s.getType()) {
@@ -561,7 +581,6 @@ public class AdminPrincipalWindowController implements Initializable {
                 if (event.isPrimaryButtonDown()) {
                     isDragging = true;
                     draggedSpace = s;
-                    draggedNode = btn;
 
                     Dragboard db = btn.startDragAndDrop(TransferMode.MOVE);
                     ClipboardContent content = new ClipboardContent();
@@ -581,6 +600,8 @@ public class AdminPrincipalWindowController implements Initializable {
                 btn.setOpacity(1.0);
                 btn.setEffect(null);
                 isDragging = false;
+                limpiarHighlights();
+                limpiarPreview();
 
                 if (!event.isDropCompleted()) {
                     animarRebote(btn);
@@ -617,33 +638,62 @@ public class AdminPrincipalWindowController implements Initializable {
     }
 
     private void bloquearEspacioDialog(Space s) {
-        LocalDate fecha = dpAdminDate.getValue();
-        if (fecha == null) {
-            new Alert(Alert.AlertType.WARNING, "Debe seleccionar fecha").showAndWait();
+
+        Dialog<LocalDate> fechaDialog = new Dialog<>();
+        fechaDialog.setTitle("Bloquear espacio - Seleccionar fecha");
+        fechaDialog.setHeaderText("Selecciona la fecha para bloquear el espacio '" + s.getSpaceName() + "'");
+
+        DatePicker datePicker = new DatePicker();
+        datePicker.setValue(LocalDate.now());
+        datePicker.setPrefWidth(200);
+
+        ButtonType okButtonType = new ButtonType("Continuar", ButtonBar.ButtonData.OK_DONE);
+        fechaDialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+
+        VBox vbox = new VBox(10);
+        vbox.getChildren().addAll(new Label("Fecha:"), datePicker);
+        fechaDialog.getDialogPane().setContent(vbox);
+
+        fechaDialog.setResultConverter(dialogButton -> {
+            if (dialogButton == okButtonType) {
+                return datePicker.getValue();
+            }
+            return null;
+        });
+
+        Optional<LocalDate> fechaResult = fechaDialog.showAndWait();
+        if (fechaResult.isEmpty() || fechaResult.get() == null) {
             return;
         }
+        LocalDate fecha = fechaResult.get();
+
         List<String> slots = TimeSlots.getDefaultTimeSlots();
         ChoiceDialog<String> hi = new ChoiceDialog<>(slots.get(0), slots);
-        hi.setTitle("Bloquear espacio");
-        hi.setHeaderText("Hora inicio");
+        hi.setTitle("Bloquear espacio - Hora de inicio");
+        hi.setHeaderText("Selecciona la hora de inicio para bloquear");
+        hi.setContentText("Hora inicio:");
         Optional<String> rhi = hi.showAndWait();
         if (rhi.isEmpty()) {
             return;
         }
+
         ChoiceDialog<String> hf = new ChoiceDialog<>(slots.get(slots.size() - 1), slots);
-        hf.setTitle("Bloquear espacio");
-        hf.setHeaderText("Hora fin");
+        hf.setTitle("Bloquear espacio - Hora de fin");
+        hf.setHeaderText("Selecciona la hora de fin para bloquear");
+        hf.setContentText("Hora fin:");
         Optional<String> rhf = hf.showAndWait();
         if (rhf.isEmpty()) {
             return;
         }
+
         LocalTime start = TimeSlots.parse(rhi.get()), end = TimeSlots.parse(rhf.get());
         if (!end.isAfter(start)) {
-            new Alert(Alert.AlertType.ERROR, "La hora fin debe ser mayor").showAndWait();
+            new Alert(Alert.AlertType.ERROR, "La hora fin debe ser mayor que la hora de inicio").showAndWait();
             return;
         }
+
         spaceService.blockSpace(s, fecha, start, end);
-        new Alert(Alert.AlertType.INFORMATION, "Espacio bloqueado").showAndWait();
+        new Alert(Alert.AlertType.INFORMATION, "Espacio '" + s.getSpaceName() + "' bloqueado correctamente\nFecha: " + fecha + "\nHorario: " + start + " - " + end).showAndWait();
         cargarPlanoDeRoomActual();
     }
 
@@ -707,49 +757,54 @@ public class AdminPrincipalWindowController implements Initializable {
         SpaceType tipo = tipoResult.get();
 
         int width = 1, height = 1;
-        switch (tipo) {
-            case AREA_COMUN:
-                width = height = 2;
-                break;
-            case SALA_REUNIONES:
-                width = 3;
-                height = 2;
-                break;
-            case PASILLO:
-                width = height = 1;
-                break;
-            default:
-                width = height = 1;
-        }
-
-        TextInputDialog nameDlg = new TextInputDialog(tipo.toString());
-        nameDlg.setTitle("Nombre");
-        nameDlg.setHeaderText("Ponle un nombre al espacio:");
-        nameDlg.setContentText("Nombre:");
-        Optional<String> nameRes = nameDlg.showAndWait();
-        if (!nameRes.isPresent() || nameRes.get().trim().isEmpty()) {
-            return;
-        }
-        String nombre = nameRes.get().trim();
-
+        String nombre;
         int capacidad = 1;
-        if (tipo != SpaceType.ESCRITORIO) {
-            TextInputDialog capDlg = new TextInputDialog("1");
-            capDlg.setTitle("Capacidad");
-            capDlg.setHeaderText("Introduce la capacidad deseada:");
-            capDlg.setContentText("Capacidad:");
-            Optional<String> capRes = capDlg.showAndWait();
-            if (!capRes.isPresent()) {
+
+        if (tipo == SpaceType.PASILLO) {
+            width = height = 1;
+            nombre = "Pasillo";
+            capacidad = 0;
+        } else {
+            switch (tipo) {
+                case AREA_COMUN:
+                    width = height = 2;
+                    break;
+                case SALA_REUNIONES:
+                    width = 3;
+                    height = 2;
+                    break;
+                default:
+                    width = height = 1;
+            }
+
+            TextInputDialog nameDlg = new TextInputDialog(tipo.toString());
+            nameDlg.setTitle("Nombre");
+            nameDlg.setHeaderText("Ponle un nombre al espacio:");
+            nameDlg.setContentText("Nombre:");
+            Optional<String> nameRes = nameDlg.showAndWait();
+            if (!nameRes.isPresent() || nameRes.get().trim().isEmpty()) {
                 return;
             }
-            try {
-                capacidad = Integer.parseInt(capRes.get().trim());
-                if (capacidad < 1) {
-                    throw new NumberFormatException();
+            nombre = nameRes.get().trim();
+
+            if (tipo != SpaceType.ESCRITORIO) {
+                TextInputDialog capDlg = new TextInputDialog("1");
+                capDlg.setTitle("Capacidad");
+                capDlg.setHeaderText("Introduce la capacidad deseada:");
+                capDlg.setContentText("Capacidad:");
+                Optional<String> capRes = capDlg.showAndWait();
+                if (!capRes.isPresent()) {
+                    return;
                 }
-            } catch (NumberFormatException ex) {
-                new Alert(Alert.AlertType.ERROR, "Capacidad inválida.").showAndWait();
-                return;
+                try {
+                    capacidad = Integer.parseInt(capRes.get().trim());
+                    if (capacidad < 1) {
+                        throw new NumberFormatException();
+                    }
+                } catch (NumberFormatException ex) {
+                    new Alert(Alert.AlertType.ERROR, "Capacidad inválida.").showAndWait();
+                    return;
+                }
             }
         }
 
