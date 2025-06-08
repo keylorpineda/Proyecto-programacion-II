@@ -25,6 +25,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Glow;
@@ -32,6 +35,8 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class AdminPrincipalWindowController implements Initializable {
@@ -773,11 +778,26 @@ public class AdminPrincipalWindowController implements Initializable {
             }
         });
     }
+@FXML
+private void clickEditarUsuario(ActionEvent event) throws IOException {
+    User seleccionado = tblUsers.getSelectionModel().getSelectedItem();
 
-    @FXML
-    private void clickEditarUsuario(ActionEvent event) {
-    ////
+    if (seleccionado == null) {
+        utilities.showAlert(Alert.AlertType.WARNING, "Selecciona un usuario", "Debes seleccionar un usuario de la tabla.");
+        return;
     }
+
+    // Guardar el usuario actual en el servicio
+    UserService.setCurrentUser(seleccionado);
+
+    // Cambiar de vista a la ventana de edición
+    FlowController.getInstance().goView("EditUserFromAdmin");
+    cargarTablaUsuarios();
+}
+
+
+
+
 
     private static class Delta {
 

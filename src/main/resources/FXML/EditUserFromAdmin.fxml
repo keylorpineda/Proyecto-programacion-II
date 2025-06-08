@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controllers.EditUserFromAdminController"
+            prefWidth="600" prefHeight="450"
+            style="-fx-background-color: #f0f0f0; -fx-padding: 30;">
+
+    <top>
+        <Label text="Editar Usuario"
+               BorderPane.alignment="CENTER"
+               style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #333;"
+               />
+    </top>
+
+    <center>
+        <GridPane hgap="20" vgap="20" alignment="CENTER">
+            <columnConstraints>
+                <ColumnConstraints halignment="RIGHT" minWidth="150"/>
+                <ColumnConstraints hgrow="ALWAYS"/>
+            </columnConstraints>
+
+            <Label text="Nombre:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtNombre" promptText="Nombre"
+                       GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+            <Label text="Apellido:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtApellido" promptText="Apellido"
+                       GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+            <Label text="Usuario:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtUsuario" promptText="Usuario"
+                       GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+            <Label text="Contraseña:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <PasswordField fx:id="txtContrasena" promptText="Contraseña"
+                           GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        </GridPane>
+    </center>
+
+    <bottom>
+        <HBox spacing="20" alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
+            <Button text="Cancelar" onAction="#clickCancelar" />
+            <Button text="Guardar" onAction="#clickGuardar" />
+        </HBox>
+    </bottom>
+
+</BorderPane>
