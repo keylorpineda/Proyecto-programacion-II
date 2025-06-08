@@ -3,6 +3,7 @@ package Controllers;
 import Models.Room;
 import Models.Space;
 import Models.Reservation;
+import Models.SpaceType;
 import Services.RoomService;
 import Services.SpaceService;
 import Services.ReservationService;
@@ -21,6 +22,7 @@ import javafx.geometry.Insets;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,6 +58,52 @@ public class MakeReservationWindowController implements Initializable {
     private List<Room> floor3Rooms = new ArrayList<>();
     private final Set<Space> selectedSpaces = new HashSet<>();
     private static final double CELL_SIZE = 70;
+    private static ReservationData reservationData;
+
+    public static class ReservationData {
+
+        public Set<Space> selectedSpaces;
+        public LocalDate date;
+        public LocalDateTime startTime;
+        public LocalDateTime endTime;
+        public double totalPrice;
+
+        public ReservationData(Set<Space> spaces, LocalDate date, LocalDateTime start, LocalDateTime end, double price) {
+            this.selectedSpaces = new HashSet<>(spaces);
+            this.date = date;
+            this.startTime = start;
+            this.endTime = end;
+            this.totalPrice = price;
+        }
+
+        public Set<Space> getSelectedSpaces() {
+            return selectedSpaces;
+        }
+
+        public LocalDate getDate() {
+            return date;
+        }
+
+        public LocalDateTime getStartTime() {
+            return startTime;
+        }
+
+        public void setStartTime(LocalDateTime startTime) {
+            this.startTime = startTime;
+        }
+
+        public LocalDateTime getEndTime() {
+            return endTime;
+        }
+
+        public void setEndTime(LocalDateTime endTime) {
+            this.endTime = endTime;
+        }
+
+        public double getTotalPrice() {
+            return totalPrice;
+        }
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -68,6 +116,10 @@ public class MakeReservationWindowController implements Initializable {
             showAlert(Alert.AlertType.ERROR, "Error de Inicialización",
                     "Error al inicializar la ventana: " + e.getMessage());
         }
+    }
+
+    public static ReservationData getReservationData() {
+        return reservationData;
     }
 
     private void initializeComponents() {
@@ -216,7 +268,6 @@ public class MakeReservationWindowController implements Initializable {
                 return;
             }
 
-            // ARREGLADO: Usar el método correcto del servicio
             List<Reservation> reservations = resService.findByRoomAndDateAndTime(
                     currentRoom.getId(), selectedDate, startTime, endTime
             );
@@ -225,7 +276,6 @@ public class MakeReservationWindowController implements Initializable {
                     .map(r -> r.getSpace().getId())
                     .collect(Collectors.toSet());
 
-            // ARREGLADO: Verificar si el método existe antes de llamarlo
             Set<Long> blockedSpaces = new HashSet<>();
             try {
                 List<Space> blocked = spaceService.findBlockedSpaces(
@@ -236,7 +286,6 @@ public class MakeReservationWindowController implements Initializable {
                         .collect(Collectors.toSet());
             } catch (Exception e) {
                 System.out.println("Método findBlockedSpaces no disponible o error: " + e.getMessage());
-                // Continuar sin espacios bloqueados
             }
 
             createMatrix(currentPane, currentRoom, occupiedSpaces, blockedSpaces);
@@ -279,8 +328,17 @@ public class MakeReservationWindowController implements Initializable {
 
                 if (spaceOpt.isPresent()) {
                     Space space = spaceOpt.get();
-                    Button spaceButton = createSpaceButton(space, occupiedSpaces, blockedSpaces);
-                    pane.add(spaceButton, col, startRow + row, space.getWidth(), space.getHeight());
+
+                    if (space.getType() == SpaceType.PASILLO) {
+
+                        Region pasillo = new Region();
+                        pasillo.setPrefSize(CELL_SIZE * space.getWidth(), CELL_SIZE * space.getHeight());
+                        pasillo.setStyle("-fx-background-color: #a1887f; -fx-border-color: #8d6e63; -fx-border-width: 1;");
+                        pane.add(pasillo, col, startRow + row, space.getWidth(), space.getHeight());
+                    } else {
+                        Button spaceButton = createSpaceButton(space, occupiedSpaces, blockedSpaces);
+                        pane.add(spaceButton, col, startRow + row, space.getWidth(), space.getHeight());
+                    }
                 } else {
                     Region emptyRegion = new Region();
                     emptyRegion.setPrefSize(CELL_SIZE, CELL_SIZE);
@@ -295,6 +353,11 @@ public class MakeReservationWindowController implements Initializable {
     }
 
     private Button createSpaceButton(Space space, Set<Long> occupiedSpaces, Set<Long> blockedSpaces) {
+
+        if (space.getType() == SpaceType.PASILLO) {
+            return null;
+        }
+
         Button btn = new Button(space.getSpaceName());
         btn.setPrefSize(CELL_SIZE * space.getWidth(), CELL_SIZE * space.getHeight());
         btn.setFont(Font.font("Segoe UI", 10));
@@ -316,7 +379,6 @@ public class MakeReservationWindowController implements Initializable {
             String textColor = isSelected ? "white" : "#222";
 
             btn.setStyle("-fx-background-color: " + buttonColor + "; -fx-text-fill: " + textColor + "; -fx-border-radius: 6; -fx-background-radius: 6;");
-
             btn.setOnAction(ev -> toggleSpaceSelection(space, btn, baseColor));
         }
 
@@ -351,7 +413,42 @@ public class MakeReservationWindowController implements Initializable {
         }
     }
 
+    private String getSpacePrice(SpaceType type) {
+        switch (type) {
+            case ESCRITORIO:
+                return "$15/hora";
+            case SALA_REUNIONES:
+                return "$50/hora";
+            case AREA_COMUN:
+                return "$25/hora";
+            case PASILLO:
+                return "Gratis";
+            default:
+                return "$10/hora";
+        }
+    }
+
+    private double getSpacePriceValue(SpaceType type) {
+        switch (type) {
+            case ESCRITORIO:
+                return 15.0;
+            case SALA_REUNIONES:
+                return 50.0;
+            case AREA_COMUN:
+                return 25.0;
+            case PASILLO:
+                return 0.0;
+            default:
+                return 10.0;
+        }
+    }
+
     private void setupSpaceTooltip(Button btn, Space space) {
+
+        if (space.getType() == SpaceType.PASILLO) {
+            return;
+        }
+
         Tooltip tooltip = new Tooltip();
         tooltip.setText(buildSpaceInfo(space));
         tooltip.setFont(Font.font("Segoe UI", 12));
@@ -364,7 +461,10 @@ public class MakeReservationWindowController implements Initializable {
         info.append("Nombre: ").append(space.getSpaceName()).append("\n");
         info.append("Tipo: ").append(space.getType().toString().replace("_", " ")).append("\n");
         info.append("Tamaño: ").append(space.getWidth()).append("x").append(space.getHeight()).append("\n");
-        info.append("Posición: (").append(space.getStartRow()).append(",").append(space.getStartCol()).append(")");
+        info.append("Posición: (").append(space.getStartRow()).append(",").append(space.getStartCol()).append(")").append("\n");
+
+        String precio = getSpacePrice(space.getType());
+        info.append("Precio: ").append(precio);
 
         if (space.getCapacity() > 0) {
             info.append("\nCapacidad: ").append(space.getCapacity()).append(" personas");
@@ -373,9 +473,26 @@ public class MakeReservationWindowController implements Initializable {
         return info.toString();
     }
 
+    private double calculateTotalPrice() {
+        LocalTime startTime = LocalTime.parse(cbStartTime.getValue());
+        LocalTime endTime = LocalTime.parse(cbEndTime.getValue());
+
+        double totalHours = java.time.Duration.between(startTime, endTime).toMinutes() / 60.0;
+        double totalPrice = 0.0;
+
+        for (Space space : selectedSpaces) {
+            double pricePerHour = getSpacePriceValue(space.getType());
+            totalPrice += pricePerHour * totalHours;
+        }
+
+        return totalPrice;
+    }
+
     private void updateSelectedSpacesLabel() {
         if (lblSelectedSpaces != null) {
-            lblSelectedSpaces.setText("Espacios seleccionados: " + selectedSpaces.size());
+            double totalPrice = calculateTotalPrice();
+            lblSelectedSpaces.setText(String.format("Espacios seleccionados: %d | Total: $%.2f",
+                    selectedSpaces.size(), totalPrice));
         }
     }
 
@@ -444,6 +561,7 @@ public class MakeReservationWindowController implements Initializable {
         }
     }
 
+    @FXML
     private void goToPay() {
         if (selectedSpaces.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Advertencia", "Seleccione al menos un espacio para reservar.");
@@ -451,22 +569,31 @@ public class MakeReservationWindowController implements Initializable {
         }
 
         LocalDate selectedDate = dpDateOption.getValue();
-        String startTime = cbStartTime.getValue();
-        String endTime = cbEndTime.getValue();
+        LocalTime startLocalTime = LocalTime.parse(cbStartTime.getValue());
+        LocalTime endLocalTime = LocalTime.parse(cbEndTime.getValue());
 
-        StringBuilder reservationDetails = new StringBuilder();
-        reservationDetails.append("Fecha: ").append(selectedDate).append("\n");
-        reservationDetails.append("Horario: ").append(startTime).append(" - ").append(endTime).append("\n");
-        reservationDetails.append("Espacios seleccionados: ").append(selectedSpaces.size()).append("\n\n");
-
-        for (Space space : selectedSpaces) {
-            reservationDetails.append("- ").append(space.getSpaceName())
-                    .append(" (").append(space.getType().toString().replace("_", " ")).append(")\n");
+        if (!startLocalTime.isBefore(endLocalTime)) {
+            showAlert(Alert.AlertType.WARNING, "Advertencia", "La hora de inicio debe ser antes de la hora final.");
+            return;
         }
 
-        showAlert(Alert.AlertType.INFORMATION, "Proceder al Pago",
-                "Detalles de la reserva:\n\n" + reservationDetails.toString()
-                + "\nImplementar navegación a ventana de pago...");
+        LocalDateTime startDateTime = LocalDateTime.of(selectedDate, startLocalTime);
+        LocalDateTime endDateTime = LocalDateTime.of(selectedDate, endLocalTime);
+
+        double totalPrice = calculateTotalPrice();
+        reservationData = new ReservationData(
+                selectedSpaces,
+                selectedDate,
+                startDateTime,
+                endDateTime,
+                totalPrice
+        );
+
+        try {
+            FlowController.getInstance().goView("PaymentWindow");
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "No se pudo abrir la ventana de pago: " + e.getMessage());
+        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
