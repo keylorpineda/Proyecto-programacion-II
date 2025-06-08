@@ -1,0 +1,14 @@
+#gamePane {
+    -fx-background-color: #1e1e1e;
+    -fx-border-color: #444;
+    -fx-border-width: 2;
+}
+
+.snake-tile {
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+}
+
+.snake-tile:filled {
+    -fx-fill: #39ff14; 
+}

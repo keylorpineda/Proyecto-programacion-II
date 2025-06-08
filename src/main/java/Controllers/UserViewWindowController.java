@@ -18,7 +18,10 @@ import com.mycompany.proyectoprogramacionii.App;
 import java.io.IOException;
 import javafx.scene.control.Alert;
 import Utilities.graphicUtilities;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class UserViewWindowController {
 
@@ -122,4 +125,16 @@ public class UserViewWindowController {
     private void clickEditarUsuario(ActionEvent event) throws IOException {
         FlowController.getInstance().goView("EditCustomer");
     }
+  
+
+    @FXML
+private void clickOpenGame(ActionEvent event) {
+    try {
+        FlowController.getInstance().goView("SnakeGame");
+    } catch (Exception e) {
+        utilities.showAlert(Alert.AlertType.ERROR, "Error", "No se pudo abrir el minijuego.");
+        e.printStackTrace();
+    }
+}
+
 }

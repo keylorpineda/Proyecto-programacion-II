@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.Pane?>
+
+<Pane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1"
+      fx:controller="Controllers.SnakeGameController"
+      fx:id="gamePane"
+      prefWidth="600.0" prefHeight="400.0"
+      stylesheets="@../css/snakegame.css"/>
