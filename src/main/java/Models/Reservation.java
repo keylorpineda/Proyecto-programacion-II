@@ -1,4 +1,3 @@
-
 package Models;
 
 import jakarta.persistence.*;
@@ -21,7 +20,7 @@ public class Reservation {
     @JoinColumn(name = "space_id", nullable = false)
     private Space space;
 
-    @Column(nullable = false)
+    @Column(name = "DATECREATED",nullable = false)
     private LocalDateTime dateCreated;
 
     @Column(nullable = false)
@@ -30,7 +29,8 @@ public class Reservation {
     @Column(nullable = false)
     private LocalDateTime endTime;
 
-    public Reservation() { }
+    public Reservation() {
+    }
 
     public Reservation(User user, Space space, LocalDateTime dateCreated, LocalDateTime startTime, LocalDateTime endTime) {
         this.user = user;
@@ -40,21 +40,61 @@ public class Reservation {
         this.endTime = endTime;
     }
 
-    public Long getId() { return id; }
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
-    public Space getSpace() { return space; }
-    public void setSpace(Space space) { this.space = space; }
-    public LocalDateTime getDateCreated() { return dateCreated; }
-    public void setDateCreated(LocalDateTime dateCreated) { this.dateCreated = dateCreated; }
-    public LocalDateTime getStartTime() { return startTime; }
-    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
-    public LocalDateTime getEndTime() { return endTime; }
-    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
+    public Long getId() {
+        return id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Space getSpace() {
+        return space;
+    }
+
+    public void setSpace(Space space) {
+        this.space = space;
+    }
+
+    public LocalDateTime getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(LocalDateTime dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
     public void setDate(LocalDate d) {
-    this.dateCreated = d.atStartOfDay();
-}
+        this.dateCreated = d.atStartOfDay();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.dateCreated = LocalDateTime.now();
+    }
 
     @Transient
-    public String getPlace() { return space.getRoom().getRoomName(); }
+    public String getPlace() {
+        return space.getRoom().getRoomName();
+    }
 }

@@ -1,9 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Pos?>
 
-<Pane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1"
-      fx:controller="Controllers.SnakeGameController"
-      fx:id="gamePane"
-      prefWidth="600.0" prefHeight="400.0"
-      stylesheets="@../css/snakegame.css"/>
+<AnchorPane xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="Controllers.SnakeGameController"
+            prefWidth="800.0" prefHeight="600.0"
+            stylesheets="@/css/snakeGame.css"
+            style="-fx-background-color: #0C0C0C;">
+
+    <children>
+
+        <!-- Zona de juego -->
+        <Pane fx:id="gamePane" prefHeight="600.0" prefWidth="800.0" />
+
+        <!-- Puntos -->
+        <Label fx:id="lblScore" text="Puntos: 0"
+               styleClass="score-label"
+               AnchorPane.topAnchor="10.0" AnchorPane.leftAnchor="10.0" />
+
+        <!-- Pantalla de inicio -->
+        <StackPane fx:id="overlayPane" prefWidth="800.0" prefHeight="600.0"
+                   style="-fx-background-color: rgba(0,0,0,0.85);">
+            <children>
+                <VBox alignment="CENTER" spacing="25.0">
+
+                    <!-- Logo con emojis -->
+                    <StackPane styleClass="emoji-logo">
+                        <Label text="🐍🐍" styleClass="emoji-icon" />
+                    </StackPane>
+
+                    <!-- Título -->
+                    <Label text="Snake Game" styleClass="title-label" />
+
+                    <!-- Botón -->
+                    <Button fx:id="btnStartGame"
+                            text="Comenzar Juego"
+                            styleClass="start-button" />
+                </VBox>
+            </children>
+        </StackPane>
+
+    </children>
+</AnchorPane>
