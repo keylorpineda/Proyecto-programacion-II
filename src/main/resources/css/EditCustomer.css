@@ -1,0 +1,75 @@
+.root {
+    -fx-background-color: #0C0C0C;
+    -fx-padding: 50;
+    -fx-alignment: center;
+}
+
+.form-container {
+    -fx-background-color: #1a1a1a;
+    -fx-padding: 40;
+    -fx-spacing: 15;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(250,121,66,0.3), 20, 0.3, 0, 4);
+    -fx-border-color: #FA7942;
+    -fx-border-width: 2;
+    -fx-alignment: center;
+}
+
+.signup-title {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FA7942;
+}
+
+.label {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+.text-field {
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #FA7942;
+    -fx-padding: 8 12;
+    -fx-pref-width: 250;
+}
+
+.text-field:focused {
+    -fx-border-color: #FF9554;
+    -fx-background-color: #3b3b3b;
+}
+
+.signup-button {
+    -fx-background-color: #FA7942;
+    -fx-text-fill: #0C0C0C;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(250,121,66,0.4), 6, 0.4, 0, 2);
+}
+
+.signup-button:hover {
+    -fx-background-color: #e56e39;
+}
+
+.signup-button-secondary {
+    -fx-background-color: transparent;
+    -fx-text-fill: #FA7942;
+    -fx-border-color: #FA7942;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.signup-button-secondary:hover {
+    -fx-background-color: #fa794228;
+}
