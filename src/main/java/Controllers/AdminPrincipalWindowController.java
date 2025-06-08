@@ -54,7 +54,7 @@ public class AdminPrincipalWindowController implements Initializable {
     private TableView<User> tblUsers;
     @FXML
     private TableView<Reservation> tblReservations;
-    @FXML
+
     private TableView<Report> tblReports;
     @FXML
     private TableColumn<User, Long> colId;
@@ -64,10 +64,9 @@ public class AdminPrincipalWindowController implements Initializable {
     private TableColumn<Reservation, Long> colResId;
     @FXML
     private TableColumn<Reservation, String> colResUser, colResRoom, colResDate, colResStart, colResEnd;
-    @FXML
     private TableColumn<Report, Long> colReportId;
-    @FXML
-    private TableColumn<Report, String> colReportName, colReportDate;
+    private TableColumn<Report, String> colReportName;
+    private TableColumn<Report, String> colReportDate;
     @FXML
     private GridPane formAdmin;
     @FXML
@@ -101,6 +100,10 @@ public class AdminPrincipalWindowController implements Initializable {
     @FXML
     private TableColumn<Map.Entry<String, Long>, Long> colCantidadHora;
 
+    graphicUtilities utilities = new graphicUtilities();
+
+    private UserService userService = new UserService();
+
     private Room currentRoom;
     private final RoomService roomService = new RoomService();
     private final SpaceService spaceService = new SpaceService();
@@ -112,6 +115,20 @@ public class AdminPrincipalWindowController implements Initializable {
     private double cellWidth = 60.0;
     private double cellHeight = 60.0;
     private List<Region> highlightCells = new ArrayList<>();
+    @FXML
+    private VBox root;
+    @FXML
+    private HBox header;
+    @FXML
+    private Button btnToggleSidebar;
+    @FXML
+    private Button btnGuardarAdmin;
+    @FXML
+    private Button btnEditarUsuario;
+    @FXML
+    private Button btnEliminarUsuario;
+
+    private User userSeleccionado;
 
     private boolean esPosicionValida(Space espacioAMover, int nuevaFila, int nuevaColumna) {
         if (espacioAMover == null || currentRoom == null) {
@@ -730,12 +747,43 @@ public class AdminPrincipalWindowController implements Initializable {
         return true;
     }
 
+    @FXML
+    private void clickEliminarUsuario(ActionEvent event) {
+        userSeleccionado = tblUsers.getSelectionModel().getSelectedItem();
+
+        if (userSeleccionado == null) {
+            utilities.showAlert(Alert.AlertType.WARNING,
+                    "Ningún usuario seleccionado",
+                    "Selecciona un usuario para eliminar.");
+            return;
+        }
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "¿Seguro que deseas eliminar al usuario: " + userSeleccionado.getFullName() + "?",
+                ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Confirmar eliminación");
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.YES) {
+                userService.delete(userSeleccionado.getId());
+                cargarTablaUsuarios();
+
+                utilities.showAlert(Alert.AlertType.INFORMATION,
+                        "Eliminado",
+                        "Usuario eliminado correctamente.");
+            }
+        });
+    }
+
+    @FXML
+    private void clickEditarUsuario(ActionEvent event) {
+    ////
+    }
+
     private static class Delta {
 
         double x, y;
     }
 
-    @FXML
     private void onFiltrarPlano(ActionEvent e) {
         cargarPlanoDeRoomActual();
     }
@@ -863,16 +911,6 @@ public class AdminPrincipalWindowController implements Initializable {
         }
     }
 
-    @FXML
-    private void onCreateAdmin(ActionEvent e) {
-        txtAdminId.clear();
-        txtAdminName.clear();
-        txtAdminLastName.clear();
-        txtAdminUser.clear();
-        txtAdminPass.clear();
-        showUsers();
-    }
-
     private void showUsers() {
         toggleViews(true, false, false, false, false);
     }
@@ -953,6 +991,7 @@ public class AdminPrincipalWindowController implements Initializable {
     @FXML
     private void tgShowUsersTable(ActionEvent event) {
         showUsers();
+
     }
 
     @FXML
@@ -973,9 +1012,82 @@ public class AdminPrincipalWindowController implements Initializable {
         cargarTablaHorarios();
     }
 
+    private void clearAdminFields() {
+        txtAdminId.clear();
+        txtAdminName.clear();
+        txtAdminLastName.clear();
+        txtAdminUser.clear();
+        txtAdminPass.clear();
+    }
+
     @FXML
     private void tgCreateAdmin(ActionEvent event) {
         showCreateAdminForm();
+    }
+
+    @FXML
+    private void onCreateAdmin(ActionEvent e) {
+        try {
+            String firstName = txtAdminName.getText().trim();
+            String lastName = txtAdminLastName.getText().trim();
+            String user = txtAdminUser.getText().trim();
+            String password = txtAdminPass.getText().trim();
+
+            if (firstName.isEmpty() || lastName.isEmpty() || user.isEmpty() || password.isEmpty()) {
+                utilities.showAlert(Alert.AlertType.WARNING,
+                        "Campos incompletos",
+                        "Por favor, complete todos los campos.");
+                return;
+            }
+            String idText = txtAdminId.getText().trim();
+            if (!idText.matches("\\d+")) {
+                utilities.showAlert(Alert.AlertType.ERROR,
+                        "Cédula inválida",
+                        "La cédula debe contener solo números.");
+                return;
+            }
+            if (idText.length() > 9) {
+                utilities.showAlert(Alert.AlertType.ERROR,
+                        "Cédula demasiado larga",
+                        "La cédula no puede tener más de 9 dígitos.");
+                return;
+            }
+            if (idText.length() < 9) {
+                utilities.showAlert(Alert.AlertType.ERROR,
+                        "Cédula demasiado corta",
+                        "La cédula no puede tener menos de 9 dígitos.");
+                return;
+            }
+            Long id = Long.parseLong(idText);
+
+            if (userService.findByIdentification(id) != null) {
+                utilities.showAlert(Alert.AlertType.ERROR,
+                        "Cédula ya registrada",
+                        "Ya existe un usuario con esta cédula.");
+                return;
+            }
+
+            if (userService.findByUserName(user) != null) {
+                utilities.showAlert(Alert.AlertType.ERROR,
+                        "Nombre de usuario duplicado",
+                        "El nombre de usuario ya está en uso.");
+                return;
+            }
+
+            Administrator admin = new Administrator(id, firstName, lastName, user, password);
+            userService.save(admin);
+
+            utilities.showAlert(Alert.AlertType.INFORMATION,
+                    "Éxito",
+                    "Administrador creado correctamente.");
+            clearAdminFields();
+
+        } catch (Exception ex) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Error",
+                    "No se pudo crear el administrador.");
+            ex.printStackTrace();
+        }
     }
 
     private void mostrarInfoEspacio(Space s, String precio) {

@@ -7,6 +7,7 @@ import jakarta.persistence.TypedQuery;
 import java.util.List;
 
 public class UserService {
+
     private static User currentUser;
 
     public void save(User u) {
@@ -99,11 +100,12 @@ public class UserService {
             em.close();
         }
     }
+
     public static void setCurrentUser(User user) {
-    currentUser = user;
-}
+        currentUser = user;
+    }
 
     public static User getCurrentUser() {
-    return currentUser;
+        return currentUser;
     }
 }
