@@ -386,6 +386,7 @@ public class AdminPrincipalWindowController implements Initializable {
     private void cargarTablaUsuarios() {
         ObservableList<User> data = FXCollections.observableArrayList(new UserService().findAll());
         tblUsers.setItems(data);
+        tblUsers.refresh();
     }
 
     private void cargarTablaReservas() {
@@ -778,26 +779,22 @@ public class AdminPrincipalWindowController implements Initializable {
             }
         });
     }
-@FXML
-private void clickEditarUsuario(ActionEvent event) throws IOException {
-    User seleccionado = tblUsers.getSelectionModel().getSelectedItem();
 
-    if (seleccionado == null) {
-        utilities.showAlert(Alert.AlertType.WARNING, "Selecciona un usuario", "Debes seleccionar un usuario de la tabla.");
-        return;
+    @FXML
+    private void clickEditarUsuario(ActionEvent event) throws IOException {
+        User seleccionado = tblUsers.getSelectionModel().getSelectedItem();
+
+        if (seleccionado == null) {
+            utilities.showAlert(Alert.AlertType.WARNING, "Selecciona un usuario", "Debes seleccionar un usuario de la tabla.");
+            return;
+        }
+        UserService.setCurrentUser(seleccionado);
+        FlowController.getInstance().goView("EditUserFromAdmin");
     }
-
-    // Guardar el usuario actual en el servicio
-    UserService.setCurrentUser(seleccionado);
-
-    // Cambiar de vista a la ventana de edición
-    FlowController.getInstance().goView("EditUserFromAdmin");
+    
+    public void refrescarVista() {
     cargarTablaUsuarios();
-}
-
-
-
-
+    }
 
     private static class Delta {
 

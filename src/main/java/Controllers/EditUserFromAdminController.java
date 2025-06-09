@@ -20,6 +20,7 @@ public class EditUserFromAdminController implements Initializable {
     private final UserService userService = new UserService();
     private final graphicUtilities utilities = new graphicUtilities();
     private User user;
+    private User copiaOriginal;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -29,6 +30,12 @@ public class EditUserFromAdminController implements Initializable {
             txtUsuario.setText(user.getUserName());
             txtContrasena.setText(user.getPassword());
         
+    }
+    private void fillFields(User u) {
+        txtNombre.setText(u.getName());
+        txtApellido.setText(u.getLastName());
+        txtUsuario.setText(u.getUserName());
+        txtContrasena.setText(u.getPassword());
     }
 
     @FXML
@@ -62,12 +69,32 @@ public class EditUserFromAdminController implements Initializable {
         userService.update(user);
         utilities.showAlert(Alert.AlertType.INFORMATION, "Éxito", "Usuario actualizado correctamente.");
 
-        // Volver a la vista principal
-        FlowController.getInstance().goView("AdminPrincipalWindow");
+      FlowController flow = FlowController.getInstance();
+    flow.goView("AdminPrincipalWindow");
+ 
+    AdminPrincipalWindowController ctrl = (AdminPrincipalWindowController) flow.getController("AdminPrincipalWindow");
+    ctrl.refrescarVista();   
     }
 
     @FXML
     private void clickCancelar(ActionEvent event) throws IOException {
+        utilities.showAlert(Alert.AlertType.INFORMATION,
+                "Cancelado",
+                "No se realizaron cambios.");
+        User original = userService.findByIdentification(user.getId());
+
+        if (original != null) {
+            user = original;       
+            fillFields(user);      
+        } else {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Error",
+                    "No se pudo recargar la información del usuario.");
+        }
         FlowController.getInstance().goView("AdminPrincipalWindow");
     }
-}
+    }
+    
+    
+ 
+
