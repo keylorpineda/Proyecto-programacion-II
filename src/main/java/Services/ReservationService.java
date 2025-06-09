@@ -301,4 +301,23 @@ public class ReservationService {
             em.close();
         }
     }
+    
+    public void delete(Reservation reservation) {
+    EntityManager em = DataBaseManager.getEntityManager();
+    try {
+        em.getTransaction().begin();
+        Reservation attached = em.find(Reservation.class, reservation.getId());
+        if (attached != null) {
+            em.remove(attached);
+        }
+        em.getTransaction().commit();
+    } catch (Exception e) {
+        if (em.getTransaction().isActive()) {
+            em.getTransaction().rollback();
+        }
+        e.printStackTrace();
+    } finally {
+        em.close();
+    }
+}
 }

@@ -843,32 +843,36 @@ public class AdminPrincipalWindowController implements Initializable {
         return true;
     }
 
-    @FXML
-    private void clickEliminarUsuario(ActionEvent event) {
-        userSeleccionado = tblUsers.getSelectionModel().getSelectedItem();
+  @FXML
+private void clickEliminarUsuario(ActionEvent event) {
+    userSeleccionado = tblUsers.getSelectionModel().getSelectedItem();
 
-        if (userSeleccionado == null) {
-            utilities.showAlert(Alert.AlertType.WARNING,
-                    "Ningún usuario seleccionado",
-                    "Selecciona un usuario para eliminar.");
-            return;
-        }
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "¿Seguro que deseas eliminar al usuario: " + userSeleccionado.getFullName() + "?",
-                ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Confirmar eliminación");
-
-        confirm.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.YES) {
-                userService.delete(userSeleccionado.getId());
-                cargarTablaUsuarios();
-
-                utilities.showAlert(Alert.AlertType.INFORMATION,
-                        "Eliminado",
-                        "Usuario eliminado correctamente.");
-            }
-        });
+    if (userSeleccionado == null) {
+        utilities.showAlert(Alert.AlertType.WARNING,
+                "Ningún usuario seleccionado",
+                "Selecciona un usuario para eliminar.");
+        return;
     }
+
+    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+            "¿Seguro que deseas eliminar al usuario: " + userSeleccionado.getFullName() + "?\nTambién se eliminarán sus reservas.",
+            ButtonType.YES, ButtonType.NO);
+    confirm.setTitle("Confirmar eliminación");
+
+    confirm.showAndWait().ifPresent(response -> {
+        if (response == ButtonType.YES) {
+            List<Reservation> reservas = reservationService.findByUserId(userSeleccionado.getId());
+            reservas.forEach(reservationService::delete); // elimina todas las reservas
+
+            userService.delete(userSeleccionado.getId());  // elimina el usuario
+            cargarTablaUsuarios();
+
+            utilities.showAlert(Alert.AlertType.INFORMATION,
+                    "Eliminado",
+                    "El usuario y sus reservas han sido eliminados correctamente.");
+        }
+    });
+}
 
     @FXML
     private void clickEditarUsuario(ActionEvent event) throws IOException {
