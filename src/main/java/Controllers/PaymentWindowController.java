@@ -1,5 +1,7 @@
 package Controllers;
 
+import Controllers.MakeReservationWindowController.MultipleReservationsData;
+import Controllers.MakeReservationWindowController.ReservationData;
 import Models.Space;
 import Models.Reservation;
 import Models.User;
@@ -26,6 +28,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -70,6 +73,7 @@ public class PaymentWindowController implements Initializable {
     private Label lblPaymentStatus;
     @FXML
     private ProgressIndicator piPaymentProgress;
+    private List<ReservationData> multipleReservations;
 
     private final ReservationService reservationService = new ReservationService();
     private final UserService userService = new UserService();
@@ -131,25 +135,19 @@ public class PaymentWindowController implements Initializable {
                 return false;
             }
 
-            LocalDate selectedDate = reservationData.getDate();
-            LocalDateTime startDateTime = LocalDateTime.of(selectedDate, reservationData.getStartTime().toLocalTime());
-            LocalDateTime endDateTime = LocalDateTime.of(selectedDate, reservationData.getEndTime().toLocalTime());
-            LocalDateTime creationDateTime = LocalDateTime.now();
+            for (ReservationData rd : multipleReservations) {
+                LocalDate d = rd.getDate();
+                LocalDateTime start = rd.getStartTime();
+                LocalDateTime end = rd.getEndTime();
+                LocalDateTime now = LocalDateTime.now();
 
-            for (Space space : reservationData.getSelectedSpaces()) {
-                int seatsRequested = reservationData.getSeatsPerSpace().getOrDefault(space, 1);
-                Reservation reservation = new Reservation(
-                        currentUser,
-                        space,
-                        creationDateTime,
-                        startDateTime,
-                        endDateTime,
-                        seatsRequested
-                );
-                reservationService.save(reservation);
+                for (Space s : rd.getSelectedSpaces()) {
+                    int seats = rd.getSeatsPerSpace().getOrDefault(s, 1);
+                    Reservation r = new Reservation(currentUser, s, now, start, end, seats);
+                    reservationService.save(r);
+                }
             }
             return true;
-
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -191,19 +189,50 @@ public class PaymentWindowController implements Initializable {
 
     private void loadReservationData() {
         try {
-            reservationData = MakeReservationWindowController.getReservationData();
-            if (reservationData == null) {
+
+            MultipleReservationsData multiData = MakeReservationWindowController.getMultipleReservationsData();
+            if (multiData == null || multiData.getReservations().isEmpty()) {
                 showAlert(Alert.AlertType.ERROR, "Error",
                         "No se encontraron datos de reservación. Regresando a la selección de espacios.");
                 goBackToReservation();
                 return;
             }
 
-            displayReservationDetails();
-            displayTotalPrice();
+            this.multipleReservations = multiData.getReservations();
+            displayMultipleReservationDetails(multiData);
+            lblTotalPrice.setText("Total a Pagar: $" + String.format("%.2f", multiData.getGrandTotal()));
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error",
                     "Error al cargar los datos de reservación: " + e.getMessage());
+        }
+    }
+
+    private void displayMultipleReservationDetails(MultipleReservationsData multiData) {
+        vbReservationDetails.getChildren().clear();
+
+        for (ReservationData rd : multiData.getReservations()) {
+            VBox block = createDetailSection("📅 Reserva: " + rd.getDate()
+                    + " " + rd.getStartTime().toLocalTime()
+                    + "–" + rd.getEndTime().toLocalTime(), "#1976d2");
+
+            for (Space s : rd.getSelectedSpaces()) {
+                int seats = rd.getSeatsPerSpace().getOrDefault(s, 1);
+                double unitPrice = getSpacePriceValue(s)
+                        * java.time.Duration.between(rd.getStartTime(), rd.getEndTime()).toMinutes() / 60.0;
+                double totalForSpace = unitPrice * seats;
+                block.getChildren().add(new Label(
+                        String.format("• %s (%s) — %d asientos: $%.2f",
+                                s.getSpaceName(),
+                                s.getType().toString().replace("_", " "),
+                                seats,
+                                totalForSpace)
+                ));
+            }
+
+            block.getChildren().add(createDetailLabel(
+                    String.format("Subtotal reserva: $%.2f", rd.getTotalPrice())
+            ));
+            vbReservationDetails.getChildren().add(block);
         }
     }
 

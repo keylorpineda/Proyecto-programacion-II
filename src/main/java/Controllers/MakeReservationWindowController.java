@@ -47,6 +47,10 @@ public class MakeReservationWindowController implements Initializable {
     private Button btnBack;
     @FXML
     private Button btnGoToPay;
+    @FXML
+    private Button btnAddReservation;
+    @FXML
+    private ListView<String> lvReservationList;
 
     private Label lblSelectedSpaces;
     private final RoomService roomService = new RoomService();
@@ -60,9 +64,38 @@ public class MakeReservationWindowController implements Initializable {
     private static final double CELL_SIZE = 70;
     private static ReservationData reservationData;
     private final Map<Space, Integer> selectedSeatsPerSpace = new HashMap<>();
+    private List<ReservationData> multipleReservations = new ArrayList<>();
+    private final Set<Space> currentSelectedSpaces = new HashSet<>();
+    private final Map<Space, Integer> currentSelectedSeatsPerSpace = new HashMap<>();
+
+    public static class MultipleReservationsData {
+
+        private List<ReservationData> reservations;
+        private double grandTotal;
+
+        public MultipleReservationsData(List<ReservationData> reservations) {
+            this.reservations = new ArrayList<>(reservations);
+            this.grandTotal = reservations.stream().mapToDouble(r -> r.totalPrice).sum();
+        }
+
+        public List<ReservationData> getReservations() {
+            return reservations;
+        }
+
+        public double getGrandTotal() {
+            return grandTotal;
+        }
+    }
+
+    private static MultipleReservationsData multipleReservationsData;
+
+    public static MultipleReservationsData getMultipleReservationsData() {
+        return multipleReservationsData;
+    }
 
     public static class ReservationData {
 
+        private String id;
         public Set<Space> selectedSpaces;
         public Map<Space, Integer> seatsPerSpace;
         public LocalDate date;
@@ -72,6 +105,7 @@ public class MakeReservationWindowController implements Initializable {
 
         public ReservationData(Set<Space> spaces, Map<Space, Integer> seatsMap, LocalDate date,
                 LocalDateTime start, LocalDateTime end, double price) {
+            this.id = UUID.randomUUID().toString();
             this.selectedSpaces = new HashSet<>(spaces);
             this.seatsPerSpace = new HashMap<>(seatsMap);
             this.date = date;
@@ -90,6 +124,10 @@ public class MakeReservationWindowController implements Initializable {
 
         public LocalDate getDate() {
             return date;
+        }
+
+        public String getId() {
+            return id;
         }
 
         public LocalDateTime getStartTime() {
@@ -124,6 +162,118 @@ public class MakeReservationWindowController implements Initializable {
             showAlert(Alert.AlertType.ERROR, "Error de Inicialización",
                     "Error al inicializar la ventana: " + e.getMessage());
         }
+    }
+
+    @FXML
+    private void addReservationToList() {
+        if (currentSelectedSpaces.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Advertencia", "Seleccione al menos un espacio para agregar a la lista.");
+            return;
+        }
+
+        LocalDate selectedDate = dpDateOption.getValue();
+        String startStr = cbStartTime.getValue();
+        String endStr = cbEndTime.getValue();
+
+        if (selectedDate == null || startStr == null || endStr == null) {
+            showAlert(Alert.AlertType.WARNING, "Advertencia", "Seleccione fecha y horarios válidos.");
+            return;
+        }
+
+        LocalTime startTime = LocalTime.parse(startStr);
+        LocalTime endTime = LocalTime.parse(endStr);
+
+        if (!startTime.isBefore(endTime)) {
+            showAlert(Alert.AlertType.WARNING, "Advertencia", "La hora de inicio debe ser antes de la hora final.");
+            return;
+        }
+
+        LocalDateTime startDateTime = LocalDateTime.of(selectedDate, startTime);
+        LocalDateTime endDateTime = LocalDateTime.of(selectedDate, endTime);
+
+        if (hasConflictWithExistingReservations(currentSelectedSpaces, startDateTime, endDateTime)) {
+            showAlert(Alert.AlertType.WARNING, "Conflicto",
+                    "Ya tienes una reservación para alguno de estos espacios en el horario seleccionado.");
+            return;
+        }
+
+        for (Space space : currentSelectedSpaces) {
+            int requestedSeats = currentSelectedSeatsPerSpace.getOrDefault(space, 1);
+            try {
+                int alreadyReserved = resService.getReservedSeats(space.getId(), startDateTime, endDateTime);
+                if (alreadyReserved + requestedSeats > space.getCapacity()) {
+                    showAlert(Alert.AlertType.ERROR, "Error de Capacidad",
+                            String.format("El espacio '%s' no tiene suficiente capacidad disponible.",
+                                    space.getSpaceName()));
+                    return;
+                }
+            } catch (Exception e) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Error al verificar disponibilidad: " + e.getMessage());
+                return;
+            }
+        }
+
+        double totalPrice = calculateCurrentTotalPrice();
+        ReservationData newReservation = new ReservationData(
+                currentSelectedSpaces,
+                currentSelectedSeatsPerSpace,
+                selectedDate,
+                startDateTime,
+                endDateTime,
+                totalPrice
+        );
+
+        multipleReservations.add(newReservation);
+        updateReservationsList();
+        clearCurrentSelection();
+
+        showAlert(Alert.AlertType.INFORMATION, "Éxito", "Reservación agregada a la lista.");
+    }
+
+    private boolean hasConflictWithExistingReservations(Set<Space> spaces, LocalDateTime start, LocalDateTime end) {
+        for (ReservationData existing : multipleReservations) {
+           
+            if (timesOverlap(start, end, existing.startTime, existing.endTime)) {
+               
+                for (Space space : spaces) {
+                    if (existing.selectedSpaces.contains(space)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean timesOverlap(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
+        return start1.isBefore(end2) && end1.isAfter(start2);
+    }
+
+    private void updateReservationsList() {
+        if (lvReservationList != null) {
+            lvReservationList.getItems().clear();
+            for (ReservationData reservation : multipleReservations) {
+                String description = String.format("%s | %s - %s | %d espacios | $%.2f",
+                        reservation.date.toString(),
+                        reservation.startTime.toLocalTime().toString(),
+                        reservation.endTime.toLocalTime().toString(),
+                        reservation.selectedSpaces.size(),
+                        reservation.totalPrice);
+                lvReservationList.getItems().add(description);
+            }
+            updateTotalPrice();
+            updatePayButtonState();
+        }
+    }
+
+
+    private void clearCurrentSelection() {
+        currentSelectedSpaces.clear();
+        currentSelectedSeatsPerSpace.clear();
+        selectedSpaces.clear();
+        selectedSeatsPerSpace.clear();
+        updateSelectedSpacesLabel();
+        reloadMatrix();
     }
 
     public static ReservationData getReservationData() {
@@ -384,6 +534,7 @@ public class MakeReservationWindowController implements Initializable {
         }
 
         updateSelectedSpacesLabel();
+        updateAddReservationButtonState();
         updatePayButtonState();
     }
 
@@ -410,21 +561,19 @@ public class MakeReservationWindowController implements Initializable {
         int availableSeats = space.getCapacity() - occupiedSeats;
 
         if (availableSeats <= 0) {
-
             spaceButton.setStyle("-fx-background-color: #e57373; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 6; -fx-background-radius: 6;");
             spaceButton.setDisable(true);
             spaceButton.setText(spaceButton.getText() + "\n(Ocupado)");
             return spaceButton;
         } else if (occupiedSeats > 0) {
-            // Parcialmente ocupado - mostrar disponibilidad
             spaceButton.setText(space.getSpaceName() + "\n(" + availableSeats + " disponibles)");
         }
 
-        boolean isSelected = selectedSpaces.contains(space);
+        boolean isSelected = currentSelectedSpaces.contains(space); 
         updateSpaceButtonStyle(spaceButton, isSelected, baseColor);
 
-        if (!selectedSeatsPerSpace.containsKey(space)) {
-            selectedSeatsPerSpace.put(space, 1);
+        if (!currentSelectedSeatsPerSpace.containsKey(space)) {
+            currentSelectedSeatsPerSpace.put(space, 1);
         }
 
         spaceButton.setOnAction(ev -> {
@@ -438,23 +587,28 @@ public class MakeReservationWindowController implements Initializable {
     }
 
     private void handleSpaceSelection(Space space, Button spaceButton, String baseColor) {
-        if (selectedSpaces.contains(space)) {
-
-            selectedSpaces.remove(space);
+        if (currentSelectedSpaces.contains(space)) {
+            
+            currentSelectedSpaces.remove(space);
+            currentSelectedSeatsPerSpace.remove(space);
+            selectedSpaces.remove(space); 
             selectedSeatsPerSpace.remove(space);
             updateSpaceButtonStyle(spaceButton, false, baseColor);
         } else {
-
-            selectedSpaces.add(space);
-            if (!selectedSeatsPerSpace.containsKey(space)) {
+            // Seleccionar
+            currentSelectedSpaces.add(space);
+            selectedSpaces.add(space); 
+            if (!currentSelectedSeatsPerSpace.containsKey(space)) {
+                currentSelectedSeatsPerSpace.put(space, 1);
                 selectedSeatsPerSpace.put(space, 1);
             }
             updateSpaceButtonStyle(spaceButton, true, baseColor);
 
             if (space.getCapacity() > 1) {
                 boolean confirmed = showCapacitySelector(space);
-
                 if (!confirmed) {
+                    currentSelectedSpaces.remove(space);
+                    currentSelectedSeatsPerSpace.remove(space);
                     selectedSpaces.remove(space);
                     selectedSeatsPerSpace.remove(space);
                     updateSpaceButtonStyle(spaceButton, false, baseColor);
@@ -463,7 +617,39 @@ public class MakeReservationWindowController implements Initializable {
         }
 
         updateSelectedSpacesLabel();
-        updatePayButtonState();
+        updateAddReservationButtonState();
+    }
+
+    private double calculateCurrentTotalPrice() {
+        if (cbStartTime.getValue() == null || cbEndTime.getValue() == null) {
+            return 0.0;
+        }
+
+        LocalTime startTime = LocalTime.parse(cbStartTime.getValue());
+        LocalTime endTime = LocalTime.parse(cbEndTime.getValue());
+
+        double totalHours = java.time.Duration.between(startTime, endTime).toMinutes() / 60.0;
+        double totalPrice = 0.0;
+
+        for (Space space : currentSelectedSpaces) {
+            double pricePerHour = getSpacePriceValue(space.getType());
+            int seatsRequested = currentSelectedSeatsPerSpace.getOrDefault(space, 1);
+            totalPrice += pricePerHour * totalHours * seatsRequested;
+        }
+
+        return totalPrice;
+    }
+
+    private void updateTotalPrice() {
+        double grandTotal = multipleReservations.stream()
+                .mapToDouble(r -> r.totalPrice)
+                .sum();
+
+        
+        if (lblSelectedSpaces != null) {
+            lblSelectedSpaces.setText(String.format("Total de reservaciones: %d | Gran Total: $%.2f",
+                    multipleReservations.size(), grandTotal));
+        }
     }
 
     private void updateSpaceButtonStyle(Button button, boolean isSelected, String baseColor) {
@@ -735,17 +921,37 @@ public class MakeReservationWindowController implements Initializable {
 
     private void updateSelectedSpacesLabel() {
         if (lblSelectedSpaces != null) {
-            double totalPrice = calculateTotalPrice();
-            int totalSeats = selectedSeatsPerSpace.values().stream().mapToInt(Integer::intValue).sum();
+            double currentPrice = calculateCurrentTotalPrice();
+            int currentSeats = currentSelectedSeatsPerSpace.values().stream().mapToInt(Integer::intValue).sum();
+            double grandTotal = multipleReservations.stream().mapToDouble(r -> r.totalPrice).sum();
 
-            lblSelectedSpaces.setText(String.format("Espacios: %d | Asientos: %d | Total: $%.2f",
-                    selectedSpaces.size(), totalSeats, totalPrice));
+            lblSelectedSpaces.setText(String.format("Actual: %d espacios, %d asientos ($%.2f) | Total reservaciones: %d ($%.2f)",
+                    currentSelectedSpaces.size(), currentSeats, currentPrice,
+                    multipleReservations.size(), grandTotal));
+        }
+    }
+
+    private void updateAddReservationButtonState() {
+        if (btnAddReservation != null) {
+            btnAddReservation.setDisable(currentSelectedSpaces.isEmpty());
         }
     }
 
     private void updatePayButtonState() {
         if (btnGoToPay != null) {
-            btnGoToPay.setDisable(selectedSpaces.isEmpty());
+            btnGoToPay.setDisable(multipleReservations.isEmpty());
+        }
+    }
+
+    @FXML
+    private void removeSelectedReservation() {
+        int selectedIndex = lvReservationList.getSelectionModel().getSelectedIndex();
+        if (selectedIndex >= 0 && selectedIndex < multipleReservations.size()) {
+            multipleReservations.remove(selectedIndex);
+            updateReservationsList();
+            showAlert(Alert.AlertType.INFORMATION, "Eliminado", "Reservación eliminada de la lista.");
+        } else {
+            showAlert(Alert.AlertType.WARNING, "Selección", "Seleccione una reservación para eliminar.");
         }
     }
 
@@ -810,49 +1016,15 @@ public class MakeReservationWindowController implements Initializable {
 
     @FXML
     private void goToPay() {
-        if (selectedSpaces.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Advertencia", "Seleccione al menos un espacio para reservar.");
+        if (multipleReservations.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Advertencia", "Agregue al menos una reservación a la lista.");
             return;
         }
 
-        LocalDate selectedDate = dpDateOption.getValue();
-        LocalTime startLocalTime = LocalTime.parse(cbStartTime.getValue());
-        LocalTime endLocalTime = LocalTime.parse(cbEndTime.getValue());
+        MultipleReservationsData allReservations = new MultipleReservationsData(multipleReservations);
 
-        if (!startLocalTime.isBefore(endLocalTime)) {
-            showAlert(Alert.AlertType.WARNING, "Advertencia", "La hora de inicio debe ser antes de la hora final.");
-            return;
-        }
-
-        LocalDateTime startDateTime = LocalDateTime.of(selectedDate, startLocalTime);
-        LocalDateTime endDateTime = LocalDateTime.of(selectedDate, endLocalTime);
-
-        for (Space space : selectedSpaces) {
-            int requestedSeats = selectedSeatsPerSpace.getOrDefault(space, 1);
-            try {
-                int alreadyReserved = resService.getReservedSeats(space.getId(), startDateTime, endDateTime);
-                if (alreadyReserved + requestedSeats > space.getCapacity()) {
-                    showAlert(Alert.AlertType.ERROR, "Error de Capacidad",
-                            String.format("El espacio '%s' no tiene suficiente capacidad disponible.\n"
-                                    + "Solicitados: %d, Ya reservados: %d, Capacidad total: %d",
-                                    space.getSpaceName(), requestedSeats, alreadyReserved, space.getCapacity()));
-                    return;
-                }
-            } catch (Exception e) {
-                showAlert(Alert.AlertType.ERROR, "Error", "Error al verificar la disponibilidad: " + e.getMessage());
-                return;
-            }
-        }
-
-        double totalPrice = calculateTotalPrice();
-        reservationData = new ReservationData(
-                selectedSpaces,
-                selectedSeatsPerSpace,
-                selectedDate,
-                startDateTime,
-                endDateTime,
-                totalPrice
-        );
+        reservationData = null;
+        multipleReservationsData = allReservations;
 
         try {
             FlowController.getInstance().goView("PaymentWindow");
