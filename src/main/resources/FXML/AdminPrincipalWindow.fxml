@@ -6,6 +6,7 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -72,11 +73,11 @@
                             <Insets bottom="10.0" />
                         </VBox.margin>
                     </Button>
-                    <ToggleButton fx:id="tgViewUsers" onAction="#tgShowUsersTable" styleClass="buttonToggle" text="Usuarios" />
-                    <ToggleButton fx:id="tgViewRooms" onAction="#tgShowRoomTable" styleClass="buttonToggle" text="Plano" />
-                    <ToggleButton fx:id="tgViewReservations" onAction="#tgShowReservationsTable" styleClass="buttonToggle" text="Reservas" />
-                    <ToggleButton fx:id="tgViewReports" onAction="#tgShowReport" styleClass="buttonToggle" text="Reportes" />
-                    <ToggleButton fx:id="tgCreateAdmin" onAction="#tgCreateAdmin" styleClass="buttonToggle" text="Crear Admin" />
+                    <ToggleButton fx:id="tgViewUsers" onAction="#tgShowUsersTable" prefHeight="34.0" prefWidth="114.0" styleClass="buttonToggle" text="Usuarios" />
+                    <ToggleButton fx:id="tgViewRooms" onAction="#tgShowRoomTable" prefHeight="34.0" prefWidth="116.0" styleClass="buttonToggle" text="Plano" />
+                    <ToggleButton fx:id="tgViewReservations" onAction="#tgShowReservationsTable" prefHeight="34.0" prefWidth="116.0" styleClass="buttonToggle" text="Reservas" />
+                    <ToggleButton fx:id="tgViewReports" onAction="#tgShowReport" prefHeight="34.0" prefWidth="115.0" styleClass="buttonToggle" text="Reportes" />
+                    <ToggleButton fx:id="tgCreateAdmin" onAction="#tgCreateAdmin" styleClass="buttonToggle" text="Crear Usuario" />
                 </children>
             </VBox>
             <StackPane fx:id="spGeneralContent" style="-fx-padding: 20;" HBox.hgrow="ALWAYS">
@@ -102,18 +103,18 @@
                                 </TableView>
                             </content>
                         </ScrollPane>
-                  <HBox prefHeight="63.0" prefWidth="970.0" spacing="40.0">
-                     <children>
-                        <Button fx:id="btnEditarUsuario" mnemonicParsing="false" onAction="#clickEditarUsuario" prefHeight="26.0" prefWidth="58.0" text="Editar" />
-                        <Button fx:id="btnEliminarUsuario" mnemonicParsing="false" onAction="#clickEliminarUsuario" text="Eliminar" />
-                     </children>
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                     <padding>
-                        <Insets left="800.0" />
-                     </padding>
-                  </HBox>
+                        <HBox prefHeight="63.0" prefWidth="970.0" spacing="40.0">
+                            <children>
+                                <Button fx:id="btnEditarUsuario" mnemonicParsing="false" onAction="#clickEditarUsuario" prefHeight="26.0" prefWidth="58.0" text="Editar" />
+                                <Button fx:id="btnEliminarUsuario" mnemonicParsing="false" onAction="#clickEliminarUsuario" text="Eliminar" />
+                            </children>
+                            <VBox.margin>
+                                <Insets />
+                            </VBox.margin>
+                            <padding>
+                                <Insets left="800.0" />
+                            </padding>
+                        </HBox>
                     </VBox>
                     <ScrollPane fx:id="spRoomsScroll" fitToHeight="true" fitToWidth="true" maxHeight="600" prefHeight="600" styleClass="transparent-scrollpane" visible="false" HBox.hgrow="ALWAYS">
                         <content>
@@ -201,6 +202,7 @@
                             <RowConstraints />
                             <RowConstraints />
                             <RowConstraints />
+                     <RowConstraints />
                         </rowConstraints>
                         <children>
                             <Label text="Cédula:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
@@ -213,7 +215,14 @@
                             <TextField fx:id="txtAdminUser" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                             <Label text="Contraseña:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
                             <PasswordField fx:id="txtAdminPass" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                            <Button fx:id="btnGuardarAdmin" onAction="#onCreateAdmin" styleClass="button" text="Guardar" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                            <Label text="Rol:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                            <HBox alignment="CENTER_LEFT" spacing="30" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                <children>
+                                    <RadioButton fx:id="radioCliente" style="-fx-font-size: 14px; -fx-padding: 5 10;" text="Cliente" />
+                                    <RadioButton fx:id="radioAdmin" style="-fx-font-size: 14px; -fx-padding: 5 10;" text="Admin" />
+                                </children>
+                            </HBox>
+                            <Button fx:id="btnGuardarAdmin" onAction="#onCreateAdmin" styleClass="button" text="Guardar" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                         </children>
                     </GridPane>
                 </children>
