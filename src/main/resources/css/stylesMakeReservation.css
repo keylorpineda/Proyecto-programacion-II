@@ -2,7 +2,6 @@
     -fx-background-color: #0C0C0C;
 }
 
-/* ===================== TITULOS ===================== */
 .textFieldTitle {
     -fx-font-family: "Segoe UI Semibold";
     -fx-font-size: 28px;
@@ -17,7 +16,6 @@
     -fx-padding: 10 30 10 30;
 }
 
-/* ===================== BOTONES ===================== */
 .backButton {
     -fx-background-color: transparent;
     -fx-border-color: #FA7942;
@@ -55,7 +53,6 @@
     -fx-cursor: default;
 }
 
-/* ===================== CONTROLES ===================== */
 .date-picker,
 .combo-box {
     -fx-background-color: #1A1A1A;
@@ -89,7 +86,6 @@
     -fx-background-color: #1A1A1A;
 }
 
-/* ===================== TABS ===================== */
 .tab-pane {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
@@ -118,7 +114,6 @@
     -fx-font-weight: bold;
 }
 
-/* ===================== ESPACIOS ===================== */
 .floorGrid {
     -fx-background-color: #0C0C0C;
     -fx-border-color: #FA7942;
@@ -158,7 +153,6 @@
     -fx-scale-y: 1.06;
 }
 
-/* ===================== TOOLTIP ===================== */
 .tooltip {
     -fx-background-color: #1A1A1A;
     -fx-text-fill: #FA7942;
@@ -169,7 +163,6 @@
     -fx-background-radius: 6;
 }
 
-/* ===================== CONTENEDOR ===================== */
 .reservation-container {
     -fx-background-color: #0C0C0C;
     -fx-border-color: #FA7942;
