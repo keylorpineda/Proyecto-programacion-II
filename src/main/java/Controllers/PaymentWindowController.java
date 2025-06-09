@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Pattern;
+import javafx.geometry.Pos;
 
 public class PaymentWindowController implements Initializable {
 
@@ -189,8 +190,8 @@ public class PaymentWindowController implements Initializable {
 
     private void loadReservationData() {
         try {
-
-            MultipleReservationsData multiData = MakeReservationWindowController.getMultipleReservationsData();
+            MultipleReservationsData multiData
+                    = MakeReservationWindowController.getMultipleReservationsData();
             if (multiData == null || multiData.getReservations().isEmpty()) {
                 showAlert(Alert.AlertType.ERROR, "Error",
                         "No se encontraron datos de reservación. Regresando a la selección de espacios.");
@@ -198,9 +199,16 @@ public class PaymentWindowController implements Initializable {
                 return;
             }
 
+            // Guardamos la lista de ReservationData
             this.multipleReservations = multiData.getReservations();
+
+            // Despliegas cada bloque de reserva
             displayMultipleReservationDetails(multiData);
-            lblTotalPrice.setText("Total a Pagar: $" + String.format("%.2f", multiData.getGrandTotal()));
+
+            // Y pones el total
+            lblTotalPrice.setText(
+                    "Total a Pagar: $" + String.format("%.2f", multiData.getGrandTotal())
+            );
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error",
                     "Error al cargar los datos de reservación: " + e.getMessage());
@@ -524,23 +532,18 @@ public class PaymentWindowController implements Initializable {
             return;
         }
 
+        // 1. Muestra el overlay de "procesando"
+        showFullScreenProcessing();
+
+        // 2. Después, lanza el guardado y la animación
         Timeline reservationTimeline = new Timeline(
                 new KeyFrame(Duration.seconds(1), e -> {
-                    boolean success = false;
-                    try {
-                        success = createReservations();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-
-                    final boolean paymentOk = success;
+                    boolean success = createReservations();
                     Platform.runLater(() -> {
-                        if (paymentOk) {
-
+                        if (success) {
                             if (paymentAnimation == null) {
                                 paymentAnimation = new PaymentAnimation(spPaymentOverlay);
                                 paymentAnimation.setOnAnimationComplete(() -> {
-
                                     Platform.runLater(() -> {
                                         try {
                                             goToConfirmation();
@@ -551,12 +554,14 @@ public class PaymentWindowController implements Initializable {
                                     });
                                 });
                             }
+                            // 3. Calcula el gran total en lugar de usar reservationData
+                            double grandTotal = multipleReservations.stream()
+                                    .mapToDouble(ReservationData::getTotalPrice)
+                                    .sum();
 
-                            paymentAnimation.playPaymentAnimation(reservationData.getTotalPrice());
+                            paymentAnimation.playPaymentAnimation(grandTotal);
                         } else {
-
-                            showAlert(Alert.AlertType.ERROR, "Error de Pago",
-                                    "No se pudo procesar la reserva. Intente de nuevo.");
+                            showPaymentError();
                         }
                     });
                 })
@@ -587,11 +592,12 @@ public class PaymentWindowController implements Initializable {
         lblPaymentStatus.setText("¡Pago Exitoso!");
         lblPaymentStatus.setTextFill(Color.web("#4CAF50"));
         lblPaymentStatus.setFont(Font.font("Segoe UI", FontWeight.BOLD, 24));
-
         piPaymentProgress.setVisible(false);
 
         try {
-            Image successImage = new Image(getClass().getResourceAsStream("/images/payment_success.png"));
+            Image successImage = new Image(
+                    getClass().getResourceAsStream("/images/payment_success.png")
+            );
             ivPaymentAnimation.setImage(successImage);
             ivPaymentAnimation.setFitWidth(120);
             ivPaymentAnimation.setFitHeight(120);
@@ -600,30 +606,27 @@ public class PaymentWindowController implements Initializable {
             System.out.println("No se pudo cargar la imagen de éxito");
         }
 
-        Label totalLabel = new Label("Total pagado: $" + String.format("%.2f", reservationData.getTotalPrice()));
+        // Calcula aquí el gran total
+        double grandTotal = multipleReservations.stream()
+                .mapToDouble(ReservationData::getTotalPrice)
+                .sum();
+
+        Label totalLabel = new Label("Total pagado: $"
+                + String.format("%.2f", grandTotal));
         totalLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 18));
         totalLabel.setTextFill(Color.WHITE);
 
-        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(500), ivPaymentAnimation);
-        scaleTransition.setFromX(0.5);
-        scaleTransition.setFromY(0.5);
-        scaleTransition.setToX(1.0);
-        scaleTransition.setToY(1.0);
-        scaleTransition.setInterpolator(Interpolator.EASE_OUT);
-        scaleTransition.play();
+        ScaleTransition scale = new ScaleTransition(Duration.millis(500), ivPaymentAnimation);
+        scale.setFromX(0.5);
+        scale.setFromY(0.5);
+        scale.setToX(1.0);
+        scale.setToY(1.0);
+        scale.setInterpolator(Interpolator.EASE_OUT);
+        scale.play();
 
-        if (spPaymentOverlay.getChildren().size() > 0) {
-            VBox overlayContent = new VBox(20);
-            overlayContent.setAlignment(javafx.geometry.Pos.CENTER);
-            overlayContent.getChildren().addAll(
-                    ivPaymentAnimation,
-                    lblPaymentStatus,
-                    totalLabel
-            );
-
-            spPaymentOverlay.getChildren().clear();
-            spPaymentOverlay.getChildren().add(overlayContent);
-        }
+        VBox overlayContent = new VBox(20, ivPaymentAnimation, lblPaymentStatus, totalLabel);
+        overlayContent.setAlignment(Pos.CENTER);
+        spPaymentOverlay.getChildren().setAll(overlayContent);
     }
 
     private void showPaymentError() {
