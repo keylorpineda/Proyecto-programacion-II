@@ -19,7 +19,7 @@ public class SpaceBlock {
     private LocalDate date;
 
     @Column(name = "start_time", nullable = false)
-    private LocalTime startTime; // formato "HH:mm"
+    private LocalTime startTime; 
     @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
 

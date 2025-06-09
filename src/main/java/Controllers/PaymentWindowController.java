@@ -695,7 +695,7 @@ public class PaymentWindowController implements Initializable {
     }
 
     private void goToConfirmation() throws IOException {
-        FlowController.getInstance().goView("ReservationConfirmationWindow");
+        FlowController.getInstance().goView("UserViewWindow");
     }
 
     @FXML

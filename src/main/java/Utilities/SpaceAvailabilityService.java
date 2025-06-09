@@ -20,11 +20,9 @@ public class SpaceAvailabilityService {
     private final ReservationService reservationService = new ReservationService();
     private final RoomService roomService = new RoomService();
 
-
     public List<Reservation> getReservationsForSpace(Long spaceId, LocalDate date, LocalTime start, LocalTime end) {
         return reservationService.findBySpaceAndDateAndTime(spaceId, date, start, end);
     }
-
 
     public List<Space> getOccupiedSpaces(Long roomId, LocalDate date, LocalTime start, LocalTime end) {
         List<Reservation> reservas = reservationService.findByRoomAndDateAndTime(roomId, date, start, end);
@@ -45,7 +43,10 @@ public class SpaceAvailabilityService {
         List<Reservation> reservas = reservationService.findBySpaceAndDate(spaceId, date);
         List<LocalTime[]> result = new ArrayList<>();
         for (Reservation r : reservas) {
-            result.add(new LocalTime[]{r.getStartTime().toLocalTime(), r.getEndTime().toLocalTime()});
+
+            if (r.getStartTime().toLocalDate().equals(date)) {
+                result.add(new LocalTime[]{r.getStartTime().toLocalTime(), r.getEndTime().toLocalTime()});
+            }
         }
         return result;
     }
@@ -67,7 +68,7 @@ public class SpaceAvailabilityService {
             if (!overlap) {
                 libres.add(new LocalTime[]{actual, next});
             }
-            actual = actual.plusMinutes(30); 
+            actual = actual.plusMinutes(30);
         }
         return libres;
     }

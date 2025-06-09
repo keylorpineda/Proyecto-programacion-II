@@ -25,7 +25,6 @@ public class SpaceVisualFactory {
 
         Rectangle rect = new Rectangle(width, height);
 
-        // Por defecto, sin esquinas redondeadas
         rect.setArcWidth(0);
         rect.setArcHeight(0);
 
@@ -33,13 +32,12 @@ public class SpaceVisualFactory {
         pane.setAlignment(Pos.CENTER);
 
         if (space.getType() == SpaceType.PASILLO) {
-            // Color mate café, sin brillo
+
             rect.setFill(Color.web("#8d6e63"));
             rect.setStroke(Color.web("#5d4037"));
             rect.setStrokeWidth(1.5);
             rect.setEffect(new DropShadow(6, Color.rgb(70, 50, 40, 0.09)));
 
-            // Esquinas solo en las esquinas absolutas
             int row = space.getStartRow();
             int col = space.getStartCol();
             int filas = totalRows;
@@ -55,11 +53,9 @@ public class SpaceVisualFactory {
                 rect.setArcHeight(arc);
             }
 
-            // No poner nada de texto ni tooltip, solo decoración
             return pane;
         }
 
-        // --------- OTROS ESPACIOS -----------
         Color baseColor = getColorByType(space.getType());
         rect.setFill(space.getAvailable() ? baseColor : baseColor.darker().darker());
         rect.setStroke(Color.web("#222"));
@@ -68,20 +64,19 @@ public class SpaceVisualFactory {
         rect.setArcHeight(18);
         rect.setEffect(new DropShadow(10, Color.rgb(60, 60, 60, 0.15)));
 
-        // Ícono según tipo
         Label icon = new Label();
         icon.setFont(Font.font("Segoe UI Symbol", 28));
         icon.setTextFill(Color.WHITE);
 
         switch (space.getType()) {
             case AREA_COMUN:
-                icon.setText("\uD83D\uDC65"); // 👥 (personas)
+                icon.setText("\uD83D\uDC65");
                 break;
             case SALA_REUNIONES:
-                icon.setText("\uD83D\uDC6B"); // 👫 (pareja/personas reunión)
+                icon.setText("\uD83D\uDC6B");
                 break;
             case ESCRITORIO:
-                icon.setText("\uD83D\uDCC4"); // 📄 (papel/escritorio)
+                icon.setText("\uD83D\uDCC4");
                 break;
             default:
                 icon.setText("");
@@ -106,7 +101,6 @@ public class SpaceVisualFactory {
 
         pane.getChildren().add(box);
 
-        // Tooltip visual (solo para no-pasillos)
         String tooltipText = "Nombre: " + space.getName()
                 + "\nTipo: " + getTypeName(space.getType())
                 + "\nCapacidad: " + space.getCapacity()
@@ -114,7 +108,6 @@ public class SpaceVisualFactory {
         Tooltip tooltip = new Tooltip(tooltipText);
         Tooltip.install(pane, tooltip);
 
-        // Menú contextual para eliminar
         if (editable) {
             ContextMenu menu = new ContextMenu();
             MenuItem deleteItem = new MenuItem("Eliminar espacio");
@@ -147,13 +140,13 @@ public class SpaceVisualFactory {
     private static Color getColorByType(SpaceType type) {
         switch (type) {
             case ESCRITORIO:
-                return Color.web("#FBA834");      // Naranja pastel
+                return Color.web("#FBA834");
             case AREA_COMUN:
-                return Color.web("#95E1D3");      // Verde agua
+                return Color.web("#95E1D3");
             case SALA_REUNIONES:
-                return Color.web("#9B59B6");      // Morado elegante
+                return Color.web("#9B59B6");
             case PASILLO:
-                return Color.web("#D7DDE8");      // Gris azulado claro
+                return Color.web("#D7DDE8");
             default:
                 return Color.LIGHTGRAY;
         }

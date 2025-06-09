@@ -84,23 +84,27 @@ public class SpaceService {
         }
     }
 
-    public List<Space> findBlockedSpaces(Long roomId, LocalDate date, LocalTime start, LocalTime end) {
+    public List<Space> findBlockedSpaces(Long roomId,
+            LocalDate date,
+            LocalTime start,
+            LocalTime end) {
         EntityManager em = DataBaseManager.getEntityManager();
         try {
-            TypedQuery<SpaceBlock> q = em.createQuery(
-                    "SELECT b FROM SpaceBlock b WHERE b.room.id = :roomId AND b.date = :date AND b.start = :start AND b.end = :end",
-                    SpaceBlock.class);
+            TypedQuery<Space> q = em.createQuery(
+                    "SELECT b.space "
+                    + "FROM SpaceBlock b "
+                    + " WHERE b.space.room.id = :roomId "
+                    + "   AND b.date            = :date   "
+                    + "   AND b.startTime       = :start  "
+                    + "   AND b.endTime         = :end    ",
+                    Space.class
+            );
             q.setParameter("roomId", roomId);
             q.setParameter("date", date);
             q.setParameter("start", start);
             q.setParameter("end", end);
 
-            List<SpaceBlock> bloques = q.getResultList();
-            List<Space> espacios = new ArrayList<>();
-            for (int i = 0; i < bloques.size(); i++) {
-                espacios.add(bloques.get(i).getSpace());
-            }
-            return espacios;
+            return q.getResultList();
         } finally {
             em.close();
         }
