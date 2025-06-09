@@ -3,6 +3,7 @@ package Models;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "reservations")
@@ -20,7 +21,7 @@ public class Reservation {
     @JoinColumn(name = "space_id", nullable = false)
     private Space space;
 
-    @Column(name = "DATECREATED",nullable = false)
+    @Column(name = "DATECREATED", nullable = false)
     private LocalDateTime dateCreated;
 
     @Column(nullable = false)
@@ -29,15 +30,32 @@ public class Reservation {
     @Column(nullable = false)
     private LocalDateTime endTime;
 
+    @Column(name = "seat_count", nullable = false)
+    private int seatCount = 1;
+
     public Reservation() {
     }
 
-    public Reservation(User user, Space space, LocalDateTime dateCreated, LocalDateTime startTime, LocalDateTime endTime) {
+    public Reservation(User user,
+            Space space,
+            LocalDateTime dateCreated,
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            int seatCount) {
         this.user = user;
         this.space = space;
         this.dateCreated = dateCreated;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.seatCount = seatCount;
+    }
+
+    public int getSeatCount() {
+        return seatCount;
+    }
+
+    public void setSeatCount(int seatCount) {
+        this.seatCount = seatCount;
     }
 
     public Long getId() {
@@ -96,5 +114,36 @@ public class Reservation {
     @Transient
     public String getPlace() {
         return space.getRoom().getRoomName();
+    }
+
+    @Transient
+    public String getReservationId() {
+        return String.valueOf(id);
+    }
+
+    @Transient
+    public String getSpaceName() {
+        return space != null ? space.getName() : "";
+    }
+
+    @Transient
+    public String getDate() {
+        return startTime != null ? startTime.toLocalDate().toString() : "";
+    }
+
+    @Transient
+    public String getStartTimeAux() {
+        if (startTime != null) {
+            return startTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"));
+        }
+        return "";
+    }
+
+    @Transient
+    public String getEndTimeAux() {
+        if (endTime != null) {
+            return endTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm"));
+        }
+        return "";
     }
 }

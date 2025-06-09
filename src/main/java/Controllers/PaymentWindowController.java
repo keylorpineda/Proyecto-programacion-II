@@ -137,17 +137,19 @@ public class PaymentWindowController implements Initializable {
             LocalDateTime creationDateTime = LocalDateTime.now();
 
             for (Space space : reservationData.getSelectedSpaces()) {
+                int seatsRequested = reservationData.getSeatsPerSpace().getOrDefault(space, 1);
                 Reservation reservation = new Reservation(
                         currentUser,
                         space,
                         creationDateTime,
                         startDateTime,
-                        endDateTime
+                        endDateTime,
+                        seatsRequested
                 );
                 reservationService.save(reservation);
             }
-
             return true;
+
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -211,13 +213,14 @@ public class PaymentWindowController implements Initializable {
         VBox dateTimeBox = createDetailSection("📅 Fecha y Horario", "#1976d2");
         dateTimeBox.getChildren().addAll(
                 createDetailLabel("Fecha: " + reservationData.getDate().toString()),
-                createDetailLabel("Hora inicio: " + reservationData.getStartTime().toString()),
-                createDetailLabel("Hora fin: " + reservationData.getEndTime().toString())
+                createDetailLabel("Hora inicio: " + reservationData.getStartTime().toLocalTime()),
+                createDetailLabel("Hora fin: " + reservationData.getEndTime().toLocalTime())
         );
         vbReservationDetails.getChildren().add(dateTimeBox);
 
         VBox spacesBox = createDetailSection("🏢 Espacios Seleccionados", "#388e3c");
         for (Space space : reservationData.getSelectedSpaces()) {
+            int seats = reservationData.getSeatsPerSpace().getOrDefault(space, 1);
             VBox spaceDetail = new VBox(5);
             spaceDetail.setPadding(new Insets(10));
             spaceDetail.setStyle(
@@ -228,24 +231,27 @@ public class PaymentWindowController implements Initializable {
             );
 
             Label spaceName = new Label("• " + space.getSpaceName());
-            spaceName.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
-            spaceName.setTextFill(Color.web("#333"));
+            Label spaceType = new Label("   Tipo: " + space.getType().toString().replace("_", " "));
+            Label spaceSeats = new Label("   Asientos: " + seats + " / " + space.getCapacity());
 
-            Label spaceType = new Label("  Tipo: " + space.getType().toString().replace("_", " "));
-            spaceType.setFont(Font.font("Segoe UI", 12));
-            spaceType.setTextFill(Color.web("#666"));
+            double unitPrice = getSpacePriceValue(space)
+                    * java.time.Duration.between(
+                            reservationData.getStartTime(), reservationData.getEndTime()
+                    ).toMinutes() / 60.0;
+            double totalForSpace = unitPrice * seats;
+            Label spacePrice = new Label(
+                    String.format("   Precio: $%.2f × %d = $%.2f", unitPrice, seats, totalForSpace)
+            );
 
-            Label spacePrice = new Label("  Precio: " + getSpacePrice(space));
-            spacePrice.setFont(Font.font("Segoe UI", 12));
-            spacePrice.setTextFill(Color.web("#2e7d32"));
-
-            spaceDetail.getChildren().addAll(spaceName, spaceType, spacePrice);
+            spaceDetail.getChildren().addAll(spaceName, spaceType, spaceSeats, spacePrice);
             spacesBox.getChildren().add(spaceDetail);
         }
         vbReservationDetails.getChildren().add(spacesBox);
 
         VBox durationBox = createDetailSection("⏰ Duración", "#f57c00");
-        double duration = calculateDuration();
+        double duration = java.time.Duration.between(
+                reservationData.getStartTime(), reservationData.getEndTime()
+        ).toMinutes() / 60.0;
         durationBox.getChildren().add(
                 createDetailLabel("Duración total: " + String.format("%.1f horas", duration))
         );

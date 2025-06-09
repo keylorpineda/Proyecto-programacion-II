@@ -49,7 +49,6 @@ public class LoginWindowController implements Initializable {
         }
 
         User u = userService.authenticate(username, password);
-
         if (u != null) {
             UserService.setCurrentUser(u);
             try {
@@ -58,8 +57,10 @@ public class LoginWindowController implements Initializable {
                     flow.goView("AdminPrincipalWindow");
                 } else {
                     flow.goView("UserViewWindow");
-                    UserViewWindowController usrCtrl
-                            = flow.getController("UserViewWindow");
+                    UserViewWindowController usrCtrl = flow.getController("UserViewWindow");
+
+                    
+                    usrCtrl.setUserId(u.getId()); 
                     usrCtrl.setUserName(u.getName());
                 }
             } catch (IOException e) {
@@ -86,16 +87,16 @@ public class LoginWindowController implements Initializable {
         }
     }
 
-@FXML
-private void showInfo(ActionEvent event) {
-    try {
-        FlowController.getInstance().goView("InfoWindow");
-    } catch (IOException e) {
-        utilities.showAlert(Alert.AlertType.ERROR,
-            "Error",
-            "No se pudo cargar la ventana de información.");
-        e.printStackTrace();
+    @FXML
+    private void showInfo(ActionEvent event) {
+        try {
+            FlowController.getInstance().goView("InfoWindow");
+        } catch (IOException e) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Error",
+                    "No se pudo cargar la ventana de información.");
+            e.printStackTrace();
+        }
     }
-}
 
 }

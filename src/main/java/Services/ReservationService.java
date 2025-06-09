@@ -18,9 +18,19 @@ import java.util.TreeMap;
 public class ReservationService {
 
     public Reservation save(Reservation r) {
+        Long spaceId = r.getSpace().getId();
+        LocalDateTime start = r.getStartTime(), end = r.getEndTime();
+        int requested = r.getSeatCount(); 
+        int capacity = r.getSpace().getCapacity();
 
-        if (!isSpaceAvailableForReservation(r.getSpace().getId(), r.getStartTime(), r.getEndTime())) {
-            throw new IllegalArgumentException("El espacio ya está reservado para este horario");
+       
+        int already = getReservedSeats(spaceId, start, end);
+
+        if (already + requested > capacity) {
+            throw new IllegalArgumentException(
+                    String.format("No hay suficientes asientos libres: %d ya reservados + %d solicitados > %d capacidad",
+                            already, requested, capacity)
+            );
         }
 
         EntityManager em = DataBaseManager.getEntityManager();
@@ -33,6 +43,29 @@ public class ReservationService {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
+            em.close();
+        }
+    }
+
+    public boolean cancelReservation(Long reservationId) {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Reservation reservation = em.find(Reservation.class, reservationId);
+            if (reservation != null) {
+                em.remove(reservation);
+                em.getTransaction().commit();
+                return true;
+            }
+            em.getTransaction().rollback();
+            return false;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
             em.close();
         }
     }
@@ -218,4 +251,54 @@ public class ReservationService {
         return result;
     }
 
+    public List<Reservation> findByUserName(String userName) {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            TypedQuery<Reservation> q = em.createQuery(
+                    "SELECT r FROM Reservation r "
+                    + "WHERE r.user.userName = :userName "
+                    + "ORDER BY r.startTime DESC",
+                    Reservation.class
+            );
+            q.setParameter("userName", userName);
+            return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    public List<Reservation> findByUserId(Long userId) {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            List<Reservation> reservations = em.createQuery(
+                    "SELECT r FROM Reservation r WHERE r.user.id = :userId ORDER BY r.dateCreated DESC",
+                    Reservation.class)
+                    .setParameter("userId", userId)
+                    .getResultList();
+
+            System.out.println("Query ejecutada para userId: " + userId + ", resultados: " + reservations.size());
+            return reservations;
+        } finally {
+            em.close();
+        }
+    }
+
+    public int getReservedSeats(Long spaceId, LocalDateTime startTime, LocalDateTime endTime) {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            TypedQuery<Long> q = em.createQuery(
+                    "SELECT COALESCE(SUM(r.seatCount),0) "
+                    + "  FROM Reservation r "
+                    + " WHERE r.space.id = :spaceId "
+                    + "   AND r.startTime < :endTime "
+                    + "   AND r.endTime > :startTime",
+                    Long.class);
+            q.setParameter("spaceId", spaceId);
+            q.setParameter("startTime", startTime);
+            q.setParameter("endTime", endTime);
+            return q.getSingleResult().intValue();
+        } finally {
+            em.close();
+        }
+    }
 }

@@ -104,8 +104,10 @@ public class AdminPrincipalWindowController implements Initializable {
     private TableColumn<Map.Entry<String, Long>, String> colHoraInicio;
     @FXML
     private TableColumn<Map.Entry<String, Long>, Long> colCantidadHora;
-    @FXML private RadioButton radioCliente;
-    @FXML private RadioButton radioAdmin;
+    @FXML
+    private RadioButton radioCliente;
+    @FXML
+    private RadioButton radioAdmin;
     private ToggleGroup grupoRol = new ToggleGroup();
 
     graphicUtilities utilities = new graphicUtilities();
@@ -262,7 +264,7 @@ public class AdminPrincipalWindowController implements Initializable {
         colUsername.setCellValueFactory(new PropertyValueFactory<>("userName"));
         colRole.setCellValueFactory(new PropertyValueFactory<>("userRole"));
         cargarPlanoDeRoomActual();
-        
+
         configurarDragAndDrop();
         radioCliente.setToggleGroup(grupoRol);
         radioAdmin.setToggleGroup(grupoRol);
@@ -646,6 +648,9 @@ public class AdminPrincipalWindowController implements Initializable {
                 MenuItem info = new MenuItem("ℹ️ Información");
                 info.setOnAction(e -> mostrarInfoEspacio(s, precio));
 
+                MenuItem cambiarCapacidad = new MenuItem("👥 Cambiar capacidad");
+                cambiarCapacidad.setOnAction(e -> cambiarCapacidadEspacio(s));
+
                 MenuItem eliminar = new MenuItem("🗑️ Eliminar espacio");
                 eliminar.setOnAction(e -> confirmarEliminarEspacio(currentRoom, s));
 
@@ -655,15 +660,94 @@ public class AdminPrincipalWindowController implements Initializable {
                 if (btn.isDisabled()) {
                     eliminar.setDisable(true);
                     bloquear.setDisable(true);
+                    cambiarCapacidad.setDisable(true);
                 }
 
-                menu.getItems().addAll(info, new SeparatorMenuItem(), bloquear, eliminar);
+                if (s.getType() == SpaceType.PASILLO) {
+                    cambiarCapacidad.setDisable(true);
+                }
+
+                menu.getItems().addAll(info, new SeparatorMenuItem(), cambiarCapacidad, bloquear, eliminar);
                 menu.show(btn, event.getScreenX(), event.getScreenY());
             }
             event.consume();
         });
 
         return btn;
+    }
+
+    private void cambiarCapacidadEspacio(Space espacio) {
+        TextInputDialog dialog = new TextInputDialog(String.valueOf(espacio.getCapacity()));
+        dialog.setTitle("Cambiar Capacidad");
+        dialog.setHeaderText("Cambiar capacidad del espacio: " + espacio.getSpaceName());
+        dialog.setContentText("Nueva capacidad:");
+
+        // Validar entrada
+        dialog.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                dialog.getEditor().setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
+
+        Optional<String> result = dialog.showAndWait();
+
+        if (result.isPresent() && !result.get().trim().isEmpty()) {
+            try {
+                int nuevaCapacidad = Integer.parseInt(result.get().trim());
+
+                if (nuevaCapacidad < 1) {
+                    utilities.showAlert(Alert.AlertType.ERROR,
+                            "Capacidad inválida",
+                            "La capacidad debe ser mayor a 0.");
+                    return;
+                }
+
+                int capacidadMaxima = calcularCapacidadMaxima(espacio);
+                if (nuevaCapacidad > capacidadMaxima) {
+                    utilities.showAlert(Alert.AlertType.WARNING,
+                            "Capacidad excesiva",
+                            String.format("La capacidad máxima recomendada para este tipo de espacio (%dx%d) es %d personas.",
+                                    espacio.getWidth(), espacio.getHeight(), capacidadMaxima));
+                    return;
+                }
+
+                espacio.setCapacity(nuevaCapacidad);
+                spaceService.update(espacio);
+
+                utilities.showAlert(Alert.AlertType.INFORMATION,
+                        "Capacidad actualizada",
+                        String.format("La capacidad del espacio '%s' se ha actualizado a %d personas.",
+                                espacio.getSpaceName(), nuevaCapacidad));
+
+                cargarPlanoDeRoomActual();
+
+            } catch (NumberFormatException e) {
+                utilities.showAlert(Alert.AlertType.ERROR,
+                        "Entrada inválida",
+                        "Por favor ingrese un número válido.");
+            } catch (Exception e) {
+                utilities.showAlert(Alert.AlertType.ERROR,
+                        "Error",
+                        "No se pudo actualizar la capacidad: " + e.getMessage());
+            }
+        }
+    }
+
+    private int calcularCapacidadMaxima(Space espacio) {
+        int area = espacio.getWidth() * espacio.getHeight();
+
+        switch (espacio.getType()) {
+            case ESCRITORIO:
+                return 1; 
+            case SALA_REUNIONES:
+                return area * 4; 
+            case AREA_COMUN:
+                return area * 6; 
+            case PASILLO:
+                return 0; 
+            default:
+                return area * 2; 
+        }
     }
 
     private void bloquearEspacioDialog(Space s) {
@@ -797,9 +881,9 @@ public class AdminPrincipalWindowController implements Initializable {
         UserService.setCurrentUser(seleccionado);
         FlowController.getInstance().goView("EditUserFromAdmin");
     }
-    
+
     public void refrescarVista() {
-    cargarTablaUsuarios();
+        cargarTablaUsuarios();
     }
 
     private static class Delta {
@@ -967,6 +1051,8 @@ public class AdminPrincipalWindowController implements Initializable {
         spReportsScroll.setVisible(rep);
         formAdmin.setVisible(c);
         breadcrumb.setVisible(u);
+        btnEditarUsuario.setVisible(u);
+        btnEliminarUsuario.setVisible(u);
     }
 
     private void resetToggles() {
@@ -1019,6 +1105,7 @@ public class AdminPrincipalWindowController implements Initializable {
 
     @FXML
     private void tgShowRoomTable(ActionEvent event) {
+
         showRooms();
     }
 
@@ -1048,80 +1135,79 @@ public class AdminPrincipalWindowController implements Initializable {
         showCreateAdminForm();
     }
 
-   @FXML
-private void onCreateAdmin(ActionEvent e) {
-    try {
-        String firstName = txtAdminName.getText().trim();
-        String lastName = txtAdminLastName.getText().trim();
-        String user = txtAdminUser.getText().trim();
-        String password = txtAdminPass.getText().trim();
+    @FXML
+    private void onCreateAdmin(ActionEvent e) {
+        try {
+            String firstName = txtAdminName.getText().trim();
+            String lastName = txtAdminLastName.getText().trim();
+            String user = txtAdminUser.getText().trim();
+            String password = txtAdminPass.getText().trim();
 
-        if (firstName.isEmpty() || lastName.isEmpty() || user.isEmpty() || password.isEmpty()) {
-            utilities.showAlert(Alert.AlertType.WARNING,
-                    "Campos incompletos",
-                    "Por favor, complete todos los campos.");
-            return;
-        }
+            if (firstName.isEmpty() || lastName.isEmpty() || user.isEmpty() || password.isEmpty()) {
+                utilities.showAlert(Alert.AlertType.WARNING,
+                        "Campos incompletos",
+                        "Por favor, complete todos los campos.");
+                return;
+            }
 
-        String idText = txtAdminId.getText().trim();
-        if (!idText.matches("\\d+")) {
+            String idText = txtAdminId.getText().trim();
+            if (!idText.matches("\\d+")) {
+                utilities.showAlert(Alert.AlertType.ERROR,
+                        "Cédula inválida",
+                        "La cédula debe contener solo números.");
+                return;
+            }
+
+            if (idText.length() != 9) {
+                utilities.showAlert(Alert.AlertType.ERROR,
+                        "Cédula inválida",
+                        "La cédula debe tener exactamente 9 dígitos.");
+                return;
+            }
+
+            Long id = Long.parseLong(idText);
+
+            if (userService.findByIdentification(id) != null) {
+                utilities.showAlert(Alert.AlertType.ERROR,
+                        "Cédula ya registrada",
+                        "Ya existe un usuario con esta cédula.");
+                return;
+            }
+
+            if (userService.findByUserName(user) != null) {
+                utilities.showAlert(Alert.AlertType.ERROR,
+                        "Nombre de usuario duplicado",
+                        "El nombre de usuario ya está en uso.");
+                return;
+            }
+
+            // Verificación de RadioButtons
+            if (radioAdmin.isSelected()) {
+                Administrator admin = new Administrator(id, firstName, lastName, user, password);
+                userService.save(admin);
+
+                utilities.showAlert(Alert.AlertType.INFORMATION,
+                        "Éxito",
+                        "Administrador creado correctamente.");
+            } else {
+                Customer cliente = new Customer(id, firstName, lastName, user, password);
+                userService.save(cliente);
+
+                utilities.showAlert(Alert.AlertType.INFORMATION,
+                        "Éxito",
+                        "Cliente creado correctamente.");
+            }
+
+            clearAdminFields();
+            cargarTablaUsuarios();
+
+        } catch (Exception ex) {
             utilities.showAlert(Alert.AlertType.ERROR,
-                    "Cédula inválida",
-                    "La cédula debe contener solo números.");
-            return;
+                    "Error",
+                    "No se pudo crear el usuario.");
+            ex.printStackTrace();
         }
-
-        if (idText.length() != 9) {
-            utilities.showAlert(Alert.AlertType.ERROR,
-                    "Cédula inválida",
-                    "La cédula debe tener exactamente 9 dígitos.");
-            return;
-        }
-
-        Long id = Long.parseLong(idText);
-
-        if (userService.findByIdentification(id) != null) {
-            utilities.showAlert(Alert.AlertType.ERROR,
-                    "Cédula ya registrada",
-                    "Ya existe un usuario con esta cédula.");
-            return;
-        }
-
-        if (userService.findByUserName(user) != null) {
-            utilities.showAlert(Alert.AlertType.ERROR,
-                    "Nombre de usuario duplicado",
-                    "El nombre de usuario ya está en uso.");
-            return;
-        }
-
-        // Verificación de RadioButtons
-        if (radioAdmin.isSelected()) {
-            Administrator admin = new Administrator(id, firstName, lastName, user, password);
-            userService.save(admin);
-
-            utilities.showAlert(Alert.AlertType.INFORMATION,
-                    "Éxito",
-                    "Administrador creado correctamente.");
-        } else {
-            Customer cliente = new Customer(id, firstName, lastName, user, password);
-            userService.save(cliente);
-
-            utilities.showAlert(Alert.AlertType.INFORMATION,
-                    "Éxito",
-                    "Cliente creado correctamente.");
-        }
-
-        clearAdminFields();
-        cargarTablaUsuarios();
-
-    } catch (Exception ex) {
-        utilities.showAlert(Alert.AlertType.ERROR,
-                "Error",
-                "No se pudo crear el usuario.");
-        ex.printStackTrace();
     }
-}
-
 
     private void mostrarInfoEspacio(Space s, String precio) {
         Alert info = new Alert(Alert.AlertType.INFORMATION);
