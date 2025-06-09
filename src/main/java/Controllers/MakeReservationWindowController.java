@@ -617,4 +617,5 @@ public class MakeReservationWindowController implements Initializable {
     private void backUserView(ActionEvent event) {
         backUserView();
     }
+
 }
