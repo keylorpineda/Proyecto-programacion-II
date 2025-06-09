@@ -230,6 +230,8 @@ public class MakeReservationWindowController implements Initializable {
 
     private void reloadMatrix() {
         try {
+            loadRooms();
+
             GridPane currentPane = getCurrentGridPane();
             if (currentPane == null) {
                 showAlert(Alert.AlertType.WARNING, "Advertencia",
@@ -293,6 +295,15 @@ public class MakeReservationWindowController implements Initializable {
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Error al cargar la disponibilidad: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    public void refreshRooms() {
+        try {
+            loadRooms();
+            Platform.runLater(() -> reloadMatrix());
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Error al actualizar las salas: " + e.getMessage());
         }
     }
 

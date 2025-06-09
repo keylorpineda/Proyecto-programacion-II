@@ -86,6 +86,11 @@ public class UserViewWindowController {
     @FXML
     private void clickChange(ActionEvent event) throws IOException {
         FlowController.getInstance().goView("MakeReservationWindow");
+
+        Object controller = FlowController.getInstance().getController("MakeReservationWindow");
+        if (controller instanceof MakeReservationWindowController) {
+            ((MakeReservationWindowController) controller).refreshRooms();
+        }
     }
 
     @FXML
@@ -112,11 +117,13 @@ public class UserViewWindowController {
     private void toggleMenuOpciones(ActionEvent event) {
         VBoxMenuUsuario.setVisible(!VBoxMenuUsuario.isVisible());
     }
+
     @FXML
     private void clickCerrarSesionUsuario(ActionEvent event) throws IOException {
         utilities.showAlert(Alert.AlertType.INFORMATION, "Sesión cerrada", "Haz cerrado sesión correctamente!!");
         FlowController.getInstance().goView("LoginWindow");
     }
+
     @FXML
     private void clickVerPerfilUsuario(ActionEvent event) {
     }
@@ -125,16 +132,15 @@ public class UserViewWindowController {
     private void clickEditarUsuario(ActionEvent event) throws IOException {
         FlowController.getInstance().goView("EditCustomer");
     }
-  
 
     @FXML
-private void clickOpenGame(ActionEvent event) {
-    try {
-        FlowController.getInstance().goView("SnakeGame");
-    } catch (Exception e) {
-        utilities.showAlert(Alert.AlertType.ERROR, "Error", "No se pudo abrir el minijuego.");
-        e.printStackTrace();
+    private void clickOpenGame(ActionEvent event) {
+        try {
+            FlowController.getInstance().goView("SnakeGame");
+        } catch (Exception e) {
+            utilities.showAlert(Alert.AlertType.ERROR, "Error", "No se pudo abrir el minijuego.");
+            e.printStackTrace();
+        }
     }
-}
 
 }
