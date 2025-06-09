@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
@@ -21,6 +25,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+
 
 <VBox fx:id="root" prefHeight="800.0" prefWidth="1200.0" stylesheets="@../css/AdminPrincipalWindow.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.AdminPrincipalWindowController">
     <children>
@@ -164,28 +169,27 @@
                             <VBox alignment="TOP_CENTER" spacing="20" style="-fx-padding: 20;">
                                 <children>
                                     <Label styleClass="textFieldGlobal" text="Tipo de espacio más reservado" />
-                                    <TableView fx:id="tblEspaciosReservados" prefWidth="600">
-                                        <columns>
-                                            <TableColumn fx:id="colTipoEspacio" prefWidth="300" text="Tipo de espacio" />
-                                            <TableColumn fx:id="colCantidadEspacio" prefWidth="300" text="Cantidad de reservas" />
-                                        </columns>
-                                    </TableView>
+                                    <PieChart fx:id="pieTipoEspacio" prefHeight="300" prefWidth="600" />
 
                                     <Label styleClass="textFieldGlobal" text="Usuarios con más reservas" />
-                                    <TableView fx:id="tblUsuariosReservas" prefWidth="600">
-                                        <columns>
-                                            <TableColumn fx:id="colUsuarioNombre" prefWidth="300" text="Usuario" />
-                                            <TableColumn fx:id="colCantidadUsuario" prefWidth="300" text="Cantidad de reservas" />
-                                        </columns>
-                                    </TableView>
+                                    <BarChart fx:id="barUsuarios" prefHeight="300" prefWidth="600" title="Usuarios con más reservas">
+                                        <xAxis>
+                                            <CategoryAxis label="Usuario" />
+                                        </xAxis>
+                                        <yAxis>
+                                            <NumberAxis label="Cantidad de reservas" />
+                                        </yAxis>
+                                    </BarChart>
 
                                     <Label styleClass="textFieldGlobal" text="Horarios más usados" />
-                                    <TableView fx:id="tblHorariosReservas" prefWidth="600">
-                                        <columns>
-                                            <TableColumn fx:id="colHoraInicio" prefWidth="300" text="Hora de inicio" />
-                                            <TableColumn fx:id="colCantidadHora" prefWidth="300" text="Cantidad de reservas" />
-                                        </columns>
-                                    </TableView>
+                                    <BarChart fx:id="barHoras" prefHeight="300" prefWidth="600" title="Horarios más usados">
+                                        <xAxis>
+                                            <CategoryAxis label="Hora de inicio" />
+                                        </xAxis>
+                                        <yAxis>
+                                            <NumberAxis label="Cantidad de reservas" />
+                                        </yAxis>
+                                    </BarChart>
                                 </children>
                             </VBox>
                         </content>
@@ -202,7 +206,7 @@
                             <RowConstraints />
                             <RowConstraints />
                             <RowConstraints />
-                     <RowConstraints />
+                            <RowConstraints />
                         </rowConstraints>
                         <children>
                             <Label text="Cédula:" GridPane.columnIndex="0" GridPane.rowIndex="0" />

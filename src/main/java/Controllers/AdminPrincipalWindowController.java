@@ -28,6 +28,9 @@ import javafx.animation.ScaleTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Glow;
@@ -113,6 +116,15 @@ public class AdminPrincipalWindowController implements Initializable {
     graphicUtilities utilities = new graphicUtilities();
 
     private UserService userService = new UserService();
+
+  @FXML
+private PieChart pieTipoEspacio;
+
+@FXML
+private BarChart<String, Number> barUsuarios;
+
+@FXML
+private BarChart<String, Number> barHoras;
 
     private Room currentRoom;
     private final RoomService roomService = new RoomService();
@@ -251,9 +263,9 @@ public class AdminPrincipalWindowController implements Initializable {
         tgViewReservations.setOnAction(e -> showReservations());
         tgViewReports.setOnAction(e -> {
             showReports();
-            cargarTablaEspacios();
-            cargarTablaUsuariosTop();
-            cargarTablaHorarios();
+            cargarGraficoEspacios();
+        cargarGraficoUsuariosTop();
+        cargarGraficoHorarios();
         });
         tgCreateAdmin.setOnAction(e -> showCreateAdminForm());
         btnAddSpace.setOnAction(this::onAddSpace);
@@ -738,15 +750,15 @@ public class AdminPrincipalWindowController implements Initializable {
 
         switch (espacio.getType()) {
             case ESCRITORIO:
-                return 1; 
+                return 1;
             case SALA_REUNIONES:
-                return area * 4; 
+                return area * 4;
             case AREA_COMUN:
-                return area * 6; 
+                return area * 6;
             case PASILLO:
-                return 0; 
+                return 0;
             default:
-                return area * 2; 
+                return area * 2;
         }
     }
 
@@ -843,36 +855,36 @@ public class AdminPrincipalWindowController implements Initializable {
         return true;
     }
 
-  @FXML
-private void clickEliminarUsuario(ActionEvent event) {
-    userSeleccionado = tblUsers.getSelectionModel().getSelectedItem();
+    @FXML
+    private void clickEliminarUsuario(ActionEvent event) {
+        userSeleccionado = tblUsers.getSelectionModel().getSelectedItem();
 
-    if (userSeleccionado == null) {
-        utilities.showAlert(Alert.AlertType.WARNING,
-                "Ningún usuario seleccionado",
-                "Selecciona un usuario para eliminar.");
-        return;
-    }
-
-    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-            "¿Seguro que deseas eliminar al usuario: " + userSeleccionado.getFullName() + "?\nTambién se eliminarán sus reservas.",
-            ButtonType.YES, ButtonType.NO);
-    confirm.setTitle("Confirmar eliminación");
-
-    confirm.showAndWait().ifPresent(response -> {
-        if (response == ButtonType.YES) {
-            List<Reservation> reservas = reservationService.findByUserId(userSeleccionado.getId());
-            reservas.forEach(reservationService::delete); // elimina todas las reservas
-
-            userService.delete(userSeleccionado.getId());  // elimina el usuario
-            cargarTablaUsuarios();
-
-            utilities.showAlert(Alert.AlertType.INFORMATION,
-                    "Eliminado",
-                    "El usuario y sus reservas han sido eliminados correctamente.");
+        if (userSeleccionado == null) {
+            utilities.showAlert(Alert.AlertType.WARNING,
+                    "Ningún usuario seleccionado",
+                    "Selecciona un usuario para eliminar.");
+            return;
         }
-    });
-}
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "¿Seguro que deseas eliminar al usuario: " + userSeleccionado.getFullName() + "?\nTambién se eliminarán sus reservas.",
+                ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Confirmar eliminación");
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.YES) {
+                List<Reservation> reservas = reservationService.findByUserId(userSeleccionado.getId());
+                reservas.forEach(reservationService::delete); // elimina todas las reservas
+
+                userService.delete(userSeleccionado.getId());  // elimina el usuario
+                cargarTablaUsuarios();
+
+                utilities.showAlert(Alert.AlertType.INFORMATION,
+                        "Eliminado",
+                        "El usuario y sus reservas han sido eliminados correctamente.");
+            }
+        });
+    }
 
     @FXML
     private void clickEditarUsuario(ActionEvent event) throws IOException {
@@ -1077,29 +1089,49 @@ private void clickEliminarUsuario(ActionEvent event) {
         FlowController.getInstance().goView("LoginWindow");
     }
 
-    private void cargarTablaEspacios() {
-        Map<SpaceType, Long> datos = reservationService.countReservationsBySpaceType();
-        ObservableList<Map.Entry<SpaceType, Long>> items = FXCollections.observableArrayList(datos.entrySet());
-        colTipoEspacio.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getKey().toString()));
-        colCantidadEspacio.setCellValueFactory(c -> new SimpleLongProperty(c.getValue().getValue()).asObject());
-        tblEspaciosReservados.setItems(items);
+   private void cargarGraficoEspacios() {
+    Map<SpaceType, Long> datos = reservationService.countReservationsBySpaceType();
+    ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
+
+    for (Map.Entry<SpaceType, Long> entry : datos.entrySet()) {
+        pieData.add(new PieChart.Data(entry.getKey().getTypeName(), entry.getValue()));
     }
 
-    private void cargarTablaUsuariosTop() {
-        Map<String, Long> datos = reservationService.getTopUsersByReservations();
-        ObservableList<Map.Entry<String, Long>> items = FXCollections.observableArrayList(datos.entrySet());
-        colUsuarioNombre.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getKey()));
-        colCantidadUsuario.setCellValueFactory(c -> new SimpleLongProperty(c.getValue().getValue()).asObject());
-        tblUsuariosReservas.setItems(items);
+    pieTipoEspacio.setData(pieData);
+}
+
+
+ private void cargarGraficoUsuariosTop() {
+    Map<String, Long> datos = reservationService.getTopUsersByReservations();
+
+    // 👇 Validación para ver si llegan datos
+    System.out.println("Top usuarios con reservas: " + datos);
+
+    XYChart.Series<String, Number> series = new XYChart.Series<>();
+    series.setName("Reservas por usuario");
+
+    for (Map.Entry<String, Long> entry : datos.entrySet()) {
+        series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
     }
 
-    private void cargarTablaHorarios() {
-        Map<String, Long> datos = reservationService.countReservationsByHourSlot();
-        ObservableList<Map.Entry<String, Long>> items = FXCollections.observableArrayList(datos.entrySet());
-        colHoraInicio.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getKey()));
-        colCantidadHora.setCellValueFactory(c -> new SimpleLongProperty(c.getValue().getValue()).asObject());
-        tblHorariosReservas.setItems(items);
+    barUsuarios.getData().clear();
+    barUsuarios.getData().add(series);
+}
+
+
+
+    private void cargarGraficoHorarios() {
+    Map<String, Long> datos = reservationService.countReservationsByHourSlot();
+    XYChart.Series<String, Number> series = new XYChart.Series<>();
+    series.setName("Reservas por hora");
+
+    for (Map.Entry<String, Long> entry : datos.entrySet()) {
+        series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
     }
+
+    barHoras.getData().clear();
+    barHoras.getData().add(series);
+}
 
     @FXML
     private void tgShowUsersTable(ActionEvent event) {
@@ -1120,10 +1152,8 @@ private void clickEliminarUsuario(ActionEvent event) {
 
     @FXML
     private void tgShowReport(ActionEvent event) {
+           System.out.println("CLICK EN REPORTES"); // 👈 Esto DEBE imprimirse
         showReports();
-        cargarTablaEspacios();
-        cargarTablaUsuariosTop();
-        cargarTablaHorarios();
     }
 
     private void clearAdminFields() {
