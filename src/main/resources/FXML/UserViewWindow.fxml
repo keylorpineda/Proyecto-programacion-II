@@ -4,21 +4,16 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER"
-      fx:controller="Controllers.UserViewWindowController"
-      prefHeight="600.0" prefWidth="800.0"
-      xmlns="http://javafx.com/javafx/23.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
-      styleClass="login-container">
+<VBox alignment="TOP_CENTER" prefHeight="800.0" prefWidth="1200.0" styleClass="login-container" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.UserViewWindowController">
 
    <stylesheets>
        <URL value="@../css/userstyle.css" />
@@ -41,7 +36,7 @@
 
             <VBox alignment="CENTER_LEFT">
                <children>
-                  <Label text="BIENVENIDO" styleClass="textFieldTitle" />
+                  <Label styleClass="textFieldTitle" text="BIENVENIDO" />
                   <Label fx:id="lblUserName" styleClass="textFieldUserName" />
                </children>
             </VBox>
@@ -58,7 +53,7 @@
 
             <Button fx:id="btnMinijuegoSnake" onAction="#clickOpenGame" styleClass="circle-icon-button">
                <graphic>
-                  <ImageView fitWidth="28" fitHeight="28" preserveRatio="true">
+                  <ImageView fitHeight="28" fitWidth="28" preserveRatio="true">
                      <image>
                         <Image url="@../images/snakeicon.png" />
                      </image>
@@ -67,29 +62,29 @@
             </Button>
 
          </children>
-         <padding><Insets top="10" bottom="10" left="20" right="20"/></padding>
+         <padding><Insets bottom="10" left="20" right="20" top="10" /></padding>
       </HBox>
 
       <Separator prefWidth="760.0" styleClass="custom-separator" />
 
       <HBox alignment="CENTER" spacing="30.0">
          <children>
-            <Button fx:id="btnMakeReservation" onAction="#clickChange" text="Hacer una reservación" styleClass="buttonSignIn" />
-            <ToggleButton fx:id="tgbShowReservation" onAction="#showReservationTable" text="Mostrar Reservaciones" styleClass="buttonSignIn" />
+            <Button fx:id="btnMakeReservation" onAction="#clickChange" styleClass="buttonSignIn" text="Hacer una reservación" />
+            <ToggleButton fx:id="tgbShowReservation" onAction="#showReservationTable" styleClass="buttonSignIn" text="Mostrar Reservaciones" />
          </children>
-         <padding><Insets top="30" bottom="10"/></padding>
+         <padding><Insets bottom="10" top="30" /></padding>
       </HBox>
 
       <VBox fx:id="VBoxMenuUsuario" alignment="CENTER" spacing="10.0" visible="false">
          <children>
-            <Button fx:id="btnPerfilUusuario" onAction="#clickVerPerfilUsuario" text="PERFIL" styleClass="buttonSignIn" />
-            <Button fx:id="btnEditarUsuario" onAction="#clickEditarUsuario" text="EDITAR" styleClass="buttonSignIn" />
-            <Button text="#3" styleClass="buttonSignIn" />
+            <Button fx:id="btnPerfilUusuario" onAction="#clickVerPerfilUsuario" styleClass="buttonSignIn" text="PERFIL" />
+            <Button fx:id="btnEditarUsuario" onAction="#clickEditarUsuario" styleClass="buttonSignIn" text="EDITAR" />
+            <Button styleClass="buttonSignIn" text="#3" />
          </children>
-         <padding><Insets top="20"/></padding>
+         <padding><Insets top="20" /></padding>
       </VBox>
 
-      <TableView fx:id="tbvReservationTable" visible="false" VBox.vgrow="ALWAYS">
+      <TableView fx:id="tbvReservationTable" prefHeight="445.0" prefWidth="1053.0" visible="false" VBox.vgrow="ALWAYS">
          <columns>
             <TableColumn fx:id="idColumn" text="ID" />
             <TableColumn fx:id="placeColumn" text="Lugar" />
@@ -99,7 +94,7 @@
             <TableColumn fx:id="endColumn" text="Final" />
          </columns>
          <VBox.margin>
-            <Insets bottom="15.0" left="50.0" right="50.0" top="25.0" />
+            <Insets bottom="15.0" left="50.0" right="50.0" top="-80.0" />
          </VBox.margin>
       </TableView>
    </children>

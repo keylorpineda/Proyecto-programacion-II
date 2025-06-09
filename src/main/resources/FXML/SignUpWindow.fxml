@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/23.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="Controllers.SignUpWindowController"
-      alignment="CENTER"
-      spacing="20"
-      prefHeight="600.0" prefWidth="800.0"
-      stylesheets="@../css/styleSignUp.css">
+<VBox alignment="CENTER" prefHeight="800.0" prefWidth="1200.0" spacing="20" stylesheets="@../css/styleSignUp.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.SignUpWindowController">
 
     <children>
-        <VBox alignment="TOP_CENTER" spacing="20" styleClass="signup-container">
+        <VBox alignment="TOP_CENTER" prefHeight="678.0" prefWidth="1099.0" spacing="20" styleClass="signup-container">
 
-            <Button fx:id="btnBack"
-                    onAction="#backWindow"
-                    styleClass="btnBackStyle">
+            <Button fx:id="btnBack" onAction="#backWindow" styleClass="btnBackStyle">
                 <graphic>
-                    <ImageView fitWidth="35" fitHeight="35" preserveRatio="true">
+                    <ImageView fitHeight="35" fitWidth="35" preserveRatio="true">
                         <image>
                             <Image url="@../images/btnBackImage.png" />
                         </image>
@@ -29,37 +27,48 @@
                 </graphic>
             </Button>
 
-            <ImageView fitWidth="80" fitHeight="80" preserveRatio="true">
+            <ImageView fitHeight="80" fitWidth="80" preserveRatio="true">
                 <image>
                     <Image url="@../images/user1.png" />
                 </image>
             </ImageView>
 
-            <Label text="Crear Cuenta" styleClass="signup-title"/>
+            <Label styleClass="signup-title" text="Crear Cuenta" />
 
-            <GridPane hgap="15" vgap="12" alignment="CENTER">
-                <padding><Insets top="10" left="20" right="20" bottom="10"/></padding>
+            <GridPane alignment="CENTER" hgap="15" vgap="12">
+                <padding><Insets bottom="10" left="20" right="20" top="10" /></padding>
 
-                <Label text="Nombre" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-                <TextField fx:id="txtName" promptText="Nombre" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                <Label prefWidth="102.0" text="Nombre" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <TextField fx:id="txtName" promptText="Nombre" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                <Label text="Apellido" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-                <TextField fx:id="txtLastName" promptText="Apellido" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                <Label text="Apellido" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <TextField fx:id="txtLastName" promptText="Apellido" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                <Label text="Cédula" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-                <TextField fx:id="txtUserId" promptText="Cédula" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                <Label text="Cédula" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <TextField fx:id="txtUserId" promptText="Cédula" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                <Label text="Usuario" GridPane.rowIndex="3" GridPane.columnIndex="0" />
-                <TextField fx:id="txtUserName" promptText="Usuario" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                <Label text="Usuario" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <TextField fx:id="txtUserName" promptText="Usuario" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                <Label text="Contraseña" GridPane.rowIndex="4" GridPane.columnIndex="0" />
-                <PasswordField fx:id="txtUserPassword" promptText="Contraseña" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                <Label text="Contraseña" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <PasswordField fx:id="txtUserPassword" promptText="Contraseña" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <columnConstraints>
+               <ColumnConstraints />
+               <ColumnConstraints />
+            </columnConstraints>
+            <rowConstraints>
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+            </rowConstraints>
             </GridPane>
 
-            <Button fx:id="btnCreateAccount"
-                    onAction="#clickOnCreate"
-                    text="Crear Cuenta"
-                    styleClass="signup-button"/>
+            <Button fx:id="btnCreateAccount" onAction="#clickOnCreate" styleClass="signup-button" text="Crear Cuenta" />
+         <VBox.margin>
+            <Insets left="50.0" right="50.0" />
+         </VBox.margin>
 
         </VBox>
     </children>

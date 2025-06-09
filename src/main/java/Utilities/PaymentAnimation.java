@@ -194,7 +194,7 @@ public class PaymentAnimation {
         expiry.setLayoutX(25);
         expiry.setLayoutY(125);
 
-        Label visa = new Label("VISA");
+        Label visa = new Label("CARD");
         visa.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         visa.setTextFill(Color.WHITE);
         visa.setLayoutX(180);

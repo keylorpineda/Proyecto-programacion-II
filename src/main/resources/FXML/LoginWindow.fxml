@@ -10,39 +10,16 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER"
-      maxHeight="-Infinity"
-      maxWidth="-Infinity"
-      minHeight="-Infinity"
-      minWidth="-Infinity"
-      prefHeight="600.0"
-      prefWidth="800.0"
-      stylesheets="@../css/styles.css" 
-      xmlns="http://javafx.com/javafx/23.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="Controllers.LoginWindowController">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.LoginWindowController">
    <children>
-      <VBox alignment="TOP_CENTER"
-            maxHeight="1.7976931348623157E308"
-            maxWidth="-Infinity"
-            prefHeight="540.0"
-            prefWidth="654.0"
-            styleClass="login-container" 
-            VBox.vgrow="ALWAYS">
+      <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="540.0" prefWidth="654.0" styleClass="login-container" VBox.vgrow="ALWAYS">
          <children>
             <!-- Botón de información arriba a la derecha -->
             <HBox alignment="TOP_RIGHT">
                <children>
-                  <Button fx:id="btnInfo"
-                          styleClass="info-button"
-                          onAction="#showInfo"
-                          prefHeight="30.0"
-                          prefWidth="30.0">
+                  <Button fx:id="btnInfo" onAction="#showInfo" prefHeight="30.0" prefWidth="30.0" styleClass="info-button">
                      <graphic>
-                        <ImageView fitHeight="20.0"
-                                   fitWidth="20.0"
-                                   pickOnBounds="true"
-                                   preserveRatio="true">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../images/informacion1.png" />
                            </image>
@@ -51,17 +28,11 @@
                   </Button>
                </children>
                <HBox.margin>
-                  <Insets top="10.0" right="15.0" />
+                  <Insets right="15.0" top="10.0" />
                </HBox.margin>
             </HBox>
 
-            <ImageView fx:id="iconUser"
-                       styleClass="image-icon"
-                       fitHeight="123.0"
-                       fitWidth="130.0"
-                       pickOnBounds="true"
-                       preserveRatio="true"
-                       VBox.vgrow="ALWAYS">
+            <ImageView fx:id="iconUser" fitHeight="123.0" fitWidth="130.0" pickOnBounds="true" preserveRatio="true" styleClass="image-icon" VBox.vgrow="ALWAYS">
                <image>
                   <Image url="@../images/user1.png" />
                </image>
@@ -70,111 +41,62 @@
                </VBox.margin>
             </ImageView>
 
-            <Label fx:id="lblTitle"
-                   alignment="CENTER"
-                   prefHeight="38.0"
-                   prefWidth="206.0"
-                   styleClass="textFieldTitle"
-                   text="Iniciar sesión"
-                   textAlignment="CENTER"
-                   VBox.vgrow="ALWAYS">
+            <Label fx:id="lblTitle" alignment="CENTER" prefHeight="38.0" prefWidth="206.0" styleClass="textFieldTitle" text="Iniciar sesión" textAlignment="CENTER" VBox.vgrow="ALWAYS">
                <VBox.margin>
                   <Insets top="10.0" />
                </VBox.margin>
             </Label>
 
-            <HBox prefHeight="17.0"
-                  prefWidth="626.0"
-                  spacing="10.0"
-                  styleClass="field-wrapper"
-                  VBox.vgrow="NEVER">
+            <HBox prefHeight="17.0" prefWidth="626.0" spacing="10.0" styleClass="field-wrapper" VBox.vgrow="NEVER">
                <children>
-                  <ImageView fx:id="iconUserField"
-                             styleClass="icon"
-                             fitHeight="42.0"
-                             fitWidth="43.0"
-                             pickOnBounds="true"
-                             preserveRatio="true"
-                             HBox.hgrow="ALWAYS">
+                  <ImageView fx:id="iconUserField" fitHeight="42.0" fitWidth="43.0" pickOnBounds="true" preserveRatio="true" styleClass="icon" HBox.hgrow="ALWAYS">
                      <image>
                         <Image url="@../images/idUserImage.png" />
                      </image>
                   </ImageView>
-                  <TextField fx:id="txtUserNameLogin"
-                             styleClass="text-field"
-                             promptText="Usuario"
-                             HBox.hgrow="ALWAYS">
+                  <TextField fx:id="txtUserNameLogin" promptText="Usuario" styleClass="text-field" HBox.hgrow="ALWAYS">
                      <HBox.margin>
                         <Insets right="20.0" />
                      </HBox.margin>
                   </TextField>
                </children>
                <VBox.margin>
-                  <Insets left="10.0"
-                          right="10.0"
-                          top="20.0" />
+                  <Insets left="10.0" right="10.0" top="20.0" />
                </VBox.margin>
             </HBox>
 
-            <HBox prefHeight="149.0"
-                  prefWidth="626.0"
-                  spacing="10.0"
-                  VBox.vgrow="ALWAYS">
+            <HBox prefHeight="149.0" prefWidth="626.0" spacing="10.0" VBox.vgrow="ALWAYS">
                <children>
-                  <ImageView fx:id="iconPass"
-                             styleClass="icon"
-                             fitHeight="40.0"
-                             fitWidth="41.0"
-                             pickOnBounds="true"
-                             preserveRatio="true"
-                             HBox.hgrow="ALWAYS">
+                  <ImageView fx:id="iconPass" fitHeight="40.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" styleClass="icon" HBox.hgrow="ALWAYS">
                      <image>
                         <Image url="@../images/passwordImage.png" />
                      </image>
                   </ImageView>
-                  <PasswordField fx:id="txtUserPassword"
-                                 styleClass="password-field"
-                                 promptText="Contraseña"
-                                 HBox.hgrow="NEVER">
+                  <PasswordField fx:id="txtUserPassword" promptText="Contraseña" styleClass="password-field" HBox.hgrow="NEVER">
                      <HBox.margin>
                         <Insets right="20.0" />
                      </HBox.margin>
                   </PasswordField>
-                  <Button fx:id="btnLogin"
-                          styleClass="buttonSignIn"
-                          onAction="#LoginAccount"
-                          text="Ingresar"
-                          HBox.hgrow="ALWAYS">
+                  <Button fx:id="btnLogin" onAction="#LoginAccount" styleClass="buttonSignIn" text="Ingresar" HBox.hgrow="ALWAYS">
                      <HBox.margin>
-                        <Insets left="50.0"
-                                right="20.0" />
+                        <Insets left="50.0" right="20.0" />
                      </HBox.margin>
                   </Button>
                </children>
                <VBox.margin>
-                  <Insets bottom="50.0"
-                          left="10.0"
-                          right="10.0"
-                          top="20.0" />
+                  <Insets bottom="50.0" left="10.0" right="10.0" top="20.0" />
                </VBox.margin>
             </HBox>
 
-            <HBox prefHeight="36.0"
-                  prefWidth="275.0"
-                  spacing="75.0">
+            <HBox prefHeight="36.0" prefWidth="275.0" spacing="75.0">
                <VBox.margin>
-                  <Insets left="25.0"
-                          right="25.0" />
+                  <Insets left="25.0" right="25.0" />
                </VBox.margin>
             </HBox>
 
-            <HBox alignment="CENTER"
-                  VBox.vgrow="ALWAYS">
+            <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
                <children>
-                  <Button fx:id="btnCreateAccount"
-                          styleClass="linkCreateAccount"
-                          onAction="#CreateAccount"
-                          text="No tienes una cuenta? Cree aquí" />
+                  <Button fx:id="btnCreateAccount" onAction="#CreateAccount" styleClass="linkCreateAccount" text="No tienes una cuenta? Cree aquí" />
                </children>
                <HBox.margin>
                   <Insets top="20.0" />
@@ -182,10 +104,7 @@
             </HBox>
          </children>
          <VBox.margin>
-            <Insets bottom="20.0"
-                    left="50.0"
-                    right="50.0"
-                    top="20.0" />
+            <Insets bottom="20.0" top="20.0" />
          </VBox.margin>
       </VBox>
    </children>
