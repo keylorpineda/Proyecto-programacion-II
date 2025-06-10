@@ -26,7 +26,6 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-
 <VBox fx:id="root" prefHeight="800.0" prefWidth="1200.0" stylesheets="@../css/AdminPrincipalWindow.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.AdminPrincipalWindowController">
     <children>
         <HBox fx:id="header" prefHeight="79.0" spacing="20.0" styleClass="header">
@@ -87,7 +86,8 @@
             </VBox>
             <StackPane fx:id="spGeneralContent" style="-fx-padding: 20;" HBox.hgrow="ALWAYS">
                 <children>
-                    <VBox spacing="10">
+                    <!-- Tabla de Usuarios -->
+                    <VBox fx:id="vboxUsers" spacing="10">
                         <HBox fx:id="breadcrumb" spacing="5">
                             <children>
                                 <Label onMouseClicked="#onBreadcrumbHome" styleClass="linkBreadcrumb" text="Inicio" />
@@ -111,12 +111,10 @@
                         <HBox prefHeight="63.0" prefWidth="970.0" spacing="40.0">
                             <children>
                                 <Button fx:id="btnEditarUsuario" text="Editar" onAction="#clickEditarUsuario"
-        styleClass="button-editar" minWidth="90" minHeight="36"/>
-
-<Button fx:id="btnEliminarUsuario" text="Eliminar" onAction="#clickEliminarUsuario"
-        styleClass="button-eliminar" minWidth="100" minHeight="36"
-        wrapText="true" textOverrun="CLIP"/>
-
+                                        styleClass="button-editar" minWidth="90" minHeight="36"/>
+                                <Button fx:id="btnEliminarUsuario" text="Eliminar" onAction="#clickEliminarUsuario"
+                                        styleClass="button-eliminar" minWidth="100" minHeight="36"
+                                        wrapText="true" textOverrun="CLIP"/>
                             </children>
                             <VBox.margin>
                                 <Insets />
@@ -126,6 +124,8 @@
                             </padding>
                         </HBox>
                     </VBox>
+
+                    <!-- Plano de Espacios -->
                     <ScrollPane fx:id="spRoomsScroll" fitToHeight="true" fitToWidth="true" maxHeight="600" prefHeight="600" styleClass="transparent-scrollpane" visible="false" HBox.hgrow="ALWAYS">
                         <content>
                             <VBox alignment="TOP_CENTER" spacing="15.0">
@@ -154,21 +154,28 @@
                             </VBox>
                         </content>
                     </ScrollPane>
+
+                    <!-- Todas las Reservas -->
                     <ScrollPane fx:id="spReservationsScroll" fitToHeight="true" fitToWidth="true" maxHeight="450" prefHeight="450" styleClass="transparent-scrollpane" visible="false" HBox.hgrow="ALWAYS">
                         <content>
-                            <TableView fx:id="tblReservations" prefHeight="400.0" prefWidth="900.0" visible="false">
-                                <columns>
-                                    <TableColumn fx:id="colResId" prefWidth="150.0" text="ID Reserva" />
-                                    <TableColumn fx:id="colResUser" prefWidth="200.0" text="Usuario" />
-                                    <TableColumn fx:id="colResRoom" prefWidth="200.0" text="Plano/Espacio" />
-                                    <TableColumn fx:id="colResDate" prefWidth="200.0" text="Fecha" />
-                                    <TableColumn fx:id="colResStart" prefWidth="150.0" text="Inicio" />
-                                    <TableColumn fx:id="colResEnd" prefWidth="150.0" text="Fin" />
-                                </columns>
-                            </TableView>
+                            <VBox spacing="15">
+                                <Label styleClass="textFieldGlobal" text="Todas las Reservas" />
+                                <TableView fx:id="tblAllReservations" prefHeight="400.0" prefWidth="900.0">
+                                    <columns>
+                                        <TableColumn fx:id="colAllResId" prefWidth="100.0" text="ID" />
+                                        <TableColumn fx:id="colAllResUser" prefWidth="150.0" text="Usuario" />
+                                        <TableColumn fx:id="colAllResSpace" prefWidth="200.0" text="Espacio" />
+                                        <TableColumn fx:id="colAllResDate" prefWidth="120.0" text="Fecha" />
+                                        <TableColumn fx:id="colAllResStart" prefWidth="100.0" text="Inicio" />
+                                        <TableColumn fx:id="colAllResEnd" prefWidth="100.0" text="Fin" />
+                                        <TableColumn fx:id="colAllResStatus" prefWidth="100.0" text="Estado" />
+                                    </columns>
+                                </TableView>
+                            </VBox>
                         </content>
                     </ScrollPane>
-                    <!-- 🚀 Reportes con gráficos -->
+
+                    <!-- Reportes con gráficos -->
                     <ScrollPane fx:id="spReportsScroll" fitToHeight="true" fitToWidth="true" maxHeight="600" prefHeight="600" styleClass="transparent-scrollpane" visible="false" HBox.hgrow="ALWAYS">
                         <content>
                             <VBox alignment="TOP_CENTER" spacing="20" style="-fx-padding: 20;">
@@ -182,7 +189,8 @@
                                             <CategoryAxis label="Usuario" />
                                         </xAxis>
                                         <yAxis>
-                                             <NumberAxis fx:id="yAxisUsuarios" label="Cantidad de reservas" prefWidth="120" />                                        </yAxis>
+                                            <NumberAxis fx:id="yAxisUsuarios" label="Cantidad de reservas" prefWidth="120" />
+                                        </yAxis>
                                     </BarChart>
 
                                     <Label styleClass="textFieldGlobal" text="Horarios más usados" />
@@ -191,14 +199,33 @@
                                             <CategoryAxis label="Hora de inicio" />
                                         </xAxis>
                                         <yAxis>
-                                          <NumberAxis fx:id="yAxisHoras" label="Cantidad de reservas" prefWidth="120" />
+                                            <NumberAxis fx:id="yAxisHoras" label="Cantidad de reservas" prefWidth="120" />
                                         </yAxis>
-
                                     </BarChart>
+
+                                    <!-- Sección de Reservas por Usuario -->
+                                    <VBox spacing="15" style="-fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-padding: 20; -fx-background-color: #f9f9f9;">
+                                        <Label styleClass="textFieldGlobal" text="Reservas por Usuario" />
+                                        <HBox spacing="10" alignment="CENTER_LEFT">
+                                            <Label text="Seleccionar usuario:" />
+                                            <ComboBox fx:id="comboUsers" prefWidth="200" onAction="#onUserSelected" promptText="Seleccione un usuario" />
+                                        </HBox>
+                                        <TableView fx:id="tblUserReservations2" prefHeight="300" prefWidth="900">
+                                            <columns>
+                                                <TableColumn fx:id="colDate" text="Fecha" prefWidth="150" />
+                                                <TableColumn fx:id="colStartTime" text="Inicio" prefWidth="150" />
+                                                <TableColumn fx:id="colEndTime" text="Fin" prefWidth="150" />
+                                                <TableColumn fx:id="colSpace" text="Espacio" prefWidth="300" />
+                                                <TableColumn fx:id="colStatus" text="Estado" prefWidth="150" />
+                                            </columns>
+                                        </TableView>
+                                    </VBox>
                                 </children>
                             </VBox>
                         </content>
                     </ScrollPane>
+
+                    <!-- Formulario Crear Usuario -->
                     <GridPane fx:id="formAdmin" hgap="10.0" styleClass="grid-pane" vgap="10.0" visible="false">
                         <columnConstraints>
                             <ColumnConstraints percentWidth="30.0" />
