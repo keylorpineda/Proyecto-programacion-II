@@ -332,12 +332,7 @@ public class MakeReservationWindowController implements Initializable {
         if (dpDateOption != null) {
             dpDateOption.valueProperty().addListener((obs, oldVal, newVal) -> {
                 if (newVal != null) {
-                    currentSelectedSpaces.clear();
-                    currentSelectedSeatsPerSpace.clear();
-                    selectedSpaces.clear();
-                    selectedSeatsPerSpace.clear();
-                    multipleReservations.clear();
-                    updateReservationsList();
+
                     reloadMatrix();
                 }
             });
@@ -346,12 +341,7 @@ public class MakeReservationWindowController implements Initializable {
         if (cbStartTime != null) {
             cbStartTime.valueProperty().addListener((obs, oldVal, newVal) -> {
                 if (newVal != null) {
-                    currentSelectedSpaces.clear();
-                    currentSelectedSeatsPerSpace.clear();
-                    selectedSpaces.clear();
-                    selectedSeatsPerSpace.clear();
-                    multipleReservations.clear();
-                    updateReservationsList();
+
                     reloadMatrix();
                 }
             });
@@ -360,12 +350,7 @@ public class MakeReservationWindowController implements Initializable {
         if (cbEndTime != null) {
             cbEndTime.valueProperty().addListener((obs, oldVal, newVal) -> {
                 if (newVal != null) {
-                    currentSelectedSpaces.clear();
-                    currentSelectedSeatsPerSpace.clear();
-                    selectedSpaces.clear();
-                    selectedSeatsPerSpace.clear();
-                    multipleReservations.clear();
-                    updateReservationsList();
+
                     reloadMatrix();
                 }
             });
@@ -374,6 +359,7 @@ public class MakeReservationWindowController implements Initializable {
         if (tpTabChooseSpace != null) {
             tpTabChooseSpace.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
                 if (newTab != null) {
+
                     reloadMatrix();
                 }
             });
@@ -616,7 +602,9 @@ public class MakeReservationWindowController implements Initializable {
             spaceButton.setText(space.getSpaceName() + "\n(" + availableSeats + " disponibles)");
         }
 
-        boolean isInReservations = isSpaceInReservationsList(space);
+        boolean isInReservations = multipleReservations.stream()
+                .anyMatch(reservation -> reservation.selectedSpaces.stream()
+                .anyMatch(s -> s.getId().equals(space.getId())));
 
         if (isInReservations) {
             spaceButton.setStyle("-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; "
@@ -624,9 +612,16 @@ public class MakeReservationWindowController implements Initializable {
                     + "-fx-border-color: #1b5e20; -fx-border-width: 3; "
                     + "-fx-effect: dropshadow(gaussian, rgba(46, 125, 50, 0.6), 10, 0, 0, 0);");
 
-            ReservationData reservation = getReservationForSpace(space);
+            ReservationData reservation = multipleReservations.stream()
+                    .filter(r -> r.selectedSpaces.stream()
+                    .anyMatch(s -> s.getId().equals(space.getId())))
+                    .findFirst().orElse(null);
+
             if (reservation != null) {
-                int selectedSeats = reservation.seatsPerSpace.getOrDefault(space, 1);
+                Space reservedSpace = reservation.selectedSpaces.stream()
+                        .filter(s -> s.getId().equals(space.getId()))
+                        .findFirst().orElse(space);
+                int selectedSeats = reservation.seatsPerSpace.getOrDefault(reservedSpace, 1);
                 if (selectedSeats > 1) {
                     spaceButton.setText(space.getSpaceName() + "\n(" + selectedSeats + " asientos)");
                 } else {
@@ -643,7 +638,7 @@ public class MakeReservationWindowController implements Initializable {
         });
 
         spaceButton.setOnMouseEntered(e -> {
-            if (!spaceButton.isDisabled()) {
+            if (!spaceButton.isDisabled() && !isInReservations) {
                 spaceButton.setScaleX(1.05);
                 spaceButton.setScaleY(1.05);
             }
@@ -656,6 +651,12 @@ public class MakeReservationWindowController implements Initializable {
 
         setupSpaceTooltip(spaceButton, space, occupiedSeats, availableSeats);
         return spaceButton;
+    }
+
+    private boolean isSpaceInReservationsList(Space space) {
+        return multipleReservations.stream()
+                .anyMatch(reservation -> reservation.selectedSpaces.stream()
+                .anyMatch(s -> s.getId().equals(space.getId())));
     }
 
     private void handleSpaceSelection(Space space, Button spaceButton, String baseColor) {
@@ -753,7 +754,8 @@ public class MakeReservationWindowController implements Initializable {
         singleSpaceSeats.put(space, seatsToReserve);
 
         double pricePerHour = getSpacePriceValue(space.getType());
-        double totalHours = java.time.Duration.between(startDateTime.toLocalTime(), endDateTime.toLocalTime()).toMinutes() / 60.0;
+        long totalMinutes = java.time.Duration.between(startDateTime, endDateTime).toMinutes();
+        double totalHours = totalMinutes / 60.0;
         double totalPrice = pricePerHour * totalHours * seatsToReserve;
 
         ReservationData newReservation = new ReservationData(
@@ -1108,11 +1110,6 @@ public class MakeReservationWindowController implements Initializable {
         }
 
         return totalPrice;
-    }
-
-    private boolean isSpaceInReservationsList(Space space) {
-        return multipleReservations.stream()
-                .anyMatch(reservation -> reservation.selectedSpaces.contains(space));
     }
 
     private void updatePayButtonState() {

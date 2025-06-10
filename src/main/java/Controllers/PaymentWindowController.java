@@ -190,8 +190,7 @@ public class PaymentWindowController implements Initializable {
 
     private void loadReservationData() {
         try {
-            MultipleReservationsData multiData
-                    = MakeReservationWindowController.getMultipleReservationsData();
+            MultipleReservationsData multiData = MakeReservationWindowController.getMultipleReservationsData();
             if (multiData == null || multiData.getReservations().isEmpty()) {
                 showAlert(Alert.AlertType.ERROR, "Error",
                         "No se encontraron datos de reservación. Regresando a la selección de espacios.");
@@ -201,11 +200,15 @@ public class PaymentWindowController implements Initializable {
 
             this.multipleReservations = multiData.getReservations();
 
+            vbReservationDetails.getChildren().clear();
+
             displayMultipleReservationDetails(multiData);
 
-            lblTotalPrice.setText(
-                    "Total a Pagar: $" + String.format("%.2f", multiData.getGrandTotal())
-            );
+            double grandTotal = multipleReservations.stream()
+                    .mapToDouble(ReservationData::getTotalPrice)
+                    .sum();
+
+            lblTotalPrice.setText("Total a Pagar: $" + String.format("%.2f", grandTotal));
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error",
                     "Error al cargar los datos de reservación: " + e.getMessage());
