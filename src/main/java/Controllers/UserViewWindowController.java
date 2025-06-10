@@ -73,12 +73,12 @@ public class UserViewWindowController {
     @FXML
     private VBox VBoxMenuUsuario;
     @FXML
-    private Button btnPerfilUusuario;
-    @FXML
     private Button btnEditarUsuario;
 
     private ReservationService reservationService;
     private Long currentUserId;
+    @FXML
+    private Button btnMinijuegoSnake;
 
     public void initialize() {
         utilities = new graphicUtilities();
@@ -270,10 +270,6 @@ public class UserViewWindowController {
     private void clickCerrarSesionUsuario(ActionEvent event) throws IOException {
         utilities.showAlert(Alert.AlertType.INFORMATION, "Sesión cerrada", "Haz cerrado sesión correctamente!!");
         FlowController.getInstance().goView("LoginWindow");
-    }
-
-    @FXML
-    private void clickVerPerfilUsuario(ActionEvent event) {
     }
 
     @FXML

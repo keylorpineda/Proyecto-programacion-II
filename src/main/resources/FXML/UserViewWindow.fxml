@@ -77,11 +77,12 @@
 
       <VBox fx:id="VBoxMenuUsuario" alignment="CENTER" spacing="10.0" visible="false">
          <children>
-            <Button fx:id="btnPerfilUusuario" onAction="#clickVerPerfilUsuario" styleClass="buttonSignIn" text="PERFIL" />
-            <Button fx:id="btnEditarUsuario" onAction="#clickEditarUsuario" styleClass="buttonSignIn" text="EDITAR" />
-            <Button styleClass="buttonSignIn" text="#3" />
+            <Button fx:id="btnEditarUsuario" onAction="#clickEditarUsuario" prefHeight="31.0" prefWidth="148.0" styleClass="buttonSignIn" text="EDITAR USUARIO" />
          </children>
-         <padding><Insets top="20" /></padding>
+         <padding><Insets top="20.0" /></padding>
+         <VBox.margin>
+            <Insets bottom="100.0" />
+         </VBox.margin>
       </VBox>
 
       <TableView fx:id="tbvReservationTable" prefHeight="445.0" prefWidth="1053.0" visible="false" VBox.vgrow="ALWAYS">
