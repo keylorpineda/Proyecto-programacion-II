@@ -3,49 +3,50 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml"
             fx:controller="Controllers.EditUserFromAdminController"
             prefWidth="600" prefHeight="450"
-            style="-fx-background-color: #f0f0f0; -fx-padding: 30;">
+            stylesheets="@../css/editfromadmin.css"
+            styleClass="border-pane">
 
+    <!-- Título -->
     <top>
-        <Label text="Editar Usuario"
+        <Label text="🛠️ Editar Usuario"
                BorderPane.alignment="CENTER"
-               style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #333;"
-               />
+               styleClass="label"/>
     </top>
 
+    <!-- Formulario -->
     <center>
-        <GridPane hgap="20" vgap="20" alignment="CENTER">
+        <GridPane hgap="20" vgap="20" alignment="CENTER" styleClass="grid-pane">
             <columnConstraints>
                 <ColumnConstraints halignment="RIGHT" minWidth="150"/>
                 <ColumnConstraints hgrow="ALWAYS"/>
             </columnConstraints>
 
             <Label text="Nombre:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-            <TextField fx:id="txtNombre" promptText="Nombre"
-                       GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <TextField fx:id="txtNombre" promptText="Nombre" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
             <Label text="Apellido:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-            <TextField fx:id="txtApellido" promptText="Apellido"
-                       GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <TextField fx:id="txtApellido" promptText="Apellido" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
             <Label text="Usuario:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-            <TextField fx:id="txtUsuario" promptText="Usuario"
-                       GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            <TextField fx:id="txtUsuario" promptText="Usuario" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
             <Label text="Contraseña:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-            <PasswordField fx:id="txtContrasena" promptText="Contraseña"
-                           GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            <PasswordField fx:id="txtContrasena" promptText="Contraseña" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
         </GridPane>
     </center>
 
+    <!-- Botones -->
     <bottom>
         <HBox spacing="20" alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
-            <Button text="Cancelar" onAction="#clickCancelar" />
-            <Button text="Guardar" onAction="#clickGuardar" />
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <Button fx:id="btnCancelar" text="Cancelar" onAction="#clickCancelar" styleClass="signup-button-secondary"/>
+            <Button fx:id="btnGuardar" text="Guardar" onAction="#clickGuardar" styleClass="signup-button"/>
         </HBox>
     </bottom>
 

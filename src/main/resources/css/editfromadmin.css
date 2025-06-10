@@ -1,0 +1,67 @@
+.border-pane {
+    -fx-background-color: #0B132B;
+    -fx-padding: 30;
+}
+
+/* Título del formulario */
+.label {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #60A5FA;
+}
+
+/* Etiquetas dentro del GridPane */
+.grid-pane .label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+/* Campos de texto y contraseña */
+.text-field, .password-field {
+    -fx-background-color: #2B2D42;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #60A5FA;
+    -fx-padding: 8 12;
+    -fx-pref-width: 250;
+}
+
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #93C5FD;
+    -fx-background-color: #3B3D5C;
+}
+
+/* Botón Guardar */
+.signup-button {
+    -fx-background-color: #60A5FA;
+    -fx-text-fill: #0C0C0C;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(96,165,250,0.4), 6, 0.4, 0, 2);
+}
+
+.signup-button:hover {
+    -fx-background-color: #3B82F6;
+}
+
+/* Botón Cancelar */
+.signup-button-secondary {
+    -fx-background-color: transparent;
+    -fx-text-fill: #60A5FA;
+    -fx-border-color: #60A5FA;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+}
+
+.signup-button-secondary:hover {
+    -fx-background-color: #60a5fa28;
+}

@@ -1,7 +1,9 @@
+/* Fondo general */
 .root {
     -fx-background-color: #0C0C0C;
 }
 
+/* Título principal */
 .textFieldTitle {
     -fx-font-family: "Segoe UI Semibold";
     -fx-font-size: 28px;
@@ -11,11 +13,13 @@
     -fx-padding: 10 0 10 0;
 }
 
+/* Encabezado */
 .header {
     -fx-background-color: #1A1A1A;
     -fx-padding: 10 30 10 30;
 }
 
+/* Botón volver */
 .backButton {
     -fx-background-color: transparent;
     -fx-border-color: #FA7942;
@@ -27,11 +31,11 @@
     -fx-padding: 6 18 6 18;
     -fx-cursor: hand;
 }
-
 .backButton:hover {
     -fx-background-color: rgba(250,121,66,0.15);
 }
 
+/* Botones principales */
 .mainButton {
     -fx-background-color: #FA7942;
     -fx-text-fill: #0C0C0C;
@@ -43,16 +47,15 @@
     -fx-cursor: hand;
     -fx-effect: dropshadow(inner, rgba(0,0,0,0.4), 3, 0, 0, 2);
 }
-
 .mainButton:hover {
     -fx-background-color: #E06A3E;
 }
-
 .mainButton:disabled {
     -fx-opacity: 0.4;
     -fx-cursor: default;
 }
 
+/* Controles */
 .date-picker,
 .combo-box {
     -fx-background-color: #1A1A1A;
@@ -64,34 +67,30 @@
     -fx-text-fill: #FFFFFF;
     -fx-prompt-text-fill: #AAAAAA;
 }
-
 .date-picker .text-field,
 .combo-box .text-field {
     -fx-background-color: #1A1A1A;
     -fx-text-fill: #FFFFFF;
 }
-
 .date-picker .arrow-button,
 .combo-box .arrow-button {
     -fx-background-color: #FA7942;
     -fx-background-radius: 0 6 6 0;
 }
-
 .combo-box .list-cell {
     -fx-background-color: #1A1A1A;
     -fx-text-fill: #FFFFFF;
 }
-
 .combo-box-popup .list-view {
     -fx-background-color: #1A1A1A;
 }
 
+/* Tabs */
 .tab-pane {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
     -fx-padding: 0;
 }
-
 .tab-pane .tab-header-area,
 .tab-pane .tab-content-area,
 .tab-pane .tab-header-background {
@@ -99,7 +98,6 @@
     -fx-border-width: 0;
     -fx-padding: 0;
 }
-
 .tab-pane .tab {
     -fx-background-color: #1C1C1C;
     -fx-text-fill: #AAAAAA;
@@ -107,13 +105,13 @@
     -fx-border-color: transparent transparent #FA7942 transparent;
     -fx-border-width: 0 0 2 0;
 }
-
 .tab-pane .tab:selected {
     -fx-background-color: #FA7942;
     -fx-text-fill: #0C0C0C;
     -fx-font-weight: bold;
 }
 
+/* Matriz de espacios */
 .floorGrid {
     -fx-background-color: #0C0C0C;
     -fx-border-color: #FA7942;
@@ -123,22 +121,20 @@
     -fx-padding: 10;
 }
 
-.space-disponible {
-    -fx-background-color: #8B6C63;
+/* Espacios */
+.space-disponible,
+.space-ocupado {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: transparent;
+    -fx-opacity: 0;
 }
-
 .space-seleccionado {
     -fx-background-color: #36A940;
     -fx-text-fill: #FFFFFF;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 6, 0.3, 0, 2);
+    -fx-opacity: 1.0;
 }
-
-.space-ocupado {
-    -fx-background-color: #772F2F;
-    -fx-text-fill: #AAAAAA;
-    -fx-opacity: 0.8;
-}
-
 .space-button {
     -fx-font-size: 13px;
     -fx-cursor: hand;
@@ -147,12 +143,12 @@
     -fx-scale-x: 1;
     -fx-scale-y: 1;
 }
-
 .space-button:hover {
     -fx-scale-x: 1.06;
     -fx-scale-y: 1.06;
 }
 
+/* Tooltip */
 .tooltip {
     -fx-background-color: #1A1A1A;
     -fx-text-fill: #FA7942;
@@ -163,6 +159,7 @@
     -fx-background-radius: 6;
 }
 
+/* Contenedor de reservaciones */
 .reservation-container {
     -fx-background-color: #0C0C0C;
     -fx-border-color: #FA7942;
@@ -172,9 +169,71 @@
     -fx-padding: 30;
     -fx-effect: dropshadow(gaussian, rgba(250,121,66,0.5), 20, 0, 0, 5);
 }
-
 .total-info {
     -fx-text-fill: #00BFFF;
     -fx-font-size: 15px;
     -fx-font-family: "Segoe UI Semibold";
+}
+
+/* ScrollPane */
+.scroll-pane {
+    -fx-background: #0C0C0C;
+    -fx-background-color: #0C0C0C;
+    -fx-border-color: #FA7942;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+.scroll-pane .viewport {
+    -fx-background-color: #0C0C0C;
+}
+
+/* ListView */
+.reservation-box {
+    -fx-background-color: #1A1A1A;
+    -fx-border-color: #00BFFF;
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: white;
+    -fx-padding: 10;
+}
+.list-view.reservation-box {
+    -fx-background-color: #1A1A1A;
+    -fx-control-inner-background: #1A1A1A;
+    -fx-border-color: #00BFFF;
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+.list-cell {
+    -fx-text-fill: white;
+    -fx-background-color: transparent;
+}
+.list-cell:filled:selected {
+    -fx-background-color: #3B82F6;
+}
+
+/* Alertas */
+.dialog-pane {
+    -fx-background-color: #0C0C0C;
+    -fx-border-color: #FA7942;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+.dialog-pane .content {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+.dialog-pane .header-panel {
+    -fx-background-color: #1A1A1A;
+    -fx-text-fill: white;
+}
+.dialog-pane .button-bar .button {
+    -fx-background-color: #FA7942;
+    -fx-text-fill: #0C0C0C;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.dialog-pane .button-bar .button:hover {
+    -fx-background-color: #E06A3E;
 }
