@@ -1,40 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-
 <AnchorPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #0C0C0C;" stylesheets="@/css/snakeGame.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.SnakeGameController">
-
     <children>
-
-        <!-- Zona de juego -->
-        <Pane fx:id="gamePane" prefHeight="600.0" prefWidth="1003.0" />
-
-        <!-- Puntos -->
-        <Label fx:id="lblScore" styleClass="score-label" text="Puntos: 0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-
-        <!-- Pantalla de inicio -->
-        <StackPane fx:id="overlayPane" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: rgba(0,0,0,0.85);">
+        <Pane fx:id="gamePane" prefHeight="800.0" prefWidth="1200.0" styleClass="gamePane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <Label fx:id="lblScore" styleClass="score-label" text="Puntos: 0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
+        <StackPane fx:id="overlayPane" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: rgba(0,0,0,0.9);">
             <children>
-                <VBox alignment="CENTER" prefHeight="665.0" prefWidth="942.0" spacing="25.0">
-
-                    <!-- Logo con emojis -->
-                    <StackPane styleClass="emoji-logo">
-                        <Label styleClass="emoji-icon" text="🐍🐍" />
-                    </StackPane>
-
-                    <!-- Título -->
-                    <Label styleClass="title-label" text="Snake Game" />
-
-                    <!-- Botón -->
-                    <Button fx:id="btnStartGame" styleClass="start-button" text="Comenzar Juego" />
+                <VBox alignment="CENTER" spacing="30.0">
+                    <children>
+                        <StackPane styleClass="emoji-logo">
+                            <Label styleClass="emoji-icon" text="🐍🐍" />
+                        </StackPane>
+                        <Label styleClass="title-label" text="SNAKE GAME" />
+                        <Label styleClass="subtitle-label" text="¡Come la comida amarilla y evita los obstáculos rojos!" />
+                        <Button fx:id="btnStartGame" styleClass="start-button" text="🎮 COMENZAR JUEGO" />
+                        <VBox alignment="CENTER" spacing="8.0" styleClass="instructions-panel">
+                            <Label styleClass="instructions-title" text="CONTROLES:" />
+                            <Label styleClass="instructions-text" text="W, A, S, D - Mover la serpiente" />
+                            <Label styleClass="instructions-text" text="🟡 Comida amarilla - Come para crecer" />
+                            <Label styleClass="instructions-text" text="🟥 Obstáculos rojos - Evítalos" />
+                            <Label styleClass="instructions-text" text="R - Reiniciar juego" />
+                            <Label styleClass="instructions-text" text="ESC - Salir del juego" />
+                        </VBox>
+                    </children>
                 </VBox>
             </children>
         </StackPane>
-
     </children>
 </AnchorPane>

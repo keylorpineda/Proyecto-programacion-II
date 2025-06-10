@@ -3,21 +3,18 @@
     -fx-padding: 30;
 }
 
-/* Título del formulario */
 .label {
     -fx-font-size: 26px;
     -fx-font-weight: bold;
     -fx-text-fill: #60A5FA;
 }
 
-/* Etiquetas dentro del GridPane */
 .grid-pane .label {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-text-fill: white;
 }
 
-/* Campos de texto y contraseña */
 .text-field, .password-field {
     -fx-background-color: #2B2D42;
     -fx-text-fill: white;
@@ -34,7 +31,6 @@
     -fx-background-color: #3B3D5C;
 }
 
-/* Botón Guardar */
 .signup-button {
     -fx-background-color: #60A5FA;
     -fx-text-fill: #0C0C0C;
@@ -50,7 +46,6 @@
     -fx-background-color: #3B82F6;
 }
 
-/* Botón Cancelar */
 .signup-button-secondary {
     -fx-background-color: transparent;
     -fx-text-fill: #60A5FA;

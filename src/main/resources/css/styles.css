@@ -1,21 +1,17 @@
-/*=============================================================
-  ESTILO LOGIN - NEGRO Y NARANJA
-=============================================================*/
 
-/* Fondo negro general */
 .root {
     -fx-background-color: #0C0C0C;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
 }
 
-/* Reset de padding y spacing innecesario */
+
 .vbox, .hbox {
     -fx-padding: 0;
     -fx-spacing: 0;
 }
 
-/* Contenedor principal con borde naranja */
+
 .login-container {
     -fx-background-color: #0C0C0C;
     -fx-border-color: #FA7942;
@@ -26,7 +22,7 @@
     -fx-effect: dropshadow(gaussian, rgba(250,121,66,0.4), 20, 0, 0, 4);
 }
 
-/* Imagen de avatar principal */
+
 .image-icon {
     -fx-fit-width: 120px;
     -fx-fit-height: 120px;
@@ -34,7 +30,7 @@
     -fx-padding: 0 0 30 0;
 }
 
-/* Título principal “Iniciar sesión” */
+
 .textFieldTitle {
     -fx-font-family: "Segoe UI Semibold";
     -fx-font-size: 32px;
@@ -45,20 +41,20 @@
     -fx-alignment: CENTER;
 }
 
-/* Contenedor de campo con ícono */
+
 .field-wrapper {
     -fx-alignment: CENTER_LEFT;
     -fx-spacing: 10px;
 }
 
-/* Iconos al lado de los campos */
+
 .field-wrapper .icon {
     -fx-opacity: 0.9;
     -fx-fit-width: 24px;
     -fx-fit-height: 24px;
 }
 
-/* Campos de entrada (usuario/contraseña) */
+
 .text-field,
 .password-field {
     -fx-background-color: #2B2B2B;
@@ -84,7 +80,6 @@
     -fx-background-color: #3A3A3A;
 }
 
-/* Botón principal “Ingresar” */
 .buttonSignIn {
     -fx-background-color: #FA7942;
     -fx-text-fill: #0C0C0C;
@@ -108,7 +103,6 @@
     -fx-translate-y: 1;
 }
 
-/* Enlace “No tienes una cuenta?” */
 .linkCreateAccount {
     -fx-background-color: transparent;
     -fx-text-fill: #FA7942;
@@ -124,7 +118,7 @@
     -fx-text-fill: #FF935C;
 }
 
-/* Botón de información (icono i) */
+
 .info-button {
     -fx-background-color: transparent;
     -fx-cursor: hand;

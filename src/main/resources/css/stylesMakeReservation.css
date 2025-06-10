@@ -1,9 +1,7 @@
-/* Fondo general */
 .root {
     -fx-background-color: #0C0C0C;
 }
 
-/* Título principal */
 .textFieldTitle {
     -fx-font-family: "Segoe UI Semibold";
     -fx-font-size: 28px;
@@ -13,13 +11,11 @@
     -fx-padding: 10 0 10 0;
 }
 
-/* Encabezado */
 .header {
     -fx-background-color: #1A1A1A;
     -fx-padding: 10 30 10 30;
 }
 
-/* Botón volver */
 .backButton {
     -fx-background-color: transparent;
     -fx-border-color: #FA7942;
@@ -35,7 +31,6 @@
     -fx-background-color: rgba(250,121,66,0.15);
 }
 
-/* Botones principales */
 .mainButton {
     -fx-background-color: #FA7942;
     -fx-text-fill: #0C0C0C;
@@ -55,7 +50,6 @@
     -fx-cursor: default;
 }
 
-/* Controles */
 .date-picker,
 .combo-box {
     -fx-background-color: #1A1A1A;
@@ -85,7 +79,6 @@
     -fx-background-color: #1A1A1A;
 }
 
-/* Tabs */
 .tab-pane {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
@@ -111,7 +104,6 @@
     -fx-font-weight: bold;
 }
 
-/* Matriz de espacios */
 .floorGrid {
     -fx-background-color: #0C0C0C;
     -fx-border-color: #FA7942;
@@ -121,7 +113,6 @@
     -fx-padding: 10;
 }
 
-/* Espacios */
 .space-disponible,
 .space-ocupado {
     -fx-background-color: transparent;
@@ -148,7 +139,6 @@
     -fx-scale-y: 1.06;
 }
 
-/* Tooltip */
 .tooltip {
     -fx-background-color: #1A1A1A;
     -fx-text-fill: #FA7942;
@@ -159,7 +149,6 @@
     -fx-background-radius: 6;
 }
 
-/* Contenedor de reservaciones */
 .reservation-container {
     -fx-background-color: #0C0C0C;
     -fx-border-color: #FA7942;
@@ -175,7 +164,6 @@
     -fx-font-family: "Segoe UI Semibold";
 }
 
-/* ScrollPane */
 .scroll-pane {
     -fx-background: #0C0C0C;
     -fx-background-color: #0C0C0C;
@@ -187,7 +175,6 @@
     -fx-background-color: #0C0C0C;
 }
 
-/* ListView */
 .reservation-box {
     -fx-background-color: #1A1A1A;
     -fx-border-color: #00BFFF;
@@ -213,7 +200,6 @@
     -fx-background-color: #3B82F6;
 }
 
-/* Alertas */
 .dialog-pane {
     -fx-background-color: #0C0C0C;
     -fx-border-color: #FA7942;

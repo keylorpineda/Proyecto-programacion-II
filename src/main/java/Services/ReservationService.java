@@ -20,10 +20,9 @@ public class ReservationService {
     public Reservation save(Reservation r) {
         Long spaceId = r.getSpace().getId();
         LocalDateTime start = r.getStartTime(), end = r.getEndTime();
-        int requested = r.getSeatCount(); 
+        int requested = r.getSeatCount();
         int capacity = r.getSpace().getCapacity();
 
-       
         int already = getReservedSeats(spaceId, start, end);
 
         if (already + requested > capacity) {
@@ -304,23 +303,39 @@ public class ReservationService {
             em.close();
         }
     }
-    
+
     public void delete(Reservation reservation) {
-    EntityManager em = DataBaseManager.getEntityManager();
-    try {
-        em.getTransaction().begin();
-        Reservation attached = em.find(Reservation.class, reservation.getId());
-        if (attached != null) {
-            em.remove(attached);
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Reservation attached = em.find(Reservation.class, reservation.getId());
+            if (attached != null) {
+                em.remove(attached);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            em.close();
         }
-        em.getTransaction().commit();
-    } catch (Exception e) {
-        if (em.getTransaction().isActive()) {
-            em.getTransaction().rollback();
-        }
-        e.printStackTrace();
-    } finally {
-        em.close();
     }
-}
+
+    public void update(Reservation reservation) {
+        EntityManager em = DataBaseManager.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.merge(reservation);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
 }

@@ -146,4 +146,26 @@ public class Reservation {
         }
         return "";
     }
+
+    @Transient
+    public String getStatus() {
+        LocalDateTime now = LocalDateTime.now();
+
+        
+        if (this.endTime != null && this.endTime.isBefore(now)) {
+            return "COMPLETA";
+        }
+
+        
+        if (this.startTime != null && this.startTime.isBefore(now) && this.endTime.isAfter(now)) {
+            return "ACTIVA";
+        }
+
+        
+        if (this.startTime != null && this.startTime.isAfter(now)) {
+            return "PENDIENTE";
+        }
+
+        return "DESCONOCIDO";
+    }
 }

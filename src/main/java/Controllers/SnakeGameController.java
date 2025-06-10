@@ -34,8 +34,8 @@ public class SnakeGameController implements Initializable {
     private Button btnStartGame;
 
     private final int tileSize = 20;
-    private final int width = 30;
-    private final int height = 20;
+    private int width;
+    private int height;
 
     private List<Rectangle> snake;
     private String direction = "RIGHT";
@@ -44,6 +44,8 @@ public class SnakeGameController implements Initializable {
     private Rectangle food;
     private int score = 0;
     private double currentSpeed = 0.2;
+
+    private List<Rectangle> obstacles = new ArrayList<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -71,10 +73,18 @@ public class SnakeGameController implements Initializable {
                 return;
             }
 
-            if (e.getCode() == KeyCode.W && !direction.equals("DOWN")) direction = "UP";
-            if (e.getCode() == KeyCode.S && !direction.equals("UP")) direction = "DOWN";
-            if (e.getCode() == KeyCode.A && !direction.equals("RIGHT")) direction = "LEFT";
-            if (e.getCode() == KeyCode.D && !direction.equals("LEFT")) direction = "RIGHT";
+            if (e.getCode() == KeyCode.W && !direction.equals("DOWN")) {
+                direction = "UP";
+            }
+            if (e.getCode() == KeyCode.S && !direction.equals("UP")) {
+                direction = "DOWN";
+            }
+            if (e.getCode() == KeyCode.A && !direction.equals("RIGHT")) {
+                direction = "LEFT";
+            }
+            if (e.getCode() == KeyCode.D && !direction.equals("LEFT")) {
+                direction = "RIGHT";
+            }
         });
 
         gamePane.setFocusTraversable(true);
@@ -82,8 +92,22 @@ public class SnakeGameController implements Initializable {
 
     private void startGame() {
         gamePane.getChildren().clear();
+        obstacles.clear();
         score = 0;
         updateScoreLabel();
+
+        double gamePaneWidth = gamePane.getWidth();
+        double gamePaneHeight = gamePane.getHeight();
+
+        if (gamePaneWidth == 0) {
+            gamePaneWidth = 1200.0;
+        }
+        if (gamePaneHeight == 0) {
+            gamePaneHeight = 800.0;
+        }
+
+        width = (int) (gamePaneWidth / tileSize);
+        height = (int) (gamePaneHeight / tileSize);
 
         snake = new ArrayList<>();
         Rectangle head = createRectangle(tileSize * 5, tileSize * 5, Color.LIME);
@@ -92,22 +116,29 @@ public class SnakeGameController implements Initializable {
 
         direction = "RIGHT";
         running = true;
+        spawnObstacles();
         spawnFood();
 
         startTimeline(currentSpeed);
     }
 
     private void restartGame() {
-        if (timeline != null) timeline.stop();
+        if (timeline != null) {
+            timeline.stop();
+        }
         currentSpeed = 0.2;
         startGame();
         gamePane.requestFocus();
     }
 
     private void startTimeline(double speed) {
-        if (timeline != null) timeline.stop();
+        if (timeline != null) {
+            timeline.stop();
+        }
         timeline = new Timeline(new KeyFrame(Duration.seconds(speed), e -> {
-            if (running) moveSnake();
+            if (running) {
+                moveSnake();
+            }
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
@@ -119,14 +150,45 @@ public class SnakeGameController implements Initializable {
         double y = head.getY();
 
         switch (direction) {
-            case "UP": y -= tileSize; break;
-            case "DOWN": y += tileSize; break;
-            case "LEFT": x -= tileSize; break;
-            case "RIGHT": x += tileSize; break;
+            case "UP":
+                y -= tileSize;
+                break;
+            case "DOWN":
+                y += tileSize;
+                break;
+            case "LEFT":
+                x -= tileSize;
+                break;
+            case "RIGHT":
+                x += tileSize;
+                break;
         }
 
-        if (x < 0 || x + tileSize > gamePane.getWidth() || y < 0 || y + tileSize > gamePane.getHeight() || hitsItself(x, y)) {
-            gameOver();
+        double gamePaneWidth = gamePane.getWidth();
+        double gamePaneHeight = gamePane.getHeight();
+
+        if (gamePaneWidth == 0) {
+            gamePaneWidth = 1200.0;
+        }
+        if (gamePaneHeight == 0) {
+            gamePaneHeight = 800.0;
+        }
+
+        if (x < 0) {
+            x = gamePaneWidth - tileSize;
+        }
+        if (x + tileSize > gamePaneWidth) {
+            x = 0;
+        }
+        if (y < 0) {
+            y = gamePaneHeight - tileSize;
+        }
+        if (y + tileSize > gamePaneHeight) {
+            y = 0;
+        }
+
+        if (hitsItself(x, y) || isOnObstacle(x, y)) {
+            handleCollision(x, y);
             return;
         }
 
@@ -138,41 +200,109 @@ public class SnakeGameController implements Initializable {
             score++;
             updateScoreLabel();
 
-            if (currentSpeed > 0.05) {
-                currentSpeed -= 0.01;
-                startTimeline(currentSpeed);
-            }
+            ScaleTransition scaleUp = new ScaleTransition(Duration.millis(100), newHead);
+            scaleUp.setFromX(1);
+            scaleUp.setFromY(1);
+            scaleUp.setToX(1.5);
+            scaleUp.setToY(1.5);
+            scaleUp.setCycleCount(1);
+            scaleUp.setAutoReverse(true);
+            scaleUp.play();
 
             spawnFood();
         } else {
             Rectangle tail = snake.remove(snake.size() - 1);
             gamePane.getChildren().remove(tail);
         }
+
+        if (currentSpeed > 0.05) {
+            currentSpeed -= 0.0001;
+            startTimeline(currentSpeed);
+        }
     }
-private boolean hitsItself(double x, double y) {
-    for (int i = 1; i < snake.size(); i++) { 
-        Rectangle part = snake.get(i);
-        if (part.getX() == x && part.getY() == y) return true;
+
+    private boolean hitsItself(double x, double y) {
+        for (int i = 1; i < snake.size(); i++) {
+            Rectangle part = snake.get(i);
+            if (part.getX() == x && part.getY() == y) {
+                return true;
+            }
+        }
+        return false;
     }
-    return false;
-}
 
     private void spawnFood() {
         Random random = new Random();
         double x, y;
+        int attempts = 0;
+        int maxAttempts = 100;
+
         do {
             x = random.nextInt(width) * tileSize;
             y = random.nextInt(height) * tileSize;
-        } while (isOnSnake(x, y));
+            attempts++;
+        } while ((isOnSnake(x, y) || isOnObstacle(x, y)) && attempts < maxAttempts);
 
-        if (food != null) gamePane.getChildren().remove(food);
-        food = createRectangle(x, y, Color.RED);
+        if (food != null) {
+            gamePane.getChildren().remove(food);
+        }
+
+        food = createRectangle(x, y, Color.YELLOW);
         gamePane.getChildren().add(food);
     }
 
     private boolean isOnSnake(double x, double y) {
         for (Rectangle part : snake) {
-            if (part.getX() == x && part.getY() == y) return true;
+            if (part.getX() == x && part.getY() == y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isOnObstacle(double x, double y) {
+        for (Rectangle obstacle : obstacles) {
+            if (obstacle.getX() == x && obstacle.getY() == y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void spawnObstacles() {
+        Random random = new Random();
+
+        int totalTiles = width * height;
+        int numObstacles = Math.max(30, totalTiles / 50);
+
+        for (int i = 0; i < numObstacles; i++) {
+            double x, y;
+            int attempts = 0;
+            int maxAttempts = 100;
+
+            do {
+                x = random.nextInt(width) * tileSize;
+                y = random.nextInt(height) * tileSize;
+                attempts++;
+            } while ((isOnSnake(x, y) || isOnObstacle(x, y) || isNearSnakeStart(x, y)) && attempts < maxAttempts);
+
+            if (attempts < maxAttempts) {
+                Rectangle obstacle = createRectangle(x, y, Color.DARKRED);
+                obstacles.add(obstacle);
+                gamePane.getChildren().add(obstacle);
+            }
+        }
+    }
+
+    private boolean isNearSnakeStart(double x, double y) {
+        double startX = tileSize * 5;
+        double startY = tileSize * 5;
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dy = -2; dy <= 2; dy++) {
+                if (x == startX + (dx * tileSize) && y == startY + (dy * tileSize)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -186,8 +316,9 @@ private boolean hitsItself(double x, double y) {
     }
 
     private void updateScoreLabel() {
-        if (lblScore != null)
+        if (lblScore != null) {
             lblScore.setText("Puntos: " + score);
+        }
     }
 
     private void showGameOverAnimation() {
@@ -215,6 +346,22 @@ private boolean hitsItself(double x, double y) {
 
         SequentialTransition sequence = new SequentialTransition(scaleUp, bounceBack, fadeIn);
         sequence.play();
+    }
+
+    private void handleCollision(double x, double y) {
+        Rectangle head = snake.get(0);
+
+        ScaleTransition scaleUp = new ScaleTransition(Duration.millis(100), head);
+        scaleUp.setFromX(1);
+        scaleUp.setFromY(1);
+        scaleUp.setToX(1.5);
+        scaleUp.setToY(1.5);
+        scaleUp.setCycleCount(1);
+        scaleUp.setAutoReverse(true);
+        scaleUp.play();
+
+        head.setFill(Color.RED);
+        gameOver();
     }
 
     private void gameOver() {

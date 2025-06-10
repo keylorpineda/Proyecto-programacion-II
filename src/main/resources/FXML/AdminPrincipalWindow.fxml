@@ -111,11 +111,11 @@
                         <HBox prefHeight="63.0" prefWidth="970.0" spacing="40.0">
                             <children>
                                 <Button fx:id="btnEditarUsuario" text="Editar" onAction="#clickEditarUsuario"
-        styleClass="button-editar" minWidth="90" minHeight="36"/>
+                                        styleClass="button-editar" minWidth="90" minHeight="36"/>
 
-<Button fx:id="btnEliminarUsuario" text="Eliminar" onAction="#clickEliminarUsuario"
-        styleClass="button-eliminar" minWidth="100" minHeight="36"
-        wrapText="true" textOverrun="CLIP"/>
+                                <Button fx:id="btnEliminarUsuario" text="Eliminar" onAction="#clickEliminarUsuario"
+                                        styleClass="button-eliminar" minWidth="100" minHeight="36"
+                                        wrapText="true" textOverrun="CLIP"/>
 
                             </children>
                             <VBox.margin>
@@ -154,21 +154,37 @@
                             </VBox>
                         </content>
                     </ScrollPane>
-                    <ScrollPane fx:id="spReservationsScroll" fitToHeight="true" fitToWidth="true" maxHeight="450" prefHeight="450" styleClass="transparent-scrollpane" visible="false" HBox.hgrow="ALWAYS">
+                    <ScrollPane fx:id="spReservationsScroll" fitToHeight="true" fitToWidth="true" maxHeight="600" prefHeight="600" styleClass="transparent-scrollpane" visible="false" HBox.hgrow="ALWAYS">
                         <content>
-                            <TableView fx:id="tblReservations" prefHeight="400.0" prefWidth="900.0" visible="false">
-                                <columns>
-                                    <TableColumn fx:id="colResId" prefWidth="150.0" text="ID Reserva" />
-                                    <TableColumn fx:id="colResUser" prefWidth="200.0" text="Usuario" />
-                                    <TableColumn fx:id="colResRoom" prefWidth="200.0" text="Plano/Espacio" />
-                                    <TableColumn fx:id="colResDate" prefWidth="200.0" text="Fecha" />
-                                    <TableColumn fx:id="colResStart" prefWidth="150.0" text="Inicio" />
-                                    <TableColumn fx:id="colResEnd" prefWidth="150.0" text="Fin" />
-                                </columns>
-                            </TableView>
+                            <VBox spacing="10" style="-fx-padding: 20;">
+                                <children>
+                                    <!-- Tabla principal de reservas -->
+                                    <Label styleClass="textFieldGlobal" text="Todas las Reservas" />
+                                    <TableView fx:id="tblReservations" prefHeight="400" prefWidth="900">
+                                        <columns>
+                                            <TableColumn fx:id="colResId" prefWidth="80" text="ID" />
+                                            <TableColumn fx:id="colResUser" prefWidth="150" text="Usuario" />
+                                            <TableColumn fx:id="colResRoom" prefWidth="150" text="Espacio" />
+                                            <TableColumn fx:id="colResDate" prefWidth="100" text="Fecha" />
+                                            <TableColumn fx:id="colResStart" prefWidth="80" text="Inicio" />
+                                            <TableColumn fx:id="colResEnd" prefWidth="80" text="Fin" />
+                                        </columns>
+                                    </TableView>
+                                    
+                                    <!-- Botones de acción -->
+                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                        <Button fx:id="btnModificarReserva" text="Modificar Reserva" onAction="#onModificarReserva" 
+                                                styleClass="button-editar" minWidth="120" minHeight="36" disable="true"/>
+                                        <Button fx:id="btnCancelarReserva" text="Cancelar Reserva" onAction="#onCancelarReserva" 
+                                                styleClass="button-eliminar" minWidth="120" minHeight="36" disable="true"/>
+                                        <Button fx:id="btnActualizarReservas" text="Actualizar" onAction="#onActualizarReservas" 
+                                                styleClass="button" minWidth="100" minHeight="36"/>
+                                    </HBox>
+                                </children>
+                            </VBox>
                         </content>
                     </ScrollPane>
-                    <!-- 🚀 Reportes con gráficos -->
+                    <!-- Reportes con gráficos -->
                     <ScrollPane fx:id="spReportsScroll" fitToHeight="true" fitToWidth="true" maxHeight="600" prefHeight="600" styleClass="transparent-scrollpane" visible="false" HBox.hgrow="ALWAYS">
                         <content>
                             <VBox alignment="TOP_CENTER" spacing="20" style="-fx-padding: 20;">
@@ -182,7 +198,8 @@
                                             <CategoryAxis label="Usuario" />
                                         </xAxis>
                                         <yAxis>
-                                             <NumberAxis fx:id="yAxisUsuarios" label="Cantidad de reservas" prefWidth="120" />                                        </yAxis>
+                                            <NumberAxis fx:id="yAxisUsuarios" label="Cantidad de reservas" prefWidth="120" />                                        
+                                        </yAxis>
                                     </BarChart>
 
                                     <Label styleClass="textFieldGlobal" text="Horarios más usados" />
@@ -191,9 +208,8 @@
                                             <CategoryAxis label="Hora de inicio" />
                                         </xAxis>
                                         <yAxis>
-                                          <NumberAxis fx:id="yAxisHoras" label="Cantidad de reservas" prefWidth="120" />
+                                            <NumberAxis fx:id="yAxisHoras" label="Cantidad de reservas" prefWidth="120" />
                                         </yAxis>
-
                                     </BarChart>
                                 </children>
                             </VBox>

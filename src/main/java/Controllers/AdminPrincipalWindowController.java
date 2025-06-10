@@ -20,6 +20,7 @@ import javafx.scene.text.Font;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -62,7 +63,7 @@ public class AdminPrincipalWindowController implements Initializable {
     private TableView<User> tblUsers;
     @FXML
     private TableView<Reservation> tblReservations;
-
+    @FXML
     private TableView<Report> tblReports;
     @FXML
     private TableColumn<User, Long> colId;
@@ -72,8 +73,11 @@ public class AdminPrincipalWindowController implements Initializable {
     private TableColumn<Reservation, Long> colResId;
     @FXML
     private TableColumn<Reservation, String> colResUser, colResRoom, colResDate, colResStart, colResEnd;
+    @FXML
     private TableColumn<Report, Long> colReportId;
+    @FXML
     private TableColumn<Report, String> colReportName;
+    @FXML
     private TableColumn<Report, String> colReportDate;
     @FXML
     private GridPane formAdmin;
@@ -125,7 +129,8 @@ public class AdminPrincipalWindowController implements Initializable {
 
     @FXML
     private BarChart<String, Number> barHoras;
-
+    @FXML
+    private Button btnModificarReserva;
     private Room currentRoom;
     private final RoomService roomService = new RoomService();
     private final SpaceService spaceService = new SpaceService();
@@ -221,6 +226,7 @@ public class AdminPrincipalWindowController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        configurarTablaReservas();
         DataInitializer.initializeIfNeeded();
         cbAdminStartTime.getItems().setAll(TimeSlots.getDefaultTimeSlots());
         cbAdminEndTime.getItems().setAll(TimeSlots.getDefaultTimeSlots());
@@ -381,22 +387,6 @@ public class AdminPrincipalWindowController implements Initializable {
         ObservableList<User> data = FXCollections.observableArrayList(new UserService().findAll());
         tblUsers.setItems(data);
         tblUsers.refresh();
-    }
-
-    private void cargarTablaReservas() {
-        ObservableList<Reservation> data = FXCollections.observableArrayList(reservationService.findAll());
-        tblReservations.setItems(data);
-        colResId.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("id"));
-        colResUser.setCellValueFactory(r -> new SimpleStringProperty(
-                r.getValue().getUser() != null ? r.getValue().getUser().getName() : ""));
-        colResRoom.setCellValueFactory(r -> new SimpleStringProperty(
-                r.getValue().getSpace() != null ? r.getValue().getSpace().getName() : ""));
-        colResDate.setCellValueFactory(r -> new SimpleStringProperty(
-                r.getValue().getDateCreated() != null ? r.getValue().getDateCreated().toString() : ""));
-        colResStart.setCellValueFactory(r -> new SimpleStringProperty(
-                r.getValue().getStartTime() != null ? r.getValue().getStartTime().toLocalTime().toString() : ""));
-        colResEnd.setCellValueFactory(r -> new SimpleStringProperty(
-                r.getValue().getEndTime() != null ? r.getValue().getEndTime().toLocalTime().toString() : ""));
     }
 
     private void cargarTablaReportes() {
@@ -1499,10 +1489,431 @@ public class AdminPrincipalWindowController implements Initializable {
         }
     }
 
-    @FXML
-    private void onUserSelected(ActionEvent event) {
-        // Tu lógica aquí
-        System.out.println("Usuario seleccionado");
+    private void configurarTablaReservas() {
+        colResId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colResUser.setCellValueFactory(r -> new SimpleStringProperty(
+                r.getValue().getUser() != null ? r.getValue().getUser().getName() + " " + r.getValue().getUser().getLastName() : ""));
+        colResRoom.setCellValueFactory(r -> new SimpleStringProperty(
+                r.getValue().getSpace() != null ? r.getValue().getSpace().getSpaceName() : ""));
+        colResDate.setCellValueFactory(r -> new SimpleStringProperty(
+                r.getValue().getDateCreated() != null ? r.getValue().getDateCreated().toString() : ""));
+        colResStart.setCellValueFactory(r -> new SimpleStringProperty(
+                r.getValue().getStartTime() != null ? r.getValue().getStartTime().toLocalTime().toString() : ""));
+        colResEnd.setCellValueFactory(r -> new SimpleStringProperty(
+                r.getValue().getEndTime() != null ? r.getValue().getEndTime().toLocalTime().toString() : ""));
+
+        tblReservations.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldSelection, newSelection) -> {
+                    reservaSeleccionada = newSelection;
+                    btnCancelarReserva.setDisable(newSelection == null);
+                    btnModificarReserva.setDisable(newSelection == null);
+                });
     }
 
+    @FXML
+    private void onModificarReserva(ActionEvent event) {
+        if (reservaSeleccionada == null) {
+            mostrarAdvertencia("Seleccione una reserva", "Debe seleccionar una reserva para modificar.");
+            return;
+        }
+
+        try {
+            Dialog<Boolean> dialog = new Dialog<>();
+            dialog.setTitle("Modificar Reserva");
+            dialog.setHeaderText("Modificar los datos de la reserva ID: " + reservaSeleccionada.getId());
+
+            VBox content = new VBox(10);
+            content.setStyle("-fx-padding: 20px;");
+
+            Label lblInfoActual = new Label("📋 Información Actual:");
+            lblInfoActual.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+
+            Label lblUsuarioActual = new Label("Usuario: "
+                    + (reservaSeleccionada.getUser() != null ? reservaSeleccionada.getUser().getName() + " " + reservaSeleccionada.getUser().getLastName() : "N/A"));
+            Label lblEspacioActual = new Label("Espacio: "
+                    + (reservaSeleccionada.getSpace() != null ? reservaSeleccionada.getSpace().getSpaceName() : "N/A"));
+            Label lblFechaActual = new Label("Fecha: "
+                    + (reservaSeleccionada.getDateCreated() != null ? reservaSeleccionada.getDateCreated().toLocalDate().toString() : "N/A"));
+            Label lblHorarioActual = new Label("Horario: "
+                    + (reservaSeleccionada.getStartTime() != null ? reservaSeleccionada.getStartTime().toLocalTime().toString() : "N/A")
+                    + " - "
+                    + (reservaSeleccionada.getEndTime() != null ? reservaSeleccionada.getEndTime().toLocalTime().toString() : "N/A"));
+
+            Label lblSeparador = new Label("✏️ Nuevos Datos:");
+            lblSeparador.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 10 0 0 0;");
+
+            GridPane gridModificar = new GridPane();
+            gridModificar.setHgap(10);
+            gridModificar.setVgap(10);
+
+            Label lblNuevaFecha = new Label("Nueva Fecha:");
+            DatePicker dpNuevaFecha = new DatePicker();
+            if (reservaSeleccionada.getDateCreated() != null) {
+                dpNuevaFecha.setValue(reservaSeleccionada.getDateCreated().toLocalDate());
+            }
+
+            Label lblNuevaHoraInicio = new Label("Nueva Hora Inicio:");
+            ComboBox<String> cbNuevaHoraInicio = new ComboBox<>();
+            cbNuevaHoraInicio.getItems().setAll(TimeSlots.getDefaultTimeSlots());
+            if (reservaSeleccionada.getStartTime() != null) {
+                cbNuevaHoraInicio.setValue(reservaSeleccionada.getStartTime().toLocalTime().toString());
+            }
+
+            Label lblNuevaHoraFin = new Label("Nueva Hora Fin:");
+            ComboBox<String> cbNuevaHoraFin = new ComboBox<>();
+            cbNuevaHoraFin.getItems().setAll(TimeSlots.getDefaultTimeSlots());
+            if (reservaSeleccionada.getEndTime() != null) {
+                cbNuevaHoraFin.setValue(reservaSeleccionada.getEndTime().toLocalTime().toString());
+            }
+
+            gridModificar.add(lblNuevaFecha, 0, 0);
+            gridModificar.add(dpNuevaFecha, 1, 0);
+            gridModificar.add(lblNuevaHoraInicio, 0, 1);
+            gridModificar.add(cbNuevaHoraInicio, 1, 1);
+            gridModificar.add(lblNuevaHoraFin, 0, 2);
+            gridModificar.add(cbNuevaHoraFin, 1, 2);
+
+            content.getChildren().addAll(
+                    lblInfoActual, lblUsuarioActual, lblEspacioActual, lblFechaActual, lblHorarioActual,
+                    lblSeparador, gridModificar
+            );
+
+            dialog.getDialogPane().setContent(content);
+
+            ButtonType btnConfirmar = new ButtonType("Confirmar", ButtonBar.ButtonData.OK_DONE);
+            ButtonType btnCancelar = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialog.getDialogPane().getButtonTypes().addAll(btnConfirmar, btnCancelar);
+
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == btnConfirmar) {
+                    return true;
+                }
+                return false;
+            });
+
+            Optional<Boolean> result = dialog.showAndWait();
+
+            if (result.isPresent() && result.get()) {
+                LocalDate nuevaFecha = dpNuevaFecha.getValue();
+                String nuevaHoraInicioStr = cbNuevaHoraInicio.getValue();
+                String nuevaHoraFinStr = cbNuevaHoraFin.getValue();
+
+                if (nuevaFecha == null || nuevaHoraInicioStr == null || nuevaHoraFinStr == null) {
+                    mostrarError("Datos incompletos", "Por favor complete todos los campos.");
+                    return;
+                }
+
+                LocalTime nuevaHoraInicio = TimeSlots.parse(nuevaHoraInicioStr);
+                LocalTime nuevaHoraFin = TimeSlots.parse(nuevaHoraFinStr);
+
+                if (!nuevaHoraFin.isAfter(nuevaHoraInicio)) {
+                    mostrarError("Horario inválido", "La hora de fin debe ser posterior a la hora de inicio.");
+                    return;
+                }
+
+                LocalDateTime nuevoStartTime = LocalDateTime.of(nuevaFecha, nuevaHoraInicio);
+                LocalDateTime nuevoEndTime = LocalDateTime.of(nuevaFecha, nuevaHoraFin);
+
+                if (!puedeModificarReserva(reservaSeleccionada, nuevoStartTime, nuevoEndTime)) {
+                    mostrarError("Espacio no disponible",
+                            "El espacio no está disponible en el nuevo horario seleccionado.");
+                    return;
+                }
+
+                boolean modificado = modificarReserva(reservaSeleccionada, nuevaFecha, nuevaHoraInicio, nuevaHoraFin);
+
+                if (modificado) {
+                    mostrarNotificacionExito("Reserva modificada exitosamente");
+                    cargarTablaReservas();
+                    cargarPlanoDeRoomActual();
+                } else {
+                    mostrarError("Error", "No se pudo modificar la reserva");
+                }
+            }
+
+        } catch (Exception e) {
+            mostrarError("Error al modificar reserva", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private boolean puedeModificarReserva(Reservation reserva, LocalDateTime nuevoStartTime, LocalDateTime nuevoEndTime) {
+        try {
+            List<Reservation> reservasDelEspacio = reservationService.findAll().stream()
+                    .filter(r -> r.getSpace() != null && r.getSpace().getId().equals(reserva.getSpace().getId()))
+                    .filter(r -> r.getStatus() == null || !r.getStatus().toString().equals("CANCELADA"))
+                    .filter(r -> !r.getId().equals(reserva.getId()))
+                    .collect(Collectors.toList());
+
+            int asientosOcupados = 0;
+            for (Reservation otraReserva : reservasDelEspacio) {
+                LocalDateTime otroInicio = otraReserva.getStartTime();
+                LocalDateTime otroFin = otraReserva.getEndTime();
+
+                if (otroInicio != null && otroFin != null) {
+                    boolean haySuperposicion = hayColisionHorarios(
+                            nuevoStartTime, nuevoEndTime,
+                            otroInicio, otroFin
+                    );
+
+                    if (haySuperposicion) {
+                        asientosOcupados += otraReserva.getSeatCount();
+                    }
+                }
+            }
+
+            int capacidadDisponible = reserva.getSpace().getCapacity() - asientosOcupados;
+            boolean puedeModificar = capacidadDisponible >= reserva.getSeatCount();
+
+            if (!puedeModificar) {
+                utilities.showAlert(Alert.AlertType.WARNING,
+                        "Espacio no disponible",
+                        String.format("El espacio '%s' no tiene suficiente capacidad disponible.\n"
+                                + "Capacidad total: %d\n"
+                                + "Ocupados en ese horario: %d\n"
+                                + "Disponibles: %d\n"
+                                + "Necesarios: %d",
+                                reserva.getSpace().getSpaceName(),
+                                reserva.getSpace().getCapacity(),
+                                asientosOcupados,
+                                capacidadDisponible,
+                                reserva.getSeatCount()));
+            }
+
+            return puedeModificar;
+
+        } catch (Exception e) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Error de validación",
+                    "Error al verificar disponibilidad: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean hayColisionHorarios(LocalDateTime inicio1, LocalDateTime fin1,
+            LocalDateTime inicio2, LocalDateTime fin2) {
+        return !(fin1.isBefore(inicio2) || fin1.equals(inicio2)
+                || inicio1.isAfter(fin2) || inicio1.equals(fin2));
+    }
+
+    private boolean modificarReserva(Reservation reserva, LocalDate nuevaFecha,
+            LocalTime nuevaHoraInicio, LocalTime nuevaHoraFin) {
+        try {
+            LocalDateTime nuevoStartTime = LocalDateTime.of(nuevaFecha, nuevaHoraInicio);
+            LocalDateTime nuevoEndTime = LocalDateTime.of(nuevaFecha, nuevaHoraFin);
+
+            if (!puedeModificarReserva(reserva, nuevoStartTime, nuevoEndTime)) {
+                return false;
+            }
+
+            reserva.setStartTime(nuevoStartTime);
+            reserva.setEndTime(nuevoEndTime);
+            reservationService.update(reserva);
+
+            utilities.showAlert(Alert.AlertType.INFORMATION,
+                    "Modificación exitosa",
+                    String.format("La reserva ha sido modificada correctamente.\n"
+                            + "Nueva fecha: %s\n"
+                            + "Nuevo horario: %s - %s",
+                            nuevaFecha.toString(),
+                            nuevaHoraInicio.toString(),
+                            nuevaHoraFin.toString()));
+
+            return true;
+
+        } catch (Exception e) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Error al modificar",
+                    "No se pudo modificar la reserva: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private void cargarUsuariosConReservas() {
+        try {
+
+            List<Reservation> todasLasReservas = reservationService.findAll().stream()
+                    .filter(r -> r.getStatus() == null || !r.getStatus().toString().equals("CANCELADA"))
+                    .collect(Collectors.toList());
+
+            Map<User, Long> reservasPorUsuario = todasLasReservas.stream()
+                    .filter(r -> r.getUser() != null)
+                    .collect(Collectors.groupingBy(
+                            Reservation::getUser,
+                            Collectors.counting()
+                    ));
+
+            List<UsuarioConReservas> usuariosConReservas = reservasPorUsuario.entrySet().stream()
+                    .map(entry -> new UsuarioConReservas(entry.getKey(), entry.getValue().intValue()))
+                    .sorted((a, b) -> Integer.compare(b.getCantidadReservas(), a.getCantidadReservas()))
+                    .collect(Collectors.toList());
+
+            ObservableList<UsuarioConReservas> data = FXCollections.observableArrayList(usuariosConReservas);
+            tblUsuariosConReservas.setItems(data);
+
+            tblReservasUsuario.setItems(FXCollections.observableArrayList());
+            lblUsuarioSeleccionado.setText("Seleccione un usuario");
+            btnCancelarReserva.setDisable(true);
+
+        } catch (Exception e) {
+            mostrarError("Error al cargar usuarios con reservas", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void cargarReservasDelUsuario(User usuario) {
+        try {
+            List<Reservation> reservasDelUsuario = reservationService.findAll().stream()
+                    .filter(r -> r.getUser() != null && r.getUser().getId().equals(usuario.getId()))
+                    .filter(r -> r.getStatus() == null || !r.getStatus().toString().equals("CANCELADA"))
+                    .sorted((a, b) -> {
+                        if (a.getDateCreated() != null && b.getDateCreated() != null) {
+                            return b.getDateCreated().compareTo(a.getDateCreated());
+                        }
+                        return 0;
+                    })
+                    .collect(Collectors.toList());
+
+            ObservableList<Reservation> data = FXCollections.observableArrayList(reservasDelUsuario);
+            tblReservasUsuario.setItems(data);
+
+            btnCancelarReserva.setDisable(true);
+
+        } catch (Exception e) {
+            mostrarError("Error al cargar reservas del usuario", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void onCancelarReserva(ActionEvent event) {
+        if (reservaSeleccionada == null) {
+            mostrarAdvertencia("Seleccione una reserva", "Debe seleccionar una reserva para cancelar.");
+            return;
+        }
+
+        try {
+
+            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmacion.setTitle("Confirmar Cancelación");
+            confirmacion.setHeaderText("¿Cancelar Reserva?");
+            confirmacion.setContentText(String.format(
+                    "¿Está seguro de que desea cancelar la reserva?\n\n"
+                    + "ID: %d\n"
+                    + "Usuario: %s\n"
+                    + "Espacio: %s\n"
+                    + "Fecha: %s\n"
+                    + "Horario: %s - %s",
+                    reservaSeleccionada.getId(),
+                    reservaSeleccionada.getUser() != null
+                    ? reservaSeleccionada.getUser().getName() + " " + reservaSeleccionada.getUser().getLastName() : "N/A",
+                    reservaSeleccionada.getSpace() != null ? reservaSeleccionada.getSpace().getSpaceName() : "N/A",
+                    reservaSeleccionada.getDateCreated() != null ? reservaSeleccionada.getDateCreated().toString() : "N/A",
+                    reservaSeleccionada.getStartTime() != null ? reservaSeleccionada.getStartTime().toLocalTime().toString() : "N/A",
+                    reservaSeleccionada.getEndTime() != null ? reservaSeleccionada.getEndTime().toLocalTime().toString() : "N/A"
+            ));
+
+            Optional<ButtonType> result = confirmacion.showAndWait();
+
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                boolean cancelado = cancelarReserva(reservaSeleccionada);
+
+                if (cancelado) {
+                    mostrarNotificacionExito("Reserva cancelada exitosamente");
+                    cargarTablaReservas();
+                    cargarPlanoDeRoomActual(); 
+                } else {
+                    mostrarError("Error", "No se pudo cancelar la reserva");
+                }
+            }
+
+        } catch (Exception e) {
+            mostrarError("Error al cancelar reserva", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private boolean cancelarReserva(Reservation reserva) {
+        try {
+            reservationService.delete(reserva);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error al cancelar reserva: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @FXML
+    private void onActualizarReservas(ActionEvent event) {
+        cargarTablaReservas();
+        mostrarNotificacionExito("Reservas actualizadas");
+    }
+
+    private void cargarTablaReservas() {
+        ObservableList<Reservation> data = FXCollections.observableArrayList(reservationService.findAll());
+        tblReservations.setItems(data);
+        tblReservations.refresh();
+    }
+
+    private void mostrarAdvertencia(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Advertencia");
+        alert.setHeaderText(titulo);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
+    @FXML
+    private TableView<UsuarioConReservas> tblUsuariosConReservas;
+    @FXML
+    private TableColumn<UsuarioConReservas, String> colUsuarioReservas;
+    @FXML
+    private TableColumn<UsuarioConReservas, Integer> colCantidadReservas;
+    @FXML
+    private TableView<Reservation> tblReservasUsuario;
+    @FXML
+    private TableColumn<Reservation, Long> colReservaId;
+    @FXML
+    private TableColumn<Reservation, String> colReservaEspacio;
+    @FXML
+    private TableColumn<Reservation, String> colReservaFecha;
+    @FXML
+    private TableColumn<Reservation, String> colReservaInicio;
+    @FXML
+    private TableColumn<Reservation, String> colReservaFin;
+    @FXML
+    private TableColumn<Reservation, Integer> colReservaAsientos;
+    @FXML
+    private TableColumn<Reservation, String> colReservaEstado;
+    @FXML
+    private Button btnCancelarReserva;
+    @FXML
+    private Button btnActualizarReservas;
+    @FXML
+    private Label lblUsuarioSeleccionado;
+
+    private UsuarioConReservas usuarioSeleccionadoReservas;
+    private Reservation reservaSeleccionada;
+
+    public static class UsuarioConReservas {
+
+        private final User usuario;
+        private final int cantidadReservas;
+
+        public UsuarioConReservas(User usuario, int cantidadReservas) {
+            this.usuario = usuario;
+            this.cantidadReservas = cantidadReservas;
+        }
+
+        public User getUsuario() {
+            return usuario;
+        }
+
+        public int getCantidadReservas() {
+            return cantidadReservas;
+        }
+
+        public String getNombreCompleto() {
+            return usuario.getName() + " " + usuario.getLastName();
+        }
+    }
 }
