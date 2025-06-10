@@ -1499,4 +1499,10 @@ public class AdminPrincipalWindowController implements Initializable {
         }
     }
 
+    @FXML
+    private void onUserSelected(ActionEvent event) {
+        // Tu lógica aquí
+        System.out.println("Usuario seleccionado");
+    }
+
 }
