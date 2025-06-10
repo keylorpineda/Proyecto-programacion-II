@@ -50,7 +50,6 @@ public class SignUpWindowController implements Initializable {
         String userName = txtUserName.getText().trim();
         String password = txtUserPassword.getText().trim();
 
-        // 1) Validaciones
         if (name.isEmpty() || lastName.isEmpty() || idText.isEmpty()
                 || userName.isEmpty() || password.isEmpty()) {
             utilities.showAlert(Alert.AlertType.ERROR,
@@ -63,6 +62,41 @@ public class SignUpWindowController implements Initializable {
             utilities.showAlert(Alert.AlertType.ERROR,
                     "Cédula inválida",
                     "La cédula debe contener solo números.");
+            return;
+        }
+
+        if (idText.length() > 9) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Cédula inválida",
+                    "La cédula no puede tener más de 9 dígitos.");
+            return;
+        }
+
+        if (name.length() > 20) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Nombre muy largo",
+                    "El nombre no puede tener más de 30 caracteres.");
+            return;
+        }
+
+        if (lastName.length() > 20) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Apellido muy largo",
+                    "El apellido no puede tener más de 30 caracteres.");
+            return;
+        }
+
+        if (userName.length() > 12) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Nombre de usuario muy largo",
+                    "El nombre de usuario no puede tener más de 12 caracteres.");
+            return;
+        }
+
+        if (password.length() > 10) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Contraseña muy larga",
+                    "La contraseña no puede tener más de 100 caracteres.");
             return;
         }
 

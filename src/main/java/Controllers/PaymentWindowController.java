@@ -434,9 +434,11 @@ public class PaymentWindowController implements Initializable {
     }
 
     private void animateCardFlip() {
-
         try {
             Image backImage = new Image(getClass().getResourceAsStream("/images/card_back.png"));
+
+            double originalWidth = ivCardImage.getFitWidth();
+            double originalHeight = ivCardImage.getFitHeight();
 
             RotateTransition rotate = new RotateTransition(Duration.millis(300), ivCardImage);
             rotate.setByAngle(90);
@@ -444,6 +446,10 @@ public class PaymentWindowController implements Initializable {
 
             rotate.setOnFinished(e -> {
                 ivCardImage.setImage(backImage);
+                ivCardImage.setFitWidth(originalWidth);
+                ivCardImage.setFitHeight(originalHeight);
+                ivCardImage.setPreserveRatio(true);
+
                 RotateTransition rotate2 = new RotateTransition(Duration.millis(300), ivCardImage);
                 rotate2.setByAngle(90);
                 rotate2.setAxis(new javafx.geometry.Point3D(0, 1, 0));
@@ -452,19 +458,28 @@ public class PaymentWindowController implements Initializable {
 
             rotate.play();
         } catch (Exception e) {
+            double originalWidth = ivCardImage.getFitWidth();
+            double originalHeight = ivCardImage.getFitHeight();
 
             RotateTransition rotate = new RotateTransition(Duration.millis(600), ivCardImage);
             rotate.setByAngle(180);
             rotate.setAxis(new javafx.geometry.Point3D(0, 1, 0));
+            rotate.setOnFinished(event -> {
+                ivCardImage.setFitWidth(originalWidth);
+                ivCardImage.setFitHeight(originalHeight);
+                ivCardImage.setPreserveRatio(true);
+            });
             rotate.play();
         }
     }
 
     private void animateCardFlipBack() {
         try {
-
             CardType currentType = getCurrentCardType();
             Image frontImage = new Image(getClass().getResourceAsStream("/" + currentType.getImagePath()));
+
+            double originalWidth = ivCardImage.getFitWidth();
+            double originalHeight = ivCardImage.getFitHeight();
 
             RotateTransition rotate = new RotateTransition(Duration.millis(300), ivCardImage);
             rotate.setByAngle(-90);
@@ -472,6 +487,10 @@ public class PaymentWindowController implements Initializable {
 
             rotate.setOnFinished(e -> {
                 ivCardImage.setImage(frontImage);
+                ivCardImage.setFitWidth(originalWidth);
+                ivCardImage.setFitHeight(originalHeight);
+                ivCardImage.setPreserveRatio(true);
+
                 RotateTransition rotate2 = new RotateTransition(Duration.millis(300), ivCardImage);
                 rotate2.setByAngle(-90);
                 rotate2.setAxis(new javafx.geometry.Point3D(0, 1, 0));
@@ -480,11 +499,64 @@ public class PaymentWindowController implements Initializable {
 
             rotate.play();
         } catch (Exception e) {
+            double originalWidth = ivCardImage.getFitWidth();
+            double originalHeight = ivCardImage.getFitHeight();
+
             RotateTransition rotate = new RotateTransition(Duration.millis(600), ivCardImage);
             rotate.setByAngle(-180);
             rotate.setAxis(new javafx.geometry.Point3D(0, 1, 0));
+            rotate.setOnFinished(event -> {
+                ivCardImage.setFitWidth(originalWidth);
+                ivCardImage.setFitHeight(originalHeight);
+                ivCardImage.setPreserveRatio(true);
+            });
             rotate.play();
         }
+    }
+
+    private void resetPaymentForm() {
+        Platform.runLater(() -> {
+            tfCardNumber.clear();
+            tfCardName.clear();
+            tfExpiryDate.clear();
+            tfCVV.clear();
+
+            updateCardDisplay(CardType.UNKNOWN);
+            lblCardType.setText("Tipo de Tarjeta: Detectando...");
+
+            btnConfirmPayment.setDisable(true);
+
+            spPaymentOverlay.setVisible(false);
+            spPaymentOverlay.setOpacity(1.0);
+            spPaymentOverlay.getChildren().clear();
+
+            if (ivPaymentAnimation != null) {
+                ivPaymentAnimation.setScaleX(1.0);
+                ivPaymentAnimation.setScaleY(1.0);
+                ivPaymentAnimation.setTranslateX(0);
+                ivPaymentAnimation.setTranslateY(0);
+                ivPaymentAnimation.setRotate(0);
+                ivPaymentAnimation.setPreserveRatio(true);
+            }
+
+            if (ivCardImage != null) {
+                ivCardImage.setScaleX(1.0);
+                ivCardImage.setScaleY(1.0);
+                ivCardImage.setTranslateX(0);
+                ivCardImage.setTranslateY(0);
+                ivCardImage.setRotate(0);
+                ivCardImage.setPreserveRatio(true);
+            }
+
+            if (lblPaymentStatus != null) {
+                lblPaymentStatus.setScaleX(1.0);
+                lblPaymentStatus.setScaleY(1.0);
+                lblPaymentStatus.setTranslateX(0);
+                lblPaymentStatus.setTranslateY(0);
+            }
+
+            paymentAnimation = null;
+        });
     }
 
     private CardType getCurrentCardType() {
@@ -594,7 +666,7 @@ public class PaymentWindowController implements Initializable {
                     boolean success = createReservations();
                     Platform.runLater(() -> {
                         if (success) {
-                           
+
                             paymentAnimation = new PaymentAnimation(spPaymentOverlay);
                             paymentAnimation.setOnAnimationComplete(() -> {
                                 Platform.runLater(() -> {
@@ -619,40 +691,6 @@ public class PaymentWindowController implements Initializable {
                 })
         );
         reservationTimeline.play();
-    }
-
-    private void resetPaymentForm() {
-        Platform.runLater(() -> {
-            tfCardNumber.clear();
-            tfCardName.clear();
-            tfExpiryDate.clear();
-            tfCVV.clear();
-
-            updateCardDisplay(CardType.UNKNOWN);
-            lblCardType.setText("Tipo de Tarjeta: Detectando...");
-
-            btnConfirmPayment.setDisable(true);
-
-            spPaymentOverlay.setVisible(false);
-            spPaymentOverlay.setOpacity(1.0);
-            spPaymentOverlay.getChildren().clear();
-
-            if (ivPaymentAnimation != null) {
-                ivPaymentAnimation.setScaleX(1.0);
-                ivPaymentAnimation.setScaleY(1.0);
-                ivPaymentAnimation.setTranslateX(0);
-                ivPaymentAnimation.setTranslateY(0);
-            }
-
-            if (lblPaymentStatus != null) {
-                lblPaymentStatus.setScaleX(1.0);
-                lblPaymentStatus.setScaleY(1.0);
-                lblPaymentStatus.setTranslateX(0);
-                lblPaymentStatus.setTranslateY(0);
-            }
-
-            paymentAnimation = null;
-        });
     }
 
     private void showFullScreenProcessing() {
