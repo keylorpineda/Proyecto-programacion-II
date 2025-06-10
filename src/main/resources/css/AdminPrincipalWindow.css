@@ -354,3 +354,97 @@
     -fx-underline: true;
     -fx-cursor: hand;
 }
+
+/* =======================
+   BOTONES EDITAR Y ELIMINAR
+========================== */
+.button-editar {
+    -fx-background-color: #FA7942;
+    -fx-text-fill: #0C0C0C;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 6 20;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(inner, rgba(0,0,0,0.4), 3, 0, 0, 2);
+}
+
+.button-editar:hover {
+    -fx-background-color: #e06a3e;
+}
+
+.button-eliminar {
+    -fx-background-color: #ff4c4c;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 6 20;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(inner, rgba(0,0,0,0.4), 3, 0, 0, 2);
+}
+
+.button-eliminar:hover {
+    -fx-background-color: #ff6666;
+}
+
+/* =======================
+   TEXTO EN GRÁFICAS
+========================== */
+.chart-pie-label,
+.chart-legend-item,
+.chart-title,
+.chart-legend {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.chart-legend-item-symbol {
+    -fx-background-color: #FA7942;
+}
+
+.default-color0.chart-pie-label {
+    -fx-fill: white;
+}
+
+.default-color0.chart-bar {
+    -fx-bar-fill: #FA7942;
+}
+
+/* =======================
+   TEXTO DE GRÁFICAS FORZADO
+========================== */
+.chart-pie-label,
+.chart-legend-item,
+.chart-title,
+.chart-axis-label,
+.chart-bar .chart-bar-label,
+.chart-legend {
+    -fx-fill: white !important;
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold;
+}
+
+.chart-legend-item-symbol {
+    -fx-background-color: #FA7942;
+}
+
+/* =======================
+   REFORZAR TEXTOS DE EJE Y BARRAS
+========================== */
+.axis-label {
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.chart-bar .chart-bar-label {
+    -fx-text-fill: white;
+    -fx-fill: white;
+    -fx-font-weight: bold;
+}
+
+.category-axis .axis-label,
+.number-axis .axis-label {
+    -fx-text-fill: white;
+    -fx-fill: white;
+}

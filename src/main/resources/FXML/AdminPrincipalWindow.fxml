@@ -110,8 +110,13 @@
                         </ScrollPane>
                         <HBox prefHeight="63.0" prefWidth="970.0" spacing="40.0">
                             <children>
-                                <Button fx:id="btnEditarUsuario" mnemonicParsing="false" onAction="#clickEditarUsuario" prefHeight="26.0" prefWidth="58.0" text="Editar" />
-                                <Button fx:id="btnEliminarUsuario" mnemonicParsing="false" onAction="#clickEliminarUsuario" text="Eliminar" />
+                                <Button fx:id="btnEditarUsuario" text="Editar" onAction="#clickEditarUsuario"
+        styleClass="button-editar" minWidth="90" minHeight="36"/>
+
+<Button fx:id="btnEliminarUsuario" text="Eliminar" onAction="#clickEliminarUsuario"
+        styleClass="button-eliminar" minWidth="100" minHeight="36"
+        wrapText="true" textOverrun="CLIP"/>
+
                             </children>
                             <VBox.margin>
                                 <Insets />
@@ -177,8 +182,7 @@
                                             <CategoryAxis label="Usuario" />
                                         </xAxis>
                                         <yAxis>
-                                            <NumberAxis label="Cantidad de reservas" />
-                                        </yAxis>
+                                             <NumberAxis fx:id="yAxisUsuarios" label="Cantidad de reservas" prefWidth="120" />                                        </yAxis>
                                     </BarChart>
 
                                     <Label styleClass="textFieldGlobal" text="Horarios más usados" />
@@ -187,8 +191,9 @@
                                             <CategoryAxis label="Hora de inicio" />
                                         </xAxis>
                                         <yAxis>
-                                            <NumberAxis label="Cantidad de reservas" />
+                                          <NumberAxis fx:id="yAxisHoras" label="Cantidad de reservas" prefWidth="120" />
                                         </yAxis>
+
                                     </BarChart>
                                 </children>
                             </VBox>
