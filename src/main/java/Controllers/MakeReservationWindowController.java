@@ -203,8 +203,9 @@ public class MakeReservationWindowController implements Initializable {
                 int alreadyReserved = resService.getReservedSeats(space.getId(), startDateTime, endDateTime);
                 if (alreadyReserved + requestedSeats > space.getCapacity()) {
                     showAlert(Alert.AlertType.ERROR, "Error de Capacidad",
-                            String.format("El espacio '%s' no tiene suficiente capacidad disponible.",
-                                    space.getSpaceName()));
+                            String.format("El espacio '%s' no tiene suficiente capacidad disponible.\n"
+                                    + "Solicitados: %d, Ya reservados: %d, Capacidad total: %d",
+                                    space.getSpaceName(), requestedSeats, alreadyReserved, space.getCapacity()));
                     return;
                 }
             } catch (Exception e) {
@@ -214,9 +215,13 @@ public class MakeReservationWindowController implements Initializable {
         }
 
         double totalPrice = calculateCurrentTotalPrice();
+
+        Set<Space> spacesToSave = new HashSet<>(currentSelectedSpaces);
+        Map<Space, Integer> seatsToSave = new HashMap<>(currentSelectedSeatsPerSpace);
+
         ReservationData newReservation = new ReservationData(
-                currentSelectedSpaces,
-                currentSelectedSeatsPerSpace,
+                spacesToSave,
+                seatsToSave,
                 selectedDate,
                 startDateTime,
                 endDateTime,
@@ -225,16 +230,23 @@ public class MakeReservationWindowController implements Initializable {
 
         multipleReservations.add(newReservation);
         updateReservationsList();
+
         clearCurrentSelection();
 
-        showAlert(Alert.AlertType.INFORMATION, "Éxito", "Reservación agregada a la lista.");
+        reloadMatrix();
+
+        showAlert(Alert.AlertType.INFORMATION, "Éxito",
+                String.format("Reservación agregada a la lista.\nEspacios: %d, Total asientos: %d, Precio: $%.2f",
+                        spacesToSave.size(),
+                        seatsToSave.values().stream().mapToInt(Integer::intValue).sum(),
+                        totalPrice));
     }
 
     private boolean hasConflictWithExistingReservations(Set<Space> spaces, LocalDateTime start, LocalDateTime end) {
         for (ReservationData existing : multipleReservations) {
-           
+
             if (timesOverlap(start, end, existing.startTime, existing.endTime)) {
-               
+
                 for (Space space : spaces) {
                     if (existing.selectedSpaces.contains(space)) {
                         return true;
@@ -253,11 +265,19 @@ public class MakeReservationWindowController implements Initializable {
         if (lvReservationList != null) {
             lvReservationList.getItems().clear();
             for (ReservationData reservation : multipleReservations) {
-                String description = String.format("%s | %s - %s | %d espacios | $%.2f",
+
+                int totalSpaces = reservation.selectedSpaces.size();
+
+                int totalSeats = reservation.seatsPerSpace.values().stream()
+                        .mapToInt(Integer::intValue)
+                        .sum();
+
+                String description = String.format("%s | %s - %s | %d espacios | %d asientos | $%.2f",
                         reservation.date.toString(),
                         reservation.startTime.toLocalTime().toString(),
                         reservation.endTime.toLocalTime().toString(),
-                        reservation.selectedSpaces.size(),
+                        totalSpaces,
+                        totalSeats,
                         reservation.totalPrice);
                 lvReservationList.getItems().add(description);
             }
@@ -266,14 +286,26 @@ public class MakeReservationWindowController implements Initializable {
         }
     }
 
-
     private void clearCurrentSelection() {
+
         currentSelectedSpaces.clear();
         currentSelectedSeatsPerSpace.clear();
-        selectedSpaces.clear();
-        selectedSeatsPerSpace.clear();
+
+        Set<Space> spacesToRemove = new HashSet<>();
+        for (Space space : selectedSpaces) {
+            if (!isSpaceInReservationsList(space)) {
+                spacesToRemove.add(space);
+            }
+        }
+
+        selectedSpaces.removeAll(spacesToRemove);
+        for (Space space : spacesToRemove) {
+            selectedSeatsPerSpace.remove(space);
+        }
+
         updateSelectedSpacesLabel();
-        reloadMatrix();
+        updateAddReservationButtonState();
+        updatePayButtonState();
     }
 
     public static ReservationData getReservationData() {
@@ -378,7 +410,7 @@ public class MakeReservationWindowController implements Initializable {
         if (tpTabChooseSpace != null) {
             tpTabChooseSpace.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
                 if (newTab != null) {
-                    selectedSpaces.clear();
+
                     updateSelectedSpacesLabel();
                     reloadMatrix();
                 }
@@ -388,6 +420,7 @@ public class MakeReservationWindowController implements Initializable {
 
     private void reloadMatrix() {
         try {
+
             loadRooms();
 
             GridPane currentPane = getCurrentGridPane();
@@ -447,6 +480,13 @@ public class MakeReservationWindowController implements Initializable {
 
             createMatrix(currentPane, currentRoom, spaceOccupancy, blockedSpaces);
 
+            Platform.runLater(() -> {
+                currentPane.autosize();
+                if (currentPane.getScene() != null) {
+                    currentPane.getScene().getRoot().autosize();
+                }
+            });
+
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Error al cargar la disponibilidad: " + e.getMessage());
             e.printStackTrace();
@@ -457,16 +497,25 @@ public class MakeReservationWindowController implements Initializable {
         Map<Long, Integer> occupancy = new HashMap<>();
 
         try {
+
             List<Reservation> reservations = resService.findByRoomAndDateAndTime(
                     roomId, startTime.toLocalDate(), startTime.toLocalTime(), endTime.toLocalTime()
             );
 
             for (Reservation reservation : reservations) {
-                Long spaceId = reservation.getSpace().getId();
-                int reservedSeats = reservation.getSeatCount();
-                occupancy.put(spaceId, occupancy.getOrDefault(spaceId, 0) + reservedSeats);
+
+                LocalDateTime resStart = reservation.getStartTime();
+                LocalDateTime resEnd = reservation.getEndTime();
+
+                if (timesOverlap(startTime, endTime, resStart, resEnd)) {
+                    Long spaceId = reservation.getSpace().getId();
+                    int reservedSeats = reservation.getSeatCount();
+                    occupancy.put(spaceId, occupancy.getOrDefault(spaceId, 0) + reservedSeats);
+                }
             }
+
         } catch (Exception e) {
+
             e.printStackTrace();
         }
 
@@ -475,11 +524,45 @@ public class MakeReservationWindowController implements Initializable {
 
     public void refreshRooms() {
         try {
+
+            floor1Rooms.clear();
+            floor2Rooms.clear();
+            floor3Rooms.clear();
+
             loadRooms();
-            Platform.runLater(() -> reloadMatrix());
+
+            Platform.runLater(() -> {
+                reloadMatrix();
+
+            });
+
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Error al actualizar las salas: " + e.getMessage());
+
+            e.printStackTrace();
         }
+    }
+
+    public void forceRefreshAfterPayment() {
+        Platform.runLater(() -> {
+            try {
+
+                clearReservationsListAfterPayment();
+
+                Platform.runLater(() -> {
+                    try {
+                        Thread.sleep(400);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+
+                    refreshRooms();
+                });
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+            }
+        });
     }
 
     private void addMessageToPane(GridPane pane, String message, String color) {
@@ -544,14 +627,15 @@ public class MakeReservationWindowController implements Initializable {
         }
 
         Button spaceButton = new Button(space.getSpaceName());
-        spaceButton.setPrefSize(CELL_SIZE * space.getWidth(), CELL_SIZE * space.getHeight());
-        spaceButton.setFont(Font.font("Segoe UI", Math.min(10, CELL_SIZE / 8)));
+        spaceButton.setPrefSize(CELL_SIZE * space.getWidth() + 10, CELL_SIZE * space.getHeight() + 10);
+        spaceButton.setFont(Font.font("Segoe UI", Math.max(12, CELL_SIZE / 6)));
         spaceButton.setWrapText(true);
 
         String baseColor = getSpaceColor(space);
 
         if (blockedSpaces.contains(space.getId())) {
-            spaceButton.setStyle("-fx-background-color: #616161; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 6; -fx-background-radius: 6;");
+            spaceButton.setStyle("-fx-background-color: #616161; -fx-text-fill: white; -fx-font-weight: bold; "
+                    + "-fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;");
             spaceButton.setDisable(true);
             spaceButton.setText(spaceButton.getText() + "\n(Bloqueado)");
             return spaceButton;
@@ -561,7 +645,8 @@ public class MakeReservationWindowController implements Initializable {
         int availableSeats = space.getCapacity() - occupiedSeats;
 
         if (availableSeats <= 0) {
-            spaceButton.setStyle("-fx-background-color: #e57373; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 6; -fx-background-radius: 6;");
+            spaceButton.setStyle("-fx-background-color: #e57373; -fx-text-fill: white; -fx-font-weight: bold; "
+                    + "-fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;");
             spaceButton.setDisable(true);
             spaceButton.setText(spaceButton.getText() + "\n(Ocupado)");
             return spaceButton;
@@ -569,50 +654,100 @@ public class MakeReservationWindowController implements Initializable {
             spaceButton.setText(space.getSpaceName() + "\n(" + availableSeats + " disponibles)");
         }
 
-        boolean isSelected = currentSelectedSpaces.contains(space); 
-        updateSpaceButtonStyle(spaceButton, isSelected, baseColor);
+        boolean isCurrentlySelected = currentSelectedSpaces.contains(space);
+        boolean isInReservations = isSpaceInReservationsList(space);
+        boolean isSelected = isCurrentlySelected || isInReservations;
 
-        if (!currentSelectedSeatsPerSpace.containsKey(space)) {
-            currentSelectedSeatsPerSpace.put(space, 1);
+        if (isInReservations) {
+
+            spaceButton.setStyle("-fx-background-color: #ff9800; -fx-text-fill: white; -fx-font-weight: bold; "
+                    + "-fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: not-allowed; "
+                    + "-fx-border-color: #f57c00; -fx-border-width: 3; "
+                    + "-fx-effect: dropshadow(gaussian, rgba(255, 152, 0, 0.6), 10, 0, 0, 0);");
+            spaceButton.setText(spaceButton.getText() + "\n(En Lista)");
+        } else {
+            updateSpaceButtonStyle(spaceButton, isSelected, baseColor);
         }
 
         spaceButton.setOnAction(ev -> {
             ev.consume();
-            handleSpaceSelection(space, spaceButton, baseColor);
+            if (!isInReservations) {
+                handleSpaceSelection(space, spaceButton, baseColor);
+            } else {
+                showAlert(Alert.AlertType.WARNING, "Espacio en uso",
+                        "Este espacio ya está incluido en una reservación de la lista. "
+                        + "Para modificarlo, elimine primero la reservación de la lista.");
+            }
         });
 
-        setupSpaceTooltip(spaceButton, space, occupiedSeats, availableSeats);
+        if (!isInReservations) {
+            spaceButton.setOnMouseEntered(e -> {
+                if (!spaceButton.isDisabled()) {
+                    spaceButton.setScaleX(1.05);
+                    spaceButton.setScaleY(1.05);
+                }
+            });
 
+            spaceButton.setOnMouseExited(e -> {
+                spaceButton.setScaleX(1.0);
+                spaceButton.setScaleY(1.0);
+            });
+        }
+
+        setupSpaceTooltip(spaceButton, space, occupiedSeats, availableSeats);
         return spaceButton;
     }
 
     private void handleSpaceSelection(Space space, Button spaceButton, String baseColor) {
+
+        if (isSpaceInReservationsList(space)) {
+            showAlert(Alert.AlertType.WARNING, "Espacio en uso",
+                    "Este espacio ya está incluido en una reservación de la lista. "
+                    + "Para modificarlo, elimine primero la reservación de la lista.");
+            return;
+        }
+
         if (currentSelectedSpaces.contains(space)) {
-            
+
             currentSelectedSpaces.remove(space);
             currentSelectedSeatsPerSpace.remove(space);
-            selectedSpaces.remove(space); 
+
+            selectedSpaces.remove(space);
             selectedSeatsPerSpace.remove(space);
+
             updateSpaceButtonStyle(spaceButton, false, baseColor);
+
+            showAlert(Alert.AlertType.INFORMATION, "Espacio deseleccionado",
+                    "Espacio '" + space.getSpaceName() + "' ha sido deseleccionado.");
         } else {
-            // Seleccionar
+            // Seleccionar espacio
             currentSelectedSpaces.add(space);
-            selectedSpaces.add(space); 
-            if (!currentSelectedSeatsPerSpace.containsKey(space)) {
-                currentSelectedSeatsPerSpace.put(space, 1);
-                selectedSeatsPerSpace.put(space, 1);
-            }
+            selectedSpaces.add(space);
+
+            currentSelectedSeatsPerSpace.put(space, 1);
+            selectedSeatsPerSpace.put(space, 1);
+
             updateSpaceButtonStyle(spaceButton, true, baseColor);
 
             if (space.getCapacity() > 1) {
                 boolean confirmed = showCapacitySelector(space);
                 if (!confirmed) {
+
                     currentSelectedSpaces.remove(space);
                     currentSelectedSeatsPerSpace.remove(space);
                     selectedSpaces.remove(space);
                     selectedSeatsPerSpace.remove(space);
                     updateSpaceButtonStyle(spaceButton, false, baseColor);
+                } else {
+
+                    int selectedSeats = currentSelectedSeatsPerSpace.getOrDefault(space, 1);
+                    selectedSeatsPerSpace.put(space, selectedSeats);
+                    showAlert(Alert.AlertType.INFORMATION, "Espacio seleccionado",
+                            "Espacio '" + space.getSpaceName() + "' seleccionado con " + selectedSeats + " asiento(s).");
                 }
+            } else {
+                showAlert(Alert.AlertType.INFORMATION, "Espacio seleccionado",
+                        "Espacio '" + space.getSpaceName() + "' seleccionado.");
             }
         }
 
@@ -645,7 +780,6 @@ public class MakeReservationWindowController implements Initializable {
                 .mapToDouble(r -> r.totalPrice)
                 .sum();
 
-        
         if (lblSelectedSpaces != null) {
             lblSelectedSpaces.setText(String.format("Total de reservaciones: %d | Gran Total: $%.2f",
                     multipleReservations.size(), grandTotal));
@@ -653,14 +787,19 @@ public class MakeReservationWindowController implements Initializable {
     }
 
     private void updateSpaceButtonStyle(Button button, boolean isSelected, String baseColor) {
-        String buttonColor = isSelected ? "#388e3c" : baseColor;
+        String buttonColor = isSelected ? "#2e7d32" : baseColor;
         String textColor = isSelected ? "white" : "#222";
+        String borderColor = isSelected ? "#1b5e20" : "#999";
+        String borderWidth = isSelected ? "3" : "1";
 
         button.setStyle("-fx-background-color: " + buttonColor
                 + "; -fx-text-fill: " + textColor
-                + "; -fx-border-radius: 6; -fx-background-radius: 6;"
-                + "; -fx-border-color: " + (isSelected ? "#2e7d32" : "#ccc")
-                + "; -fx-border-width: " + (isSelected ? "2" : "1") + ";");
+                + "; -fx-border-radius: 8; -fx-background-radius: 8;"
+                + "; -fx-border-color: " + borderColor
+                + "; -fx-border-width: " + borderWidth
+                + "; -fx-font-weight: " + (isSelected ? "bold" : "normal")
+                + "; -fx-cursor: hand;"
+                + "; -fx-effect: " + (isSelected ? "dropshadow(gaussian, rgba(46, 125, 50, 0.6), 10, 0, 0, 0)" : "none") + ";");
     }
 
     private HBox createCapacitySelector(Space space, String baseColor) {
@@ -750,33 +889,66 @@ public class MakeReservationWindowController implements Initializable {
         handleSpaceSelection(space, spaceButton, baseColor);
     }
 
+    private int getMaxAvailableSeats(Space space) {
+        try {
+            LocalDate selectedDate = dpDateOption.getValue();
+            String startStr = cbStartTime.getValue();
+            String endStr = cbEndTime.getValue();
+
+            if (selectedDate == null || startStr == null || endStr == null) {
+                return space.getCapacity();
+            }
+
+            LocalDateTime startTime = LocalDateTime.of(selectedDate, LocalTime.parse(startStr));
+            LocalDateTime endTime = LocalDateTime.of(selectedDate, LocalTime.parse(endStr));
+
+            int alreadyReserved = resService.getReservedSeats(space.getId(), startTime, endTime);
+            return space.getCapacity() - alreadyReserved;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return space.getCapacity();
+        }
+    }
+
     private boolean showCapacitySelector(Space space) {
-
         Dialog<Integer> dialog = new Dialog<>();
-        dialog.setTitle("Seleccionar Cantidad");
-        dialog.setHeaderText("Espacio: " + space.getSpaceName() + "\nCapacidad máxima: " + space.getCapacity());
+        dialog.setTitle("Seleccionar Cantidad de Asientos");
+        dialog.setHeaderText("Espacio: " + space.getSpaceName()
+                + "\nCapacidad máxima: " + space.getCapacity() + " personas"
+                + "\nSeleccione cuántos asientos desea reservar:");
 
-        VBox content = new VBox(10);
+        VBox content = new VBox(15);
         content.setAlignment(javafx.geometry.Pos.CENTER);
         content.setPadding(new Insets(20));
 
         Label label = new Label("Cantidad de asientos a reservar:");
+        label.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
-        HBox selectorBox = new HBox(10);
+        HBox selectorBox = new HBox(15);
         selectorBox.setAlignment(javafx.geometry.Pos.CENTER);
 
         Button minusBtn = new Button("-");
-        minusBtn.setPrefSize(30, 30);
-        minusBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;");
+        minusBtn.setPrefSize(40, 40);
+        minusBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; "
+                + "-fx-border-radius: 8; -fx-background-radius: 8; -fx-font-size: 16px; "
+                + "-fx-font-weight: bold; -fx-cursor: hand;");
 
-        Label quantityLabel = new Label(String.valueOf(selectedSeatsPerSpace.getOrDefault(space, 1)));
-        quantityLabel.setPrefWidth(40);
+        Label quantityLabel = new Label("1");
+        quantityLabel.setPrefWidth(60);
         quantityLabel.setAlignment(javafx.geometry.Pos.CENTER);
-        quantityLabel.setStyle("-fx-background-color: white; -fx-border-color: #ccc; -fx-border-width: 1; -fx-padding: 5;");
+        quantityLabel.setStyle("-fx-background-color: white; -fx-border-color: #ccc; "
+                + "-fx-border-width: 2; -fx-padding: 10; -fx-font-size: 16px; "
+                + "-fx-font-weight: bold; -fx-border-radius: 5;");
 
         Button plusBtn = new Button("+");
-        plusBtn.setPrefSize(30, 30);
-        plusBtn.setStyle("-fx-background-color: #4caf50; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;");
+        plusBtn.setPrefSize(40, 40);
+        plusBtn.setStyle("-fx-background-color: #4caf50; -fx-text-fill: white; "
+                + "-fx-border-radius: 8; -fx-background-radius: 8; -fx-font-size: 16px; "
+                + "-fx-font-weight: bold; -fx-cursor: hand;");
+
+        int currentValue = currentSelectedSeatsPerSpace.getOrDefault(space, 1);
+        quantityLabel.setText(String.valueOf(currentValue));
 
         minusBtn.setOnAction(e -> {
             int current = Integer.parseInt(quantityLabel.getText());
@@ -788,12 +960,13 @@ public class MakeReservationWindowController implements Initializable {
 
         plusBtn.setOnAction(e -> {
             int current = Integer.parseInt(quantityLabel.getText());
-            if (canIncreaseSeats(space, current)) {
+            if (canIncreaseSeats(space, current - 1)) {
                 current++;
                 quantityLabel.setText(String.valueOf(current));
             } else {
                 showAlert(Alert.AlertType.WARNING, "Capacidad máxima",
-                        "No hay suficientes asientos disponibles en este espacio para el horario seleccionado.");
+                        "No hay suficientes asientos disponibles en este espacio para el horario seleccionado.\n"
+                        + "Máximo disponible: " + getMaxAvailableSeats(space));
             }
         });
 
@@ -816,12 +989,13 @@ public class MakeReservationWindowController implements Initializable {
         Optional<Integer> result = dialog.showAndWait();
 
         if (result.isPresent()) {
+            int selectedQuantity = result.get();
 
-            selectedSeatsPerSpace.put(space, result.get());
+            currentSelectedSeatsPerSpace.put(space, selectedQuantity);
+            selectedSeatsPerSpace.put(space, selectedQuantity);
             updateSelectedSpacesLabel();
             return true;
         } else {
-
             return false;
         }
     }
@@ -925,9 +1099,17 @@ public class MakeReservationWindowController implements Initializable {
             int currentSeats = currentSelectedSeatsPerSpace.values().stream().mapToInt(Integer::intValue).sum();
             double grandTotal = multipleReservations.stream().mapToDouble(r -> r.totalPrice).sum();
 
-            lblSelectedSpaces.setText(String.format("Actual: %d espacios, %d asientos ($%.2f) | Total reservaciones: %d ($%.2f)",
-                    currentSelectedSpaces.size(), currentSeats, currentPrice,
-                    multipleReservations.size(), grandTotal));
+            String currentInfo = "";
+            if (!currentSelectedSpaces.isEmpty()) {
+                currentInfo = String.format("Selección actual: %d espacios, %d asientos ($%.2f)",
+                        currentSelectedSpaces.size(), currentSeats, currentPrice);
+            }
+
+            String reservationInfo = String.format("Reservaciones en lista: %d ($%.2f)",
+                    multipleReservations.size(), grandTotal);
+
+            String fullText = currentInfo.isEmpty() ? reservationInfo : currentInfo + " | " + reservationInfo;
+            lblSelectedSpaces.setText(fullText);
         }
     }
 
@@ -947,9 +1129,17 @@ public class MakeReservationWindowController implements Initializable {
     private void removeSelectedReservation() {
         int selectedIndex = lvReservationList.getSelectionModel().getSelectedIndex();
         if (selectedIndex >= 0 && selectedIndex < multipleReservations.size()) {
+
+            ReservationData removedReservation = multipleReservations.get(selectedIndex);
+
             multipleReservations.remove(selectedIndex);
+
             updateReservationsList();
-            showAlert(Alert.AlertType.INFORMATION, "Eliminado", "Reservación eliminada de la lista.");
+
+            reloadMatrix();
+
+            showAlert(Alert.AlertType.INFORMATION, "Eliminado",
+                    "Reservación eliminada de la lista. Los espacios están ahora disponibles para nueva selección.");
         } else {
             showAlert(Alert.AlertType.WARNING, "Selección", "Seleccione una reservación para eliminar.");
         }
@@ -1043,6 +1233,39 @@ public class MakeReservationWindowController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void clearReservationsListAfterPayment() {
+        multipleReservations.clear();
+        currentSelectedSpaces.clear();
+        currentSelectedSeatsPerSpace.clear();
+        selectedSpaces.clear();
+        selectedSeatsPerSpace.clear();
+
+        if (lvReservationList != null) {
+            Platform.runLater(() -> {
+                lvReservationList.getItems().clear();
+                updateSelectedSpacesLabel();
+                updateAddReservationButtonState();
+                updatePayButtonState();
+
+                loadRooms();
+                reloadMatrix();
+            });
+        }
+
+        multipleReservationsData = null;
+        reservationData = null;
+    }
+
+    private boolean isSpaceInReservationsList(Space space) {
+        return multipleReservations.stream()
+                .anyMatch(reservation -> reservation.selectedSpaces.contains(space));
+    }
+
+    public static void clearReservationsAfterPayment() {
+        multipleReservationsData = null;
+        reservationData = null;
     }
 
     @FXML

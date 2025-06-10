@@ -199,13 +199,10 @@ public class PaymentWindowController implements Initializable {
                 return;
             }
 
-            // Guardamos la lista de ReservationData
             this.multipleReservations = multiData.getReservations();
 
-            // Despliegas cada bloque de reserva
             displayMultipleReservationDetails(multiData);
 
-            // Y pones el total
             lblTotalPrice.setText(
                     "Total a Pagar: $" + String.format("%.2f", multiData.getGrandTotal())
             );
@@ -437,17 +434,75 @@ public class PaymentWindowController implements Initializable {
     }
 
     private void animateCardFlip() {
-        RotateTransition rotate = new RotateTransition(Duration.millis(300), ivCardImage);
-        rotate.setByAngle(180);
-        rotate.setAxis(new javafx.geometry.Point3D(0, 1, 0));
-        rotate.play();
+
+        try {
+            Image backImage = new Image(getClass().getResourceAsStream("/images/card_back.png"));
+
+            RotateTransition rotate = new RotateTransition(Duration.millis(300), ivCardImage);
+            rotate.setByAngle(90);
+            rotate.setAxis(new javafx.geometry.Point3D(0, 1, 0));
+
+            rotate.setOnFinished(e -> {
+                ivCardImage.setImage(backImage);
+                RotateTransition rotate2 = new RotateTransition(Duration.millis(300), ivCardImage);
+                rotate2.setByAngle(90);
+                rotate2.setAxis(new javafx.geometry.Point3D(0, 1, 0));
+                rotate2.play();
+            });
+
+            rotate.play();
+        } catch (Exception e) {
+
+            RotateTransition rotate = new RotateTransition(Duration.millis(600), ivCardImage);
+            rotate.setByAngle(180);
+            rotate.setAxis(new javafx.geometry.Point3D(0, 1, 0));
+            rotate.play();
+        }
     }
 
     private void animateCardFlipBack() {
-        RotateTransition rotate = new RotateTransition(Duration.millis(300), ivCardImage);
-        rotate.setByAngle(-180);
-        rotate.setAxis(new javafx.geometry.Point3D(0, 1, 0));
-        rotate.play();
+        try {
+
+            CardType currentType = getCurrentCardType();
+            Image frontImage = new Image(getClass().getResourceAsStream("/" + currentType.getImagePath()));
+
+            RotateTransition rotate = new RotateTransition(Duration.millis(300), ivCardImage);
+            rotate.setByAngle(-90);
+            rotate.setAxis(new javafx.geometry.Point3D(0, 1, 0));
+
+            rotate.setOnFinished(e -> {
+                ivCardImage.setImage(frontImage);
+                RotateTransition rotate2 = new RotateTransition(Duration.millis(300), ivCardImage);
+                rotate2.setByAngle(-90);
+                rotate2.setAxis(new javafx.geometry.Point3D(0, 1, 0));
+                rotate2.play();
+            });
+
+            rotate.play();
+        } catch (Exception e) {
+            RotateTransition rotate = new RotateTransition(Duration.millis(600), ivCardImage);
+            rotate.setByAngle(-180);
+            rotate.setAxis(new javafx.geometry.Point3D(0, 1, 0));
+            rotate.play();
+        }
+    }
+
+    private CardType getCurrentCardType() {
+        String cardNumber = tfCardNumber.getText().replaceAll("\\D", "");
+
+        if (cardNumber.isEmpty()) {
+            return CardType.UNKNOWN;
+        }
+
+        char firstDigit = cardNumber.charAt(0);
+        switch (firstDigit) {
+            case '4':
+                return CardType.VISA;
+            case '5':
+                return CardType.MASTERCARD;
+            default:
+                return CardType.UNKNOWN;
+        }
     }
 
     private void setupValidation() {
@@ -532,29 +587,26 @@ public class PaymentWindowController implements Initializable {
             return;
         }
 
-        // 1. Muestra el overlay de "procesando"
         showFullScreenProcessing();
 
-        // 2. Después, lanza el guardado y la animación
         Timeline reservationTimeline = new Timeline(
                 new KeyFrame(Duration.seconds(1), e -> {
                     boolean success = createReservations();
                     Platform.runLater(() -> {
                         if (success) {
-                            if (paymentAnimation == null) {
-                                paymentAnimation = new PaymentAnimation(spPaymentOverlay);
-                                paymentAnimation.setOnAnimationComplete(() -> {
-                                    Platform.runLater(() -> {
-                                        try {
-                                            goToConfirmation();
-                                        } catch (IOException ioEx) {
-                                            showAlert(Alert.AlertType.ERROR, "Error",
-                                                    "No se pudo ir a la confirmación: " + ioEx.getMessage());
-                                        }
-                                    });
+                           
+                            paymentAnimation = new PaymentAnimation(spPaymentOverlay);
+                            paymentAnimation.setOnAnimationComplete(() -> {
+                                Platform.runLater(() -> {
+                                    try {
+                                        goToConfirmation();
+                                    } catch (IOException ioEx) {
+                                        showAlert(Alert.AlertType.ERROR, "Error",
+                                                "No se pudo ir a la confirmación: " + ioEx.getMessage());
+                                    }
                                 });
-                            }
-                            // 3. Calcula el gran total en lugar de usar reservationData
+                            });
+
                             double grandTotal = multipleReservations.stream()
                                     .mapToDouble(ReservationData::getTotalPrice)
                                     .sum();
@@ -567,6 +619,40 @@ public class PaymentWindowController implements Initializable {
                 })
         );
         reservationTimeline.play();
+    }
+
+    private void resetPaymentForm() {
+        Platform.runLater(() -> {
+            tfCardNumber.clear();
+            tfCardName.clear();
+            tfExpiryDate.clear();
+            tfCVV.clear();
+
+            updateCardDisplay(CardType.UNKNOWN);
+            lblCardType.setText("Tipo de Tarjeta: Detectando...");
+
+            btnConfirmPayment.setDisable(true);
+
+            spPaymentOverlay.setVisible(false);
+            spPaymentOverlay.setOpacity(1.0);
+            spPaymentOverlay.getChildren().clear();
+
+            if (ivPaymentAnimation != null) {
+                ivPaymentAnimation.setScaleX(1.0);
+                ivPaymentAnimation.setScaleY(1.0);
+                ivPaymentAnimation.setTranslateX(0);
+                ivPaymentAnimation.setTranslateY(0);
+            }
+
+            if (lblPaymentStatus != null) {
+                lblPaymentStatus.setScaleX(1.0);
+                lblPaymentStatus.setScaleY(1.0);
+                lblPaymentStatus.setTranslateX(0);
+                lblPaymentStatus.setTranslateY(0);
+            }
+
+            paymentAnimation = null;
+        });
     }
 
     private void showFullScreenProcessing() {
@@ -606,7 +692,6 @@ public class PaymentWindowController implements Initializable {
             System.out.println("No se pudo cargar la imagen de éxito");
         }
 
-        // Calcula aquí el gran total
         double grandTotal = multipleReservations.stream()
                 .mapToDouble(ReservationData::getTotalPrice)
                 .sum();
@@ -733,6 +818,20 @@ public class PaymentWindowController implements Initializable {
     }
 
     private void goToConfirmation() throws IOException {
+
+        resetPaymentForm();
+
+        try {
+            MakeReservationWindowController controller
+                    = (MakeReservationWindowController) FlowController.getInstance()
+                            .getController("MakeReservationWindow");
+            if (controller != null) {
+                controller.forceRefreshAfterPayment();
+            }
+        } catch (Exception e) {
+            System.out.println("No se pudo actualizar el controlador de reservaciones: " + e.getMessage());
+        }
+
         FlowController.getInstance().goView("UserViewWindow");
     }
 
@@ -745,6 +844,7 @@ public class PaymentWindowController implements Initializable {
 
         confirmAlert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
+                resetPaymentForm();
                 goBackToReservation();
             }
         });

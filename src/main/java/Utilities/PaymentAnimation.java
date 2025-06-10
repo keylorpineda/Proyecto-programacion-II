@@ -32,8 +32,11 @@ public class PaymentAnimation {
 
     public void playPaymentAnimation(double totalAmount) {
 
+        resetAnimation();
+
         animationContainer.getChildren().clear();
         animationContainer.setVisible(true);
+        animationContainer.setOpacity(1.0);
 
         createAnimationBackground();
 
@@ -42,13 +45,43 @@ public class PaymentAnimation {
 
         dataphone.setLayoutX(150);
         dataphone.setLayoutY(50);
+        dataphone.setScaleX(1.0);
+        dataphone.setScaleY(1.0);
+        dataphone.setTranslateX(0);
+        dataphone.setTranslateY(0);
 
         card.setLayoutX(-200);
         card.setLayoutY(120);
+        card.setScaleX(1.0);
+        card.setScaleY(1.0);
+        card.setTranslateX(0);
+        card.setTranslateY(0);
 
         animationContainer.getChildren().addAll(dataphone, card);
 
         executePaymentSequence(card, dataphone, totalAmount);
+    }
+
+    private void resetAnimation() {
+
+        animationContainer.getChildren().forEach(node -> {
+            if (node instanceof Group) {
+                Group group = (Group) node;
+
+                group.setScaleX(1.0);
+                group.setScaleY(1.0);
+                group.setTranslateX(0);
+                group.setTranslateY(0);
+                group.setRotate(0);
+                group.setOpacity(1.0);
+            }
+        });
+
+        animationContainer.setEffect(null);
+        animationContainer.setScaleX(1.0);
+        animationContainer.setScaleY(1.0);
+        animationContainer.setTranslateX(0);
+        animationContainer.setTranslateY(0);
     }
 
     private void createAnimationBackground() {
@@ -208,11 +241,18 @@ public class PaymentAnimation {
 
     private void executePaymentSequence(Group card, Group dataphone, double amount) {
 
+        card.setTranslateX(0);
+        card.setTranslateY(0);
+
         TranslateTransition insertCard = new TranslateTransition(Duration.seconds(2), card);
+        insertCard.setFromX(0);
         insertCard.setToX(380);
         insertCard.setInterpolator(Interpolator.EASE_IN);
 
         Rectangle screen = (Rectangle) dataphone.getChildren().get(1);
+
+        screen.setFill(Color.web("#27ae60"));
+        screen.setEffect(null);
 
         Timeline processing = new Timeline();
         processing.getKeyFrames().addAll(
@@ -260,6 +300,11 @@ public class PaymentAnimation {
         checkMark.setLayoutX(350);
         checkMark.setLayoutY(250);
 
+        checkMark.setScaleX(0);
+        checkMark.setScaleY(0);
+        checkMark.setOpacity(1.0);
+        checkMark.setEffect(null);
+
         animationContainer.getChildren().add(checkMark);
 
         ScaleTransition scaleIn = new ScaleTransition(Duration.seconds(0.8), checkMark);
@@ -288,6 +333,8 @@ public class PaymentAnimation {
         );
 
         finalSequence.setOnFinished(e -> {
+
+            resetAnimation();
             animationContainer.setVisible(false);
             if (onAnimationComplete != null) {
                 onAnimationComplete.run();

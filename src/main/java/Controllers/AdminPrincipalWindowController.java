@@ -117,14 +117,14 @@ public class AdminPrincipalWindowController implements Initializable {
 
     private UserService userService = new UserService();
 
-  @FXML
-private PieChart pieTipoEspacio;
+    @FXML
+    private PieChart pieTipoEspacio;
 
-@FXML
-private BarChart<String, Number> barUsuarios;
+    @FXML
+    private BarChart<String, Number> barUsuarios;
 
-@FXML
-private BarChart<String, Number> barHoras;
+    @FXML
+    private BarChart<String, Number> barHoras;
 
     private Room currentRoom;
     private final RoomService roomService = new RoomService();
@@ -212,32 +212,6 @@ private BarChart<String, Number> barHoras;
         }
     }
 
-    private void mostrarZonasValidas(Space espacio) {
-        limpiarHighlights();
-
-        if (espacio == null || currentRoom == null) {
-            return;
-        }
-
-        for (int row = 0; row <= currentRoom.getRows() - espacio.getHeight(); row++) {
-            for (int col = 0; col <= currentRoom.getCols() - espacio.getWidth(); col++) {
-                if (esPosicionValida(espacio, row, col)) {
-                    Region highlight = new Region();
-                    highlight.setStyle(
-                            "-fx-background-color: rgba(76, 175, 80, 0.3); "
-                            + "-fx-border-color: #4CAF50; "
-                            + "-fx-border-width: 2px; "
-                            + "-fx-border-style: dashed;"
-                    );
-                    highlight.setMouseTransparent(true);
-
-                    gridPlano.add(highlight, col, row, espacio.getWidth(), espacio.getHeight());
-                    highlightCells.add(highlight);
-                }
-            }
-        }
-    }
-
     private void limpiarHighlights() {
         for (Region highlight : highlightCells) {
             gridPlano.getChildren().remove(highlight);
@@ -264,8 +238,8 @@ private BarChart<String, Number> barHoras;
         tgViewReports.setOnAction(e -> {
             showReports();
             cargarGraficoEspacios();
-        cargarGraficoUsuariosTop();
-        cargarGraficoHorarios();
+            cargarGraficoUsuariosTop();
+            cargarGraficoHorarios();
         });
         tgCreateAdmin.setOnAction(e -> showCreateAdminForm());
         btnAddSpace.setOnAction(this::onAddSpace);
@@ -467,11 +441,8 @@ private BarChart<String, Number> barHoras;
         if (currentRoom == null) {
             return;
         }
-
         limpiarHighlights();
-
         currentRoom = roomService.findByIdWithSpaces(currentRoom.getId());
-
         gridPlano.getChildren().clear();
         gridPlano.getColumnConstraints().clear();
         gridPlano.getRowConstraints().clear();
@@ -494,21 +465,28 @@ private BarChart<String, Number> barHoras;
         String horaInicioStr = cbAdminStartTime.getValue();
         String horaFinStr = cbAdminEndTime.getValue();
 
-        Set<Long> ocupados = new HashSet<>();
-        Set<Long> bloqueados = new HashSet<>();
+        Map<Long, Integer> espaciosOcupados = new HashMap<>();
+        Set<Long> espaciosBloqueados = new HashSet<>();
 
         if (fecha != null && horaInicioStr != null && horaFinStr != null) {
             try {
                 LocalTime horaInicio = TimeSlots.parse(horaInicioStr);
                 LocalTime horaFin = TimeSlots.parse(horaFinStr);
 
-                ocupados = reservationService.findByRoomAndDateAndTime(
+                List<Reservation> reservasActivas = reservationService.findByRoomAndDateAndTime(
                         currentRoom.getId(), fecha, horaInicio, horaFin
-                ).stream().map(r -> r.getSpace().getId()).collect(Collectors.toSet());
+                );
 
-                bloqueados = spaceService.findBlockedSpaces(
+                for (Reservation reserva : reservasActivas) {
+                    Long spaceId = reserva.getSpace().getId();
+                    espaciosOcupados.put(spaceId,
+                            espaciosOcupados.getOrDefault(spaceId, 0) + reserva.getSeatCount());
+                }
+
+                espaciosBloqueados = spaceService.findBlockedSpaces(
                         currentRoom.getId(), fecha, horaInicio, horaFin
                 ).stream().map(Space::getId).collect(Collectors.toSet());
+
             } catch (Exception e) {
                 System.err.println("Error al cargar estados de espacios: " + e.getMessage());
             }
@@ -516,7 +494,17 @@ private BarChart<String, Number> barHoras;
 
         for (Space s : currentRoom.getSpaces()) {
             try {
-                Node nodo = crearVisualEspacio(s, ocupados.contains(s.getId()), bloqueados.contains(s.getId()));
+                int ocupados = 0;
+                boolean estaBloqueado = false;
+                boolean estaCompleto = false;
+
+                if (s.getType() != SpaceType.PASILLO) {
+                    ocupados = espaciosOcupados.getOrDefault(s.getId(), 0);
+                    estaBloqueado = espaciosBloqueados.contains(s.getId());
+                    estaCompleto = ocupados >= s.getCapacity();
+                }
+
+                Node nodo = crearVisualEspacio(s, ocupados, estaBloqueado, estaCompleto);
                 gridPlano.add(nodo, s.getStartCol(), s.getStartRow(), s.getWidth(), s.getHeight());
 
                 nodo.setOpacity(0);
@@ -528,20 +516,20 @@ private BarChart<String, Number> barHoras;
                 System.err.println("Error al crear espacio visual: " + e.getMessage());
             }
         }
-
         actualizarDimensionesCelda();
-
         draggedSpace = null;
         isDragging = false;
     }
 
-    private Node crearVisualEspacio(Space s, boolean isOcup, boolean isBloq) {
+    private Node crearVisualEspacio(Space s, int ocupados, boolean isBloqueado, boolean estaCompleto) {
         Button btn = new Button(s.getSpaceName());
         btn.setFont(Font.font("Segoe UI", 12));
         btn.setPrefSize(60 * s.getWidth(), 60 * s.getHeight());
 
         String color;
         String precio;
+        String estadoTexto = "";
+
         switch (s.getType()) {
             case ESCRITORIO:
                 color = "#90caf9";
@@ -557,7 +545,7 @@ private BarChart<String, Number> barHoras;
                 break;
             case PASILLO:
                 color = "#a1887f";
-                precio = "Gratis";
+                precio = "";
                 break;
             default:
                 color = "#bdbdbd";
@@ -565,42 +553,54 @@ private BarChart<String, Number> barHoras;
                 break;
         }
 
-        if (isOcup) {
-            color = "#e57373";
-            btn.setDisable(true);
-        } else if (isBloq) {
+        if (isBloqueado) {
             color = "#616161";
-            btn.setDisable(true);
+            estadoTexto = "🚫 BLOQUEADO";
+        } else if (estaCompleto) {
+            color = "#e57373";
+            estadoTexto = "⚠️ COMPLETO";
+        } else if (ocupados > 0) {
+            color = "#ffcc80";
+            estadoTexto = "⚡ PARCIAL";
+        } else {
+            estadoTexto = "✅ DISPONIBLE";
         }
 
+        final String estadoFinal = estadoTexto;
+
         btn.setStyle(String.format(
-                "-fx-background-color: %s; "
-                + "-fx-text-fill: #222; "
-                + "-fx-border-radius: 8px; "
-                + "-fx-background-radius: 8px; "
-                + "-fx-border-color: rgba(0,0,0,0.1); "
-                + "-fx-border-width: 1px; "
-                + "-fx-font-weight: bold; "
-                + "-fx-cursor: hand;",
+                "-fx-background-color: %s; -fx-text-fill: #222; -fx-border-radius: 8px; "
+                + "-fx-background-radius: 8px; -fx-border-color: rgba(0,0,0,0.1); -fx-border-width: 1px; "
+                + "-fx-font-weight: bold; -fx-cursor: hand;",
                 color
         ));
 
-        Tooltip tooltip = new Tooltip();
-        tooltip.setText(String.format(
-                "Tipo: %s\nCapacidad: %d personas\nPrecio: %s\nTamaño: %dx%d\nPosición: (%d,%d)%s%s",
+        int disponibles = Math.max(0, s.getCapacity() - ocupados);
+
+        Tooltip tooltip = new Tooltip(String.format(
+                "Tipo: %s\n"
+                + "Capacidad total: %d\n"
+                + "Ocupados: %d\n"
+                + "Disponibles: %d\n"
+                + "Precio: %s\n"
+                + "Tamaño: %dx%d\n"
+                + "Posición: (%d,%d)\n"
+                + "Estado: %s",
                 s.getType().toString().replace("_", " "),
                 s.getCapacity(),
+                ocupados,
+                disponibles,
                 precio,
                 s.getWidth(), s.getHeight(),
                 s.getStartCol(), s.getStartRow(),
-                isOcup ? "\n⚠️ OCUPADO" : "",
-                isBloq ? "\n🚫 BLOQUEADO" : ""
+                estadoFinal
         ));
+
         tooltip.setStyle("-fx-font-size: 12px; -fx-background-color: #333; -fx-text-fill: white;");
         tooltip.setShowDelay(Duration.millis(300));
         Tooltip.install(btn, tooltip);
 
-        if (!btn.isDisabled()) {
+        if (!isBloqueado && !estaCompleto) {
             btn.setOnMouseEntered(e -> {
                 if (!isDragging) {
                     btn.setStyle(btn.getStyle() + "-fx-scale-x: 1.05; -fx-scale-y: 1.05;");
@@ -617,24 +617,19 @@ private BarChart<String, Number> barHoras;
                     btn.setEffect(null);
                 }
             });
-        }
 
-        if (!btn.isDisabled()) {
             btn.setOnDragDetected(event -> {
                 if (event.isPrimaryButtonDown()) {
                     isDragging = true;
                     draggedSpace = s;
-
                     Dragboard db = btn.startDragAndDrop(TransferMode.MOVE);
                     ClipboardContent content = new ClipboardContent();
                     content.putString(String.valueOf(s.getId()));
                     db.setContent(content);
-
                     btn.setOpacity(0.7);
                     Glow glow = new Glow();
                     glow.setLevel(0.8);
                     btn.setEffect(glow);
-
                     event.consume();
                 }
             });
@@ -645,7 +640,6 @@ private BarChart<String, Number> barHoras;
                 isDragging = false;
                 limpiarHighlights();
                 limpiarPreview();
-
                 if (!event.isDropCompleted()) {
                     animarRebote(btn);
                 }
@@ -655,32 +649,7 @@ private BarChart<String, Number> barHoras;
 
         btn.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY && !isDragging) {
-                ContextMenu menu = new ContextMenu();
-
-                MenuItem info = new MenuItem("ℹ️ Información");
-                info.setOnAction(e -> mostrarInfoEspacio(s, precio));
-
-                MenuItem cambiarCapacidad = new MenuItem("👥 Cambiar capacidad");
-                cambiarCapacidad.setOnAction(e -> cambiarCapacidadEspacio(s));
-
-                MenuItem eliminar = new MenuItem("🗑️ Eliminar espacio");
-                eliminar.setOnAction(e -> confirmarEliminarEspacio(currentRoom, s));
-
-                MenuItem bloquear = new MenuItem("🔒 Bloquear espacio");
-                bloquear.setOnAction(e -> bloquearEspacioDialog(s));
-
-                if (btn.isDisabled()) {
-                    eliminar.setDisable(true);
-                    bloquear.setDisable(true);
-                    cambiarCapacidad.setDisable(true);
-                }
-
-                if (s.getType() == SpaceType.PASILLO) {
-                    cambiarCapacidad.setDisable(true);
-                }
-
-                menu.getItems().addAll(info, new SeparatorMenuItem(), cambiarCapacidad, bloquear, eliminar);
-                menu.show(btn, event.getScreenX(), event.getScreenY());
+                mostrarMenuContextualEspacio(event, s, precio, ocupados, disponibles, estadoFinal, isBloqueado, estaCompleto);
             }
             event.consume();
         });
@@ -688,13 +657,197 @@ private BarChart<String, Number> barHoras;
         return btn;
     }
 
+    private void mostrarMenuContextualEspacio(javafx.scene.input.MouseEvent event, Space s, String precio,
+            int ocupados, int disponibles, String estadoFinal,
+            boolean isBloqueado, boolean estaCompleto) {
+
+        ContextMenu menu = new ContextMenu();
+
+        MenuItem info = new MenuItem("ℹ️ Información");
+        info.setOnAction(e -> mostrarInfoEspacioDetallada(s, precio, ocupados, disponibles, estadoFinal));
+
+        MenuItem verReservas = new MenuItem("📋 Ver reservas");
+        verReservas.setOnAction(e -> mostrarReservasEspacio(s));
+        if (ocupados == 0 && !isBloqueado) {
+            verReservas.setDisable(true);
+        }
+
+        MenuItem cambiarCapacidad = new MenuItem("👥 Cambiar capacidad");
+        cambiarCapacidad.setOnAction(e -> cambiarCapacidadEspacio(s));
+        if (s.getType() == SpaceType.PASILLO) {
+            cambiarCapacidad.setDisable(true);
+        }
+
+        MenuItem bloquear;
+
+        bloquear = new MenuItem("🔒 Bloquear espacio");
+        bloquear.setOnAction(e -> bloquearEspacioDialog(s));
+
+        MenuItem eliminar = new MenuItem("🗑️ Eliminar espacio");
+        eliminar.setOnAction(e -> confirmarEliminarEspacio(currentRoom, s));
+        if (ocupados > 0) {
+            eliminar.setDisable(true);
+        }
+
+        menu.getItems().addAll(
+                info,
+                new SeparatorMenuItem(),
+                verReservas,
+                cambiarCapacidad,
+                bloquear,
+                eliminar
+        );
+
+        menu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
+    }
+
+    private void mostrarInfoEspacioDetallada(Space espacio, String precio, int ocupados, int disponibles, String estado) {
+        try {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Información del Espacio");
+            alert.setHeaderText("Detalles de: " + espacio.getSpaceName());
+
+            VBox content = new VBox(10);
+            content.setStyle("-fx-padding: 15px;");
+
+            Label lblTipo = new Label("📋 Tipo: " + espacio.getType().toString().replace("_", " "));
+            lblTipo.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+
+            Label lblCapacidad = new Label("👥 Capacidad Total: " + espacio.getCapacity());
+            Label lblOcupados = new Label("🔴 Ocupados: " + ocupados);
+            Label lblDisponibles = new Label("🟢 Disponibles: " + disponibles);
+            Label lblPrecio = new Label("💰 Precio: " + precio);
+            Label lblTamaño = new Label("📐 Tamaño: " + espacio.getWidth() + " x " + espacio.getHeight());
+            Label lblPosicion = new Label("📍 Posición: (" + espacio.getStartCol() + ", " + espacio.getStartRow() + ")");
+            Label lblEstado = new Label("🔄 Estado: " + estado);
+
+            lblEstado.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+            if (estado.contains("BLOQUEADO")) {
+                lblEstado.setStyle(lblEstado.getStyle() + " -fx-text-fill: #d32f2f;");
+            } else if (estado.contains("COMPLETO")) {
+                lblEstado.setStyle(lblEstado.getStyle() + " -fx-text-fill: #f57c00;");
+            } else if (estado.contains("DISPONIBLE")) {
+                lblEstado.setStyle(lblEstado.getStyle() + " -fx-text-fill: #388e3c;");
+            }
+
+            content.getChildren().addAll(
+                    lblTipo, lblCapacidad, lblOcupados, lblDisponibles,
+                    lblPrecio, lblTamaño, lblPosicion, lblEstado
+            );
+
+            if (ocupados > 0) {
+                Label lblReservasActivas = new Label("\n📅 Reservas Activas:");
+                lblReservasActivas.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+                content.getChildren().add(lblReservasActivas);
+
+                LocalDate fecha = dpAdminDate.getValue();
+                String horaInicioStr = cbAdminStartTime.getValue();
+                String horaFinStr = cbAdminEndTime.getValue();
+
+                if (fecha != null && horaInicioStr != null && horaFinStr != null) {
+                    try {
+                        LocalTime horaInicio = TimeSlots.parse(horaInicioStr);
+                        LocalTime horaFin = TimeSlots.parse(horaFinStr);
+
+                        List<Reservation> reservasActivas = reservationService.findBySpaceAndDateAndTime(
+                                espacio.getId(), fecha, horaInicio, horaFin
+                        );
+
+                        for (Reservation reserva : reservasActivas) {
+                            String nombreUsuario = reserva.getUser() != null
+                                    ? reserva.getUser().getName() + " " + reserva.getUser().getLastName()
+                                    : "Usuario desconocido";
+                            String horaInicioRes = reserva.getStartTime() != null
+                                    ? reserva.getStartTime().toLocalTime().toString() : "N/A";
+                            String horaFinRes = reserva.getEndTime() != null
+                                    ? reserva.getEndTime().toLocalTime().toString() : "N/A";
+
+                            Label lblReserva = new Label("   • " + nombreUsuario
+                                    + " (" + horaInicioRes + " - " + horaFinRes + ") - "
+                                    + reserva.getSeatCount() + " asientos");
+                            lblReserva.setStyle("-fx-font-size: 12px;");
+                            content.getChildren().add(lblReserva);
+                        }
+                    } catch (Exception e) {
+                        Label lblError = new Label("   Error al cargar reservas: " + e.getMessage());
+                        lblError.setStyle("-fx-font-size: 12px; -fx-text-fill: red;");
+                        content.getChildren().add(lblError);
+                    }
+                }
+            }
+
+            alert.getDialogPane().setContent(content);
+            alert.getDialogPane().setPrefWidth(450);
+            alert.showAndWait();
+
+        } catch (Exception e) {
+            mostrarError("Error al mostrar información del espacio", e.getMessage());
+        }
+    }
+
+    private void mostrarError(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(titulo);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
+
+    private void desbloquearEspacioDialog(Space espacio) {
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Desbloquear Espacio");
+        confirmacion.setHeaderText("¿Desbloquear el espacio: " + espacio.getSpaceName() + "?");
+        confirmacion.setContentText("El espacio volverá a estar disponible para reservas.");
+
+        Optional<ButtonType> resultado = confirmacion.showAndWait();
+        if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+            try {
+                // Implementar lógica para desbloquear espacio
+                // spaceService.unblockSpace(espacio.getId());
+                mostrarNotificacionExito("Espacio desbloqueado correctamente");
+                cargarPlanoDeRoomActual();
+            } catch (Exception e) {
+                mostrarError("Error al desbloquear espacio", e.getMessage());
+            }
+        }
+    }
+
     private void cambiarCapacidadEspacio(Space espacio) {
+
+        LocalDate fecha = dpAdminDate.getValue();
+        String horaInicioStr = cbAdminStartTime.getValue();
+        String horaFinStr = cbAdminEndTime.getValue();
+
+        int ocupadosActuales = 0;
+        if (fecha != null && horaInicioStr != null && horaFinStr != null) {
+            try {
+                LocalTime horaInicio = TimeSlots.parse(horaInicioStr);
+                LocalTime horaFin = TimeSlots.parse(horaFinStr);
+
+                List<Reservation> reservasActivas = reservationService.findByRoomAndDateAndTime(
+                        currentRoom.getId(), fecha, horaInicio, horaFin
+                );
+
+                for (Reservation reserva : reservasActivas) {
+                    if (reserva.getSpace().getId().equals(espacio.getId())) {
+                        ocupadosActuales += reserva.getSeatCount();
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Error al verificar ocupación actual: " + e.getMessage());
+            }
+        }
+
         TextInputDialog dialog = new TextInputDialog(String.valueOf(espacio.getCapacity()));
         dialog.setTitle("Cambiar Capacidad");
         dialog.setHeaderText("Cambiar capacidad del espacio: " + espacio.getSpaceName());
-        dialog.setContentText("Nueva capacidad:");
 
-        // Validar entrada
+        String mensaje = "Nueva capacidad:";
+        if (ocupadosActuales > 0) {
+            mensaje += "\n⚠️ Actualmente ocupados: " + ocupadosActuales + " asientos";
+        }
+        dialog.setContentText(mensaje);
+
         dialog.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 dialog.getEditor().setText(newValue.replaceAll("[^\\d]", ""));
@@ -714,13 +867,27 @@ private BarChart<String, Number> barHoras;
                     return;
                 }
 
+                if (nuevaCapacidad < ocupadosActuales) {
+                    utilities.showAlert(Alert.AlertType.ERROR,
+                            "Capacidad insuficiente",
+                            String.format("La nueva capacidad (%d) no puede ser menor que los asientos actualmente ocupados (%d).",
+                                    nuevaCapacidad, ocupadosActuales));
+                    return;
+                }
+
                 int capacidadMaxima = calcularCapacidadMaxima(espacio);
                 if (nuevaCapacidad > capacidadMaxima) {
-                    utilities.showAlert(Alert.AlertType.WARNING,
-                            "Capacidad excesiva",
-                            String.format("La capacidad máxima recomendada para este tipo de espacio (%dx%d) es %d personas.",
-                                    espacio.getWidth(), espacio.getHeight(), capacidadMaxima));
-                    return;
+                    Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmacion.setTitle("Capacidad alta");
+                    confirmacion.setHeaderText("Capacidad por encima de la recomendada");
+                    confirmacion.setContentText(String.format(
+                            "La capacidad ingresada (%d) excede la recomendada (%d) para este tipo de espacio.\n¿Desea continuar?",
+                            nuevaCapacidad, capacidadMaxima));
+
+                    Optional<ButtonType> respuesta = confirmacion.showAndWait();
+                    if (respuesta.isEmpty() || respuesta.get() != ButtonType.OK) {
+                        return;
+                    }
                 }
 
                 espacio.setCapacity(nuevaCapacidad);
@@ -833,28 +1000,6 @@ private BarChart<String, Number> barHoras;
         });
     }
 
-    private boolean puedeMover(Space espacioAMover, int nuevaFila, int nuevaColumna) {
-        if (nuevaFila < 0 || nuevaColumna < 0
-                || nuevaFila + espacioAMover.getHeight() > currentRoom.getRows()
-                || nuevaColumna + espacioAMover.getWidth() > currentRoom.getCols()) {
-            return false;
-        }
-        for (Space otroEspacio : currentRoom.getSpaces()) {
-            if (!otroEspacio.getId().equals(espacioAMover.getId())) {
-                boolean superponeHorizontal = nuevaColumna < otroEspacio.getStartCol() + otroEspacio.getWidth()
-                        && nuevaColumna + espacioAMover.getWidth() > otroEspacio.getStartCol();
-                boolean superponeVertical = nuevaFila < otroEspacio.getStartRow() + otroEspacio.getHeight()
-                        && nuevaFila + espacioAMover.getHeight() > otroEspacio.getStartRow();
-
-                if (superponeHorizontal && superponeVertical) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
     @FXML
     private void clickEliminarUsuario(ActionEvent event) {
         userSeleccionado = tblUsers.getSelectionModel().getSelectedItem();
@@ -874,9 +1019,9 @@ private BarChart<String, Number> barHoras;
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
                 List<Reservation> reservas = reservationService.findByUserId(userSeleccionado.getId());
-                reservas.forEach(reservationService::delete); // elimina todas las reservas
+                reservas.forEach(reservationService::delete);
 
-                userService.delete(userSeleccionado.getId());  // elimina el usuario
+                userService.delete(userSeleccionado.getId());
                 cargarTablaUsuarios();
 
                 utilities.showAlert(Alert.AlertType.INFORMATION,
@@ -1089,49 +1234,45 @@ private BarChart<String, Number> barHoras;
         FlowController.getInstance().goView("LoginWindow");
     }
 
-   private void cargarGraficoEspacios() {
-    Map<SpaceType, Long> datos = reservationService.countReservationsBySpaceType();
-    ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
+    private void cargarGraficoEspacios() {
+        Map<SpaceType, Long> datos = reservationService.countReservationsBySpaceType();
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
 
-    for (Map.Entry<SpaceType, Long> entry : datos.entrySet()) {
-        pieData.add(new PieChart.Data(entry.getKey().getTypeName(), entry.getValue()));
+        for (Map.Entry<SpaceType, Long> entry : datos.entrySet()) {
+            pieData.add(new PieChart.Data(entry.getKey().getTypeName(), entry.getValue()));
+        }
+
+        pieTipoEspacio.setData(pieData);
     }
 
-    pieTipoEspacio.setData(pieData);
-}
+    private void cargarGraficoUsuariosTop() {
+        Map<String, Long> datos = reservationService.getTopUsersByReservations();
 
+        System.out.println("Top usuarios con reservas: " + datos);
 
- private void cargarGraficoUsuariosTop() {
-    Map<String, Long> datos = reservationService.getTopUsersByReservations();
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Reservas por usuario");
 
-    // 👇 Validación para ver si llegan datos
-    System.out.println("Top usuarios con reservas: " + datos);
+        for (Map.Entry<String, Long> entry : datos.entrySet()) {
+            series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+        }
 
-    XYChart.Series<String, Number> series = new XYChart.Series<>();
-    series.setName("Reservas por usuario");
-
-    for (Map.Entry<String, Long> entry : datos.entrySet()) {
-        series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+        barUsuarios.getData().clear();
+        barUsuarios.getData().add(series);
     }
-
-    barUsuarios.getData().clear();
-    barUsuarios.getData().add(series);
-}
-
-
 
     private void cargarGraficoHorarios() {
-    Map<String, Long> datos = reservationService.countReservationsByHourSlot();
-    XYChart.Series<String, Number> series = new XYChart.Series<>();
-    series.setName("Reservas por hora");
+        Map<String, Long> datos = reservationService.countReservationsByHourSlot();
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Reservas por hora");
 
-    for (Map.Entry<String, Long> entry : datos.entrySet()) {
-        series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+        for (Map.Entry<String, Long> entry : datos.entrySet()) {
+            series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+        }
+
+        barHoras.getData().clear();
+        barHoras.getData().add(series);
     }
-
-    barHoras.getData().clear();
-    barHoras.getData().add(series);
-}
 
     @FXML
     private void tgShowUsersTable(ActionEvent event) {
@@ -1152,7 +1293,7 @@ private BarChart<String, Number> barHoras;
 
     @FXML
     private void tgShowReport(ActionEvent event) {
-           System.out.println("CLICK EN REPORTES"); // 👈 Esto DEBE imprimirse
+        System.out.println("CLICK EN REPORTES");
         showReports();
     }
 
@@ -1215,7 +1356,6 @@ private BarChart<String, Number> barHoras;
                 return;
             }
 
-            // Verificación de RadioButtons
             if (radioAdmin.isSelected()) {
                 Administrator admin = new Administrator(id, firstName, lastName, user, password);
                 userService.save(admin);
@@ -1262,6 +1402,68 @@ private BarChart<String, Number> barHoras;
                 s.getId()
         ));
         info.showAndWait();
+    }
+
+    private void mostrarReservasEspacio(Space espacio) {
+        LocalDate fecha = dpAdminDate.getValue();
+        String horaInicioStr = cbAdminStartTime.getValue();
+        String horaFinStr = cbAdminEndTime.getValue();
+
+        if (fecha == null || horaInicioStr == null || horaFinStr == null) {
+            utilities.showAlert(Alert.AlertType.WARNING,
+                    "Filtros incompletos",
+                    "Selecciona fecha y horarios para ver las reservas.");
+            return;
+        }
+
+        try {
+            LocalTime horaInicio = TimeSlots.parse(horaInicioStr);
+            LocalTime horaFin = TimeSlots.parse(horaFinStr);
+
+            List<Reservation> reservas = reservationService.findByRoomAndDateAndTime(
+                    currentRoom.getId(), fecha, horaInicio, horaFin
+            ).stream()
+                    .filter(r -> r.getSpace().getId().equals(espacio.getId()))
+                    .collect(Collectors.toList());
+
+            if (reservas.isEmpty()) {
+                utilities.showAlert(Alert.AlertType.INFORMATION,
+                        "Sin reservas",
+                        "No hay reservas activas para este espacio en el período seleccionado.");
+                return;
+            }
+
+            StringBuilder info = new StringBuilder();
+            info.append("Reservas activas para: ").append(espacio.getSpaceName()).append("\n");
+            info.append("Fecha: ").append(fecha).append("\n");
+            info.append("Período: ").append(horaInicio).append(" - ").append(horaFin).append("\n\n");
+
+            int totalOcupados = 0;
+            for (Reservation reserva : reservas) {
+                info.append("• Usuario: ").append(reserva.getUser().getFullName()).append("\n");
+                info.append("  Asientos: ").append(reserva.getSeatCount()).append("\n");
+                info.append("  Horario: ").append(reserva.getStartTime().toLocalTime())
+                        .append(" - ").append(reserva.getEndTime().toLocalTime()).append("\n");
+                info.append("  ID Reserva: ").append(reserva.getId()).append("\n\n");
+                totalOcupados += reserva.getSeatCount();
+            }
+
+            info.append("Total ocupados: ").append(totalOcupados)
+                    .append("/").append(espacio.getCapacity());
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Reservas del Espacio");
+            alert.setHeaderText("Información de Reservas");
+            alert.setContentText(info.toString());
+
+            alert.getDialogPane().setPrefWidth(450);
+            alert.showAndWait();
+
+        } catch (Exception e) {
+            utilities.showAlert(Alert.AlertType.ERROR,
+                    "Error",
+                    "No se pudieron cargar las reservas: " + e.getMessage());
+        }
     }
 
     private void animarRebote(Node node) {

@@ -271,7 +271,10 @@ public class ReservationService {
         EntityManager em = DataBaseManager.getEntityManager();
         try {
             List<Reservation> reservations = em.createQuery(
-                    "SELECT r FROM Reservation r WHERE r.user.id = :userId ORDER BY r.dateCreated DESC",
+                    "SELECT r FROM Reservation r "
+                    + "JOIN FETCH r.space s "
+                    + "JOIN FETCH s.room "
+                    + "WHERE r.user.id = :userId ORDER BY r.dateCreated DESC",
                     Reservation.class)
                     .setParameter("userId", userId)
                     .getResultList();

@@ -123,6 +123,9 @@ public class UserViewWindowController {
             Reservation selectedReservation = tbvReservationTable.getSelectionModel().getSelectedItem();
             if (selectedReservation != null) {
                 cancelReservation(selectedReservation);
+            } else {
+                utilities.showAlert(Alert.AlertType.WARNING, "Advertencia",
+                        "Por favor seleccione una reservación para cancelar.");
             }
         });
 
@@ -131,8 +134,14 @@ public class UserViewWindowController {
         tbvReservationTable.setOnMouseClicked((MouseEvent event) -> {
             if (event.getButton() == MouseButton.SECONDARY) {
                 Reservation selectedItem = tbvReservationTable.getSelectionModel().getSelectedItem();
-                if (selectedItem != null) {
+                if (selectedItem != null && selectedItem.getId() != null && selectedItem.getId() > 0) {
                     contextMenu.show(tbvReservationTable, event.getScreenX(), event.getScreenY());
+                } else {
+                    contextMenu.hide();
+                    if (selectedItem == null) {
+                        utilities.showAlert(Alert.AlertType.WARNING, "Advertencia",
+                                "Por favor seleccione una reservación válida.");
+                    }
                 }
             } else {
                 contextMenu.hide();
@@ -141,35 +150,77 @@ public class UserViewWindowController {
     }
 
     private void cancelReservation(Reservation reservation) {
+        if (reservation == null) {
+            utilities.showAlert(Alert.AlertType.ERROR, "Error", "No se ha seleccionado una reservación válida.");
+            return;
+        }
+
+        if (reservation.getId() == null || reservation.getId() <= 0) {
+            utilities.showAlert(Alert.AlertType.ERROR, "Error", "La reservación seleccionada no tiene un ID válido.");
+            return;
+        }
 
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Confirmar Cancelación");
         confirmAlert.setHeaderText("¿Está seguro que desea cancelar esta reservación?");
-        confirmAlert.setContentText(
-                "Lugar: " + reservation.getPlace() + "\n"
-                + "Espacio: " + reservation.getSpaceName() + "\n"
-                + "Fecha: " + reservation.getDate() + "\n"
-                + "Hora: " + reservation.getStartTimeAux() + " - " + reservation.getEndTimeAux()
-        );
+
+        StringBuilder contentText = new StringBuilder();
+        contentText.append("ID: ").append(reservation.getId()).append("\n");
+
+        try {
+            if (reservation.getPlace() != null) {
+                contentText.append("Lugar: ").append(reservation.getPlace()).append("\n");
+            }
+        } catch (Exception e) {
+            contentText.append("Lugar: No disponible\n");
+        }
+
+        if (reservation.getSpaceName() != null) {
+            contentText.append("Espacio: ").append(reservation.getSpaceName()).append("\n");
+        }
+
+        if (reservation.getDate() != null) {
+            contentText.append("Fecha: ").append(reservation.getDate()).append("\n");
+        }
+
+        if (reservation.getStartTimeAux() != null && reservation.getEndTimeAux() != null) {
+            contentText.append("Hora: ").append(reservation.getStartTimeAux()).append(" - ").append(reservation.getEndTimeAux());
+        }
+
+        confirmAlert.setContentText(contentText.toString());
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
+                if (reservationService == null) {
+                    utilities.showAlert(Alert.AlertType.ERROR, "Error", "Servicio de reservaciones no disponible.");
+                    return;
+                }
+
                 boolean success = reservationService.cancelReservation(reservation.getId());
 
                 if (success) {
                     utilities.showAlert(Alert.AlertType.INFORMATION, "Éxito",
                             "La reservación ha sido cancelada exitosamente.");
-
                     loadUserReservations();
                 } else {
                     utilities.showAlert(Alert.AlertType.ERROR, "Error",
-                            "No se pudo cancelar la reservación. Inténtelo nuevamente.");
+                            "No se pudo cancelar la reservación. Puede que ya haya sido cancelada o no exista.");
                 }
+
+            } catch (IllegalArgumentException e) {
+                utilities.showAlert(Alert.AlertType.ERROR, "Error de Validación",
+                        "Datos de reservación inválidos: " + e.getMessage());
+
+            } catch (RuntimeException e) {
+                utilities.showAlert(Alert.AlertType.ERROR, "Error de Sistema",
+                        "Error en el sistema: " + e.getMessage());
+                e.printStackTrace();
+
             } catch (Exception e) {
                 utilities.showAlert(Alert.AlertType.ERROR, "Error",
-                        "Error al cancelar la reservación: " + e.getMessage());
+                        "Error inesperado al cancelar la reservación: " + e.getMessage());
                 e.printStackTrace();
             }
         }
