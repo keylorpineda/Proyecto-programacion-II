@@ -1,4 +1,4 @@
-package mapper;
+package Mapper;
 
 import Models.Space;
 import Dto.SpaceDTO;

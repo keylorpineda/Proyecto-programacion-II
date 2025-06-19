@@ -2,7 +2,7 @@ package Services;
 
 import Dto.RoomLayoutDTO;
 import Dto.SpaceDTO;
-import mapper.SpaceMapper;
+import Mapper.SpaceMapper;
 import java.util.List;
 import java.util.stream.Collectors;
 
